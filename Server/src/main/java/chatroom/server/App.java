@@ -1,10 +1,6 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package chatroom.server;
+
+import java.util.Set;
 
 /**
  *
@@ -17,14 +13,36 @@ public class App {
      */
     public static void main(String[] args) {
         DBHelper dbHelper = new DBHelper();
+
+        /**
+         * Open connection with database
+         */
         dbHelper.open();
-        // Success login
-        dbHelper.login("daniel", "qwerty");
 
-        // Failed login
-        dbHelper.login("daniel", "12345");
+        /**
+         * This is the login, so if the returned user is null login isn't succeed,
+         * otherwise it will return the user
+         */
+        User user = dbHelper.getUserByUserNameAndPassword("daniel", "qwerty");
+        if (user != null) {
+            System.out.println("Login succeed");
+        } else {
+            System.out.println("Login failed");
+        }
 
+        /**
+         * Show all users in database
+         */
+        Set<User> users = dbHelper.getAllUsers();
+        for (User u : users) {
+            System.out.println(u.getId() + " " + u.getUsername());
+        }
+
+        /**
+         * Close connection with database
+         */
         dbHelper.close();
+
     }
-    
+
 }

@@ -2,18 +2,21 @@ package chatroom.server;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import com.mysql.cj.jdbc.Driver;
 
 /**
  * @author daniel
  */
 public class DBHelper {
-    // JDBC driver name and database URL
-    private final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
     private final String DB_URL = "jdbc:mysql://sql2.freemysqlhosting.net/sql2264793";
 
     // Database credentials
@@ -25,7 +28,7 @@ public class DBHelper {
 
     public DBHelper() {
         try {
-            Class.forName(JDBC_DRIVER);
+            DriverManager.registerDriver(new Driver());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -49,30 +52,98 @@ public class DBHelper {
         }
     }
 
-    public boolean login(String username, String password) {
+    private User extractUserFromResultSet(ResultSet rs) throws SQLException {
+        User user = new User(null, null, null);
+        user.setId(rs.getInt("id"));
+        user.setUsername(rs.getString("username"));
+        user.setPassword(rs.getString("password"));
+        user.setState(rs.getInt("state"));
+        return user;
+    }
+
+    public User getUser(int id) {
         try {
-            String pass = null;
-            String sql;
-            sql = "SELECT password FROM `users` WHERE username = '" + username + "'";
-
-            ResultSet rs = stmt.executeQuery(sql);
-
+            ResultSet rs = stmt.executeQuery("SELECT * FROM users WHERE id=" + id);
             if (rs.next()) {
-                pass = rs.getString("password");
+                return extractUserFromResultSet(rs);
             }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return null;
+    }
 
-            rs.close();
+    public User getUserByUserNameAndPassword(String user, String pass) {
+        try {
+            PreparedStatement ps = conn.prepareStatement("SELECT * FROM users WHERE username=? AND password=?");
+            ps.setString(1, user);
+            ps.setString(2, pass);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return extractUserFromResultSet(rs);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return null;
+    }
 
-            if (password.equals(pass)) {
-                System.out.println("Login succeed");
+    public Set<User> getAllUsers() {
+        try {
+            ResultSet rs = stmt.executeQuery("SELECT * FROM users");
+            Set<User> users = new HashSet<User>();
+            while (rs.next()) {
+                User user = extractUserFromResultSet(rs);
+                users.add(user);
+            }
+            return users;
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return null;
+    }
+
+    public boolean insertUser(User user) {
+        try {
+            PreparedStatement ps = conn.prepareStatement("INSERT INTO users VALUES (NULL, ?, ?, ?)");
+            ps.setString(1, user.getUsername());
+            ps.setString(2, user.getPassword());
+            ps.setInt(3, user.getState());
+            int i = ps.executeUpdate();
+            if (i == 1) {
                 return true;
             }
         } catch (SQLException ex) {
-            Logger.getLogger(DBHelper.class.getName()).log(Level.SEVERE, null, ex);
+            ex.printStackTrace();
         }
+        return false;
+    }
 
-        System.out.println("Login failed");
+    public boolean updateUser(User user) {
+        try {
+            PreparedStatement ps = conn.prepareStatement("UPDATE users SET name=?, pass=?, age=? WHERE id=?");
+            ps.setString(1, user.getUsername());
+            ps.setString(2, user.getPassword());
+            ps.setInt(4, user.getId());
+            int i = ps.executeUpdate();
+            if (i == 1) {
+                return true;
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return false;
+    }
 
+    public boolean deleteUser(int id) {
+        try {
+            int i = stmt.executeUpdate("DELETE FROM users WHERE id=" + id);
+            if (i == 1) {
+                return true;
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
         return false;
     }
 }

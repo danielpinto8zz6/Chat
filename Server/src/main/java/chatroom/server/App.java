@@ -12,7 +12,17 @@ public class App {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+        /**
+         * Start dbHelper with default values
+         */
         DBHelper dbHelper = new DBHelper("sql2264793", "jG1%xX8!", "sql2.freemysqlhosting.net", "sql2264793");
+
+        if (args.length > 3) {
+            dbHelper.setUsername(args[0]);
+            dbHelper.setPassword(args[1]);
+            dbHelper.setServer(args[2]);
+            dbHelper.setDatabase(args[3]);
+        }
 
         /**
          * Open connection with database

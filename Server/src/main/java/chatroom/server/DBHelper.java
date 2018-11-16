@@ -49,6 +49,34 @@ public class DBHelper {
         }
     }
 
+    /**
+     * @param database the database to set
+     */
+    public void setDatabase(String database) {
+        this.database = database;
+    }
+
+    /**
+     * @param server the server to set
+     */
+    public void setServer(String server) {
+        this.server = server;
+    }
+
+    /**
+     * @param username the username to set
+     */
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    /**
+     * @param password the password to set
+     */
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     public void close() {
         try {
             stmt.close();

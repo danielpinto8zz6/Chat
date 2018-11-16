@@ -17,16 +17,22 @@ import com.mysql.cj.jdbc.Driver;
  * @author daniel
  */
 public class DBHelper {
-    private final String DB_URL = "jdbc:mysql://sql2.freemysqlhosting.net/sql2264793";
+    private final String DB_PREFIX = "jdbc:mysql://";
 
-    // Database credentials
-    private static final String USER = "sql2264793";
-    private static final String PASS = "jG1%xX8!";
+    private String username;
+    private String password;
+    private String server;
+    private String database;
 
     private Connection conn = null;
     private Statement stmt = null;
 
-    public DBHelper() {
+    public DBHelper(String username, String password, String server, String database) {
+        this.username = username;
+        this.password = password;
+        this.server = server;
+        this.database = database;
+
         try {
             DriverManager.registerDriver(new Driver());
         } catch (Exception e) {
@@ -36,7 +42,7 @@ public class DBHelper {
 
     public void open() {
         try {
-            conn = DriverManager.getConnection(DB_URL, USER, PASS);
+            conn = DriverManager.getConnection(DB_PREFIX + server + "/" + database, username, password);
             stmt = conn.createStatement();
         } catch (SQLException ex) {
             Logger.getLogger(DBHelper.class.getName()).log(Level.SEVERE, null, ex);

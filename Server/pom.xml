@@ -20,40 +20,40 @@
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
     <build>
-    <plugins>
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-dependency-plugin</artifactId>
-            <executions>
-                <execution>
-                    <id>copy</id>
-                    <phase>package</phase>
-                    <goals>
-                        <goal>copy-dependencies</goal>
-                    </goals>
-                    <configuration>
-                        <outputDirectory>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>
                             ${project.build.directory}/lib
-                        </outputDirectory>
-                    </configuration>
-                </execution>
-            </executions>
-        </plugin>
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-jar-plugin</artifactId>
+                            </outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
                 <version>3.1.0</version>
-            <configuration>
-                <archive>
-                    <manifest>
-                        <addClasspath>true</addClasspath>
-                        <classpathPrefix>lib/</classpathPrefix>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>lib/</classpathPrefix>
 
-                  <mainClass>chatroom.server.App</mainClass>
-                    </manifest>
-                </archive>
-            </configuration>
-        </plugin>
-    </plugins>
-</build>
+                            <mainClass>chatroom.server.App</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

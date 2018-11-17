@@ -1,5 +1,7 @@
 package chatroom.server;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Set;
 
 /**
@@ -12,6 +14,14 @@ public class App {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+
+        try {
+            InetAddress IP = InetAddress.getLocalHost();
+            System.out.println("IP of my system is := " + IP.getHostAddress());
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+		}
+
         /**
          * Start dbHelper with default values
          */

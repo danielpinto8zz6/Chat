@@ -1,9 +1,15 @@
 package chatroom.server;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Set;
-
 /**
  *
  * @author daniel
@@ -15,8 +21,11 @@ public class App {
      */
     public static void main(String[] args) {
 
+        InetAddress IP;
+        int port;
+        
         try {
-            InetAddress IP = InetAddress.getLocalHost();
+            IP = InetAddress.getLocalHost();
             System.out.println("IP of my system is := " + IP.getHostAddress());
         } catch (UnknownHostException e) {
             e.printStackTrace();
@@ -57,6 +66,44 @@ public class App {
         for (User u : users) {
             System.out.println(u.getId() + " " + u.getUsername());
         }
+        
+        
+        Socket toClient;
+        ServerSocket ss = null;
+        DatagramSocket ds = null;
+        DatagramPacket dpk;
+        ByteArrayOutputStream bout;
+        ObjectOutputStream oout;
+        
+        try{
+            
+            System.out.println("Vou mandar o meu porto para o cliente!\n");
+            
+            ss = new ServerSocket(0);
+            
+            bout = new ByteArrayOutputStream();
+            oout = new ObjectOutputStream(bout);
+            oout.writeObject(ss.getLocalPort());
+            oout.flush();
+            
+            dpk = new DatagramPacket(bout.toByteArray(), bout.size(), InetAddress.getByName("255.255.255.255"), 5001);
+            ds = new DatagramSocket();
+            ds.send(dpk);
+            
+            System.out.println("A aguardar a resposta do Cliente");
+            
+            try{
+                while(true){
+                    toClient = ss.accept();
+                    System.out.println("Recebi uma resposta!");
+                }
+            }catch(IOException ex){
+                System.out.println("Erro ao aceder ao socket!");
+            }
+        } catch (IOException ex) {
+            System.out.println("Nao consegui abrir o socket!");
+        }
+        
 
         /**
          * Close connection with database

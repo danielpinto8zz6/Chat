@@ -29,8 +29,8 @@ public class ChatClient {
         // Layout GUI
         textField.setEditable(false);
         messageArea.setEditable(false);
-        frame.getContentPane().add(textField, "North");
         frame.getContentPane().add(new JScrollPane(messageArea), "Center");
+        frame.getContentPane().add(textField, "South");
         frame.pack();
 
         // Add Listeners

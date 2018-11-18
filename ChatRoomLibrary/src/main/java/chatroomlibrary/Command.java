@@ -2,7 +2,7 @@ package chatroomlibrary;
 
 import java.io.Serializable;
 
-public class Message implements Serializable {
+public class Command implements Serializable {
     private static final long serialVersionUID = 1L;
 
     public enum Action {
@@ -14,21 +14,21 @@ public class Message implements Serializable {
     private String password = null;
     private Action action;
 
-    public Message(String text) {
+    public Command(String text) {
         this.action = Action.MESSAGE;
         this.setText(text);
     }
 
-    public Message(Action action) {
+    public Command(Action action) {
         this.action = action;
     }
 
-    public Message(Action action, String text) {
+    public Command(Action action, String text) {
         this.setAction(action);
         this.setText(text);
     }
 
-    public Message(Action action, String username, String password) {
+    public Command(Action action, String username, String password) {
         this.setAction(action);
         this.setUsername(username);
         this.setPassword(password);

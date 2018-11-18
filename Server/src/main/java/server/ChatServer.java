@@ -1,6 +1,6 @@
 package server;
 
-import chatroomlibrary.Message;
+import chatroomlibrary.Command;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -8,7 +8,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashSet;
 
-import chatroomlibrary.Message.Action;
+import chatroomlibrary.Command.Action;
 
 public class ChatServer {
     /**
@@ -76,14 +76,14 @@ public class ChatServer {
                 in = new ObjectInputStream(socket.getInputStream());
 
                 while (true) {
-                    out.writeObject(new Message(Message.Action.REQUEST_LOGIN));
+                    out.writeObject(new Command(Command.Action.REQUEST_LOGIN));
                     out.flush();
 
                     System.out.println("Sending login request");
 
-                    Message message = (Message) in.readObject();
+                    Command message = (Command) in.readObject();
 
-                    if (message.getAction() != Message.Action.LOGIN || message.getUsername() == null) {
+                    if (message.getAction() != Command.Action.LOGIN || message.getUsername() == null) {
                         return;
                     }
 
@@ -97,7 +97,7 @@ public class ChatServer {
                             }
                         }
                     } else {
-                        out.writeObject(new Message(Message.Action.LOGIN_FAILED));
+                        out.writeObject(new Command(Command.Action.LOGIN_FAILED));
                         out.flush();
                     }
                 }
@@ -105,20 +105,20 @@ public class ChatServer {
                 // Now that a successful name has been chosen, add the
                 // socket's print writer to the set of all writers so
                 // this client can receive broadcast messages.
-                out.writeObject(new Message(Action.LOGGED));
+                out.writeObject(new Command(Action.LOGGED));
                 out.flush();
                 outputs.add(out);
 
                 // Accept messages from this client and broadcast them.
                 // Ignore other clients that cannot be broadcasted to.
                 while (true) {
-                    Message message = (Message) in.readObject();
+                    Command message = (Command) in.readObject();
                     if (message.getAction() != Action.MESSAGE || message.getText() == null) {
                         return;
                     }
 
                     for (ObjectOutputStream output : outputs) {
-                        output.writeObject(new Message("MESSAGE " + user.getUsername() + ": " + message.getText()));
+                        output.writeObject(new Command("MESSAGE " + user.getUsername() + ": " + message.getText()));
                     }
                 }
             } catch (IOException | ClassNotFoundException e) {

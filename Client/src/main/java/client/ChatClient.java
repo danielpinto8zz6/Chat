@@ -1,6 +1,6 @@
 package client;
 
-import chatroomlibrary.Message;
+import chatroomlibrary.Command;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -42,7 +42,7 @@ public class ChatClient {
              */
             public void actionPerformed(ActionEvent e) {
                 try {
-                    out.writeObject(new Message(textField.getText()));
+                    out.writeObject(new Command(textField.getText()));
                     out.flush();
                 } catch (IOException e1) {
                     e1.printStackTrace();
@@ -60,14 +60,14 @@ public class ChatClient {
                 JOptionPane.QUESTION_MESSAGE);
     }
 
-    private Message getLogin() {
+    private Command getLogin() {
         JTextField username = new JTextField();
         JTextField password = new JPasswordField();
         Object[] message = { "Username:", username, "Password:", password };
 
         int option = JOptionPane.showConfirmDialog(null, message, "Login", JOptionPane.OK_CANCEL_OPTION);
         if (option == JOptionPane.OK_OPTION) {
-            return new Message(Message.Action.LOGIN, username.getText(), password.getText());
+            return new Command(Command.Action.LOGIN, username.getText(), password.getText());
         }
 
         return null;
@@ -90,7 +90,7 @@ public class ChatClient {
                 out = new ObjectOutputStream(socket.getOutputStream());
 
                 while (true) {
-                    Message message = (Message) in.readObject();
+                    Command message = (Command) in.readObject();
 
                     switch (message.getAction()) {
                     case REQUEST_LOGIN:

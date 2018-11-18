@@ -1,4 +1,4 @@
-package server;
+package chatroomlibrary;
 
 import java.io.Serializable;
 

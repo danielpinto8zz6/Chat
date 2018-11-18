@@ -1,5 +1,6 @@
 package client;
 
+import chatroomlibrary.Message;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -13,8 +14,6 @@ import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-
-import server.Message;
 
 public class ChatClient {
 

@@ -8,23 +8,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashSet;
 
-/**
- * A multithreaded chat room server. When a client connects the server requests
- * a screen name by sending the client the text "SUBMITNAME", and keeps
- * requesting a name until a unique one is received. After a client submits a
- * unique name, the server acknowledges with "NAMEACCEPTED". Then all messages
- * from that client will be broadcast to all other clients that have submitted a
- * unique screen name. The broadcast messages are prefixed with "MESSAGE ".
- *
- * Because this is just a teaching example to illustrate a simple chat server,
- * there are a few features that have been left out. Two are very useful and
- * belong in production code:
- *
- * 1. The protocol should be enhanced so that the client can send clean
- * disconnect messages to the server.
- *
- * 2. The server should do some logging.
- */
 public class ChatServer {
     /**
      * The set of all names of clients in the chat room. Maintained so that we can
@@ -57,7 +40,7 @@ public class ChatServer {
     }
 
     /**
-     * A handler thread class. Handlers are spawned from the listening loop and are
+     * A handler runnable class. Handlers are spawned from the listening loop and are
      * responsible for a dealing with a single client and broadcasting its messages.
      */
     private class Handler implements Runnable {
@@ -84,14 +67,9 @@ public class ChatServer {
         public void run() {
             try {
 
-                // Create character streams for the socket.
                 in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 out = new PrintWriter(socket.getOutputStream(), true);
 
-                // Request a name from this client. Keep requesting until
-                // a name is submitted that is not already used. Note that
-                // checking for the existence of a name and adding the name
-                // must be done while locking the set of names.
                 while (true) {
                     out.println("SUBMITNAME");
                     name = in.readLine();

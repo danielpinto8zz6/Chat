@@ -38,14 +38,12 @@ public class ChatServer {
      */
     private static HashSet<PrintWriter> writers = new HashSet<PrintWriter>();
 
-    private ServerSocket serverSocket;
-
     public ChatServer(ServerSocket serverSocket) {
-        this.serverSocket = serverSocket;
-
         try {
             while (true) {
-                new Handler(serverSocket.accept()).start();
+                Thread thread = new Thread(new Handler(serverSocket.accept()));
+                thread.start();
+                System.out.println("Thread started");
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -62,7 +60,7 @@ public class ChatServer {
      * A handler thread class. Handlers are spawned from the listening loop and are
      * responsible for a dealing with a single client and broadcasting its messages.
      */
-    private static class Handler extends Thread {
+    private class Handler implements Runnable {
         private String name;
         private BufferedReader in;
         private PrintWriter out;
@@ -82,6 +80,7 @@ public class ChatServer {
          * output stream for the client in a global set, then repeatedly gets inputs and
          * broadcasts them.
          */
+        @Override
         public void run() {
             try {
 

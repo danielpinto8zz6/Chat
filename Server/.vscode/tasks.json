@@ -23,7 +23,7 @@
             "label": "run",
             "type": "shell",
             "dependsOn": "package",
-            "command": "java -cp target/Server-1.0-SNAPSHOT.jar chatroom.server.App",
+            "command": "java -jar target/Server-1.0-SNAPSHOT.jar",
         }
     ]
 }

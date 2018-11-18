@@ -1,4 +1,4 @@
-package chatroom.server;
+package server;
 
 public class User {
     public static final int LOGGED = 0;

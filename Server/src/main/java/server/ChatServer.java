@@ -1,25 +1,26 @@
-package chatroom.server;
+package server;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashSet;
+
+import server.Message.Action;
 
 public class ChatServer {
     /**
      * The set of all names of clients in the chat room. Maintained so that we can
      * check that new clients are not registering name already in use.
      */
-    private static HashSet<String> names = new HashSet<String>();
+    private static HashSet<String> usernames = new HashSet<String>();
 
     /**
-     * The set of all the print writers for all the clients. This set is kept so we
-     * can easily broadcast messages.
+     * The set of all the outputs for all the clients. This set is kept so we can
+     * easily broadcast messages.
      */
-    private static HashSet<PrintWriter> writers = new HashSet<PrintWriter>();
+    private static HashSet<ObjectOutputStream> outputs = new HashSet<ObjectOutputStream>();
 
     public ChatServer(ServerSocket serverSocket) {
         try {
@@ -40,18 +41,19 @@ public class ChatServer {
     }
 
     /**
-     * A handler runnable class. Handlers are spawned from the listening loop and are
-     * responsible for a dealing with a single client and broadcasting its messages.
+     * A handler runnable class. Handlers are spawned from the listening loop and
+     * are responsible for a dealing with a single client and broadcasting its
+     * messages.
      */
     private class Handler implements Runnable {
-        private String name;
-        private BufferedReader in;
-        private PrintWriter out;
+        private String username;
+        ObjectOutputStream out = null;
+        ObjectInputStream in = null;
         private Socket socket;
 
         /**
-         * Constructs a handler thread, squirreling away the socket.
-         * All the interesting work is done in the run method.
+         * Constructs a handler thread, squirreling away the socket. All the interesting
+         * work is done in the run method.
          */
         public Handler(Socket socket) {
             this.socket = socket;
@@ -66,19 +68,26 @@ public class ChatServer {
         @Override
         public void run() {
             try {
-
-                in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                out = new PrintWriter(socket.getOutputStream(), true);
-
+                out = new ObjectOutputStream(socket.getOutputStream());
+                in = new ObjectInputStream(socket.getInputStream());
+                
                 while (true) {
-                    out.println("SUBMITNAME");
-                    name = in.readLine();
-                    if (name == null) {
+                    out.writeObject(new Message(Message.Action.REQUEST_LOGIN));
+                    out.flush();
+
+                    System.out.println("Sending login request");
+
+                    Message message = (Message) in.readObject();
+
+                    if (message.getUsername() == null) {
                         return;
                     }
-                    synchronized (names) {
-                        if (!names.contains(name)) {
-                            names.add(name);
+
+                    username = message.getUsername();
+
+                    synchronized (usernames) {
+                        if (!usernames.contains(username)) {
+                            usernames.add(username);
                             break;
                         }
                     }
@@ -87,30 +96,32 @@ public class ChatServer {
                 // Now that a successful name has been chosen, add the
                 // socket's print writer to the set of all writers so
                 // this client can receive broadcast messages.
-                out.println("NAMEACCEPTED");
-                writers.add(out);
+                out.writeObject(new Message(Action.LOGGED));
+                out.flush();
+                outputs.add(out);
 
                 // Accept messages from this client and broadcast them.
                 // Ignore other clients that cannot be broadcasted to.
                 while (true) {
-                    String input = in.readLine();
-                    if (input == null) {
+                    Message message = (Message) in.readObject();
+                    if (message.getAction() != Action.MESSAGE || message.getText() == null) {
                         return;
                     }
-                    for (PrintWriter writer : writers) {
-                        writer.println("MESSAGE " + name + ": " + input);
+
+                    for (ObjectOutputStream output : outputs) {
+                        output.writeObject(new Message("MESSAGE " + username + ": " + message.getText()));
                     }
                 }
-            } catch (IOException e) {
+            } catch (IOException | ClassNotFoundException e) {
                 System.out.println(e);
             } finally {
                 // This client is going down! Remove its name and its print
                 // writer from the sets, and close its socket.
-                if (name != null) {
-                    names.remove(name);
+                if (username != null) {
+                    usernames.remove(username);
                 }
                 if (out != null) {
-                    writers.remove(out);
+                    outputs.remove(out);
                 }
                 try {
                     socket.close();

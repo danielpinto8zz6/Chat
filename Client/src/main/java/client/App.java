@@ -1,4 +1,4 @@
-package chatroom.client;
+package client;
 
 import javax.swing.JFrame;
 

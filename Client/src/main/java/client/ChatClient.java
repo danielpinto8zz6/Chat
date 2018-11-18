@@ -1,23 +1,25 @@
-package chatroom.client;
+package client;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
+import server.Message;
+
 public class ChatClient {
 
-    BufferedReader in;
-    PrintWriter out;
+    ObjectOutputStream out = null;
+    ObjectInputStream in = null;
     JFrame frame = new JFrame("Chatter");
     JTextField textField = new JTextField(40);
     JTextArea messageArea = new JTextArea(8, 40);
@@ -40,7 +42,12 @@ public class ChatClient {
              * the next message.
              */
             public void actionPerformed(ActionEvent e) {
-                out.println(textField.getText());
+                try {
+                    out.writeObject(new Message(textField.getText()));
+                    out.flush();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
                 textField.setText("");
             }
         });
@@ -54,12 +61,18 @@ public class ChatClient {
                 JOptionPane.QUESTION_MESSAGE);
     }
 
-    /**
-     * Prompt for and return the desired screen name.
-     */
-    private String getName() {
-        return JOptionPane.showInputDialog(frame, "Choose a screen name:", "Screen name selection",
-                JOptionPane.PLAIN_MESSAGE);
+    private Message getLogin() {
+        JTextField username = new JTextField();
+        JTextField password = new JPasswordField();
+        Object[] message = { "Username:", username, "Password:", password };
+
+        int option = JOptionPane.showConfirmDialog(null, message, "Login", JOptionPane.OK_CANCEL_OPTION);
+        if (option == JOptionPane.OK_OPTION) {
+            return new Message(Message.Action.LOGIN, username.getText(), password.getText());
+        }
+
+        return null;
+
     }
 
     public void start() {
@@ -74,25 +87,32 @@ public class ChatClient {
             Socket socket = null;
             try {
                 socket = new Socket(serverAddress, 9001);
-                in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                out = new PrintWriter(socket.getOutputStream(), true);
+                in = new ObjectInputStream(socket.getInputStream());
+                out = new ObjectOutputStream(socket.getOutputStream());
 
                 while (true) {
-                    String line;
-                    line = in.readLine();
-                    if (line.startsWith("SUBMITNAME")) {
-                        out.println(getName());
-                    } else if (line.startsWith("NAMEACCEPTED")) {
+                    Message message = (Message) in.readObject();
+
+                    switch (message.getAction()) {
+                    case REQUEST_LOGIN:
+                        out.writeObject(getLogin());
+                        out.flush();
+                        break;
+                    case LOGGED:
                         textField.setEditable(true);
-                    } else if (line.startsWith("MESSAGE")) {
-                        messageArea.append(line.substring(8) + "\n");
+                        break;
+                    case MESSAGE:
+                        messageArea.append(message.getText().substring(8) + "\n");
+                        break;
                     }
                 }
-            } catch (IOException e) {
+            } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
             } finally {
                 try {
                     socket.close();
+                    out.close();
+                    in.close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

@@ -48,37 +48,18 @@ public class App {
          */
         dbHelper.open();
 
-        /**
-         * This is the login, so if the returned user is null login isn't succeed,
-         * otherwise it will return the user
-         */
-        User user = dbHelper.getUserByUserNameAndPassword("daniel", "qwerty");
-        if (user != null) {
-            System.out.println("Login succeed");
-        } else {
-            System.out.println("Login failed");
-        }
+        System.out.println("The chat server is running.");
 
-        /**
-         * Show all users in database
-         */
-        Set<User> users = dbHelper.getAllUsers();
-        for (User u : users) {
-            System.out.println(u.getId() + " " + u.getUsername());
+        try {
+            new ChatServer(new ServerSocket(PORT), dbHelper);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         /**
          * Close connection with database
          */
         dbHelper.close();
-
-        System.out.println("The chat server is running.");
-
-        try {
-            new ChatServer(new ServerSocket(PORT));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
 }

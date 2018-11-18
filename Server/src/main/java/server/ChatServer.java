@@ -15,7 +15,7 @@ public class ChatServer {
      * The set of all names of clients in the chat room. Maintained so that we can
      * check that new clients are not registering name already in use.
      */
-    private static HashSet<String> usernames = new HashSet<String>();
+    private static HashSet<User> users = new HashSet<User>();
 
     /**
      * The set of all the outputs for all the clients. This set is kept so we can
@@ -23,12 +23,15 @@ public class ChatServer {
      */
     private static HashSet<ObjectOutputStream> outputs = new HashSet<ObjectOutputStream>();
 
-    public ChatServer(ServerSocket serverSocket) {
+    private DBHelper dbHelper;
+
+    public ChatServer(ServerSocket serverSocket, DBHelper dbHelper) {
+        this.dbHelper = dbHelper;
+
         try {
             while (true) {
                 Thread thread = new Thread(new Handler(serverSocket.accept()));
                 thread.start();
-                System.out.println("Thread started");
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -47,7 +50,7 @@ public class ChatServer {
      * messages.
      */
     private class Handler implements Runnable {
-        private String username;
+        private User user;
         ObjectOutputStream out = null;
         ObjectInputStream in = null;
         private Socket socket;
@@ -84,13 +87,18 @@ public class ChatServer {
                         return;
                     }
 
-                    username = message.getUsername();
+                    user = login(message.getUsername(), message.getPassword());
 
-                    synchronized (usernames) {
-                        if (!usernames.contains(username)) {
-                            usernames.add(username);
-                            break;
+                    if (user != null) {
+                        synchronized (users) {
+                            if (!users.contains(user)) {
+                                users.add(user);
+                                break;
+                            }
                         }
+                    } else {
+                        out.writeObject(new Message(Message.Action.LOGIN_FAILED));
+                        out.flush();
                     }
                 }
 
@@ -110,7 +118,7 @@ public class ChatServer {
                     }
 
                     for (ObjectOutputStream output : outputs) {
-                        output.writeObject(new Message("MESSAGE " + username + ": " + message.getText()));
+                        output.writeObject(new Message("MESSAGE " + user.getUsername() + ": " + message.getText()));
                     }
                 }
             } catch (IOException | ClassNotFoundException e) {
@@ -118,8 +126,8 @@ public class ChatServer {
             } finally {
                 // This client is going down! Remove its name and its print
                 // writer from the sets, and close its socket.
-                if (username != null) {
-                    usernames.remove(username);
+                if (user != null) {
+                    users.remove(user);
                 }
                 if (out != null) {
                     outputs.remove(out);
@@ -129,6 +137,10 @@ public class ChatServer {
                 } catch (IOException e) {
                 }
             }
+        }
+
+        public User login(String username, String password) {
+            return dbHelper.getUserByUserNameAndPassword(username, password);
         }
     }
 }

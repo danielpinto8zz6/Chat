@@ -103,6 +103,9 @@ public class ChatClient {
                     case MESSAGE:
                         messageArea.append(message.getText().substring(8) + "\n");
                         break;
+                    case LOGIN_FAILED:
+                        JOptionPane.showMessageDialog(frame, "Login failed!");
+                        break;
                     }
                 }
             } catch (IOException | ClassNotFoundException e) {

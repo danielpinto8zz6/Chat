@@ -6,7 +6,7 @@ public class Message implements Serializable {
     private static final long serialVersionUID = 1L;
 
     public enum Action {
-        REQUEST_LOGIN, LOGIN, LOGGED, MESSAGE
+        REQUEST_LOGIN, LOGIN, LOGGED, LOGIN_FAILED, MESSAGE
     }
 
     private String text = null;

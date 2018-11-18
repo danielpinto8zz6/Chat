@@ -1,7 +1,5 @@
 package chatroom.client;
 
-import java.io.IOException;
-
 import javax.swing.JFrame;
 
 /**
@@ -16,11 +14,7 @@ public class App {
         ChatClient client = new ChatClient();
         client.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         client.frame.setVisible(true);
-        try {
-            client.run();
-        } catch (IOException e) {
-			e.printStackTrace();
-		}
+        client.start();
     }
 
 }

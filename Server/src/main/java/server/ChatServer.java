@@ -71,7 +71,7 @@ public class ChatServer {
             try {
                 out = new ObjectOutputStream(socket.getOutputStream());
                 in = new ObjectInputStream(socket.getInputStream());
-                
+
                 while (true) {
                     out.writeObject(new Message(Message.Action.REQUEST_LOGIN));
                     out.flush();
@@ -80,7 +80,7 @@ public class ChatServer {
 
                     Message message = (Message) in.readObject();
 
-                    if (message.getUsername() == null) {
+                    if (message.getAction() != Message.Action.LOGIN || message.getUsername() == null) {
                         return;
                     }
 

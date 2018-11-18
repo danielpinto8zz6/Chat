@@ -106,6 +106,8 @@ public class ChatClient {
                     case LOGIN_FAILED:
                         JOptionPane.showMessageDialog(frame, "Login failed!");
                         break;
+                    default:
+                        break;
                     }
                 }
             } catch (IOException | ClassNotFoundException e) {

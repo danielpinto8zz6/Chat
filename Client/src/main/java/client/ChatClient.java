@@ -1,6 +1,5 @@
 package client;
 
-import chatroomlibrary.Command;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -15,6 +14,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
+import chatroomlibrary.Message;
+
 public class ChatClient {
 
     ObjectOutputStream out = null;
@@ -23,6 +24,7 @@ public class ChatClient {
     JTextField textField = new JTextField(40);
     JTextArea messageArea = new JTextArea(8, 40);
     private Thread thread;
+    private String username = "User";
 
     public ChatClient() {
 
@@ -42,7 +44,7 @@ public class ChatClient {
              */
             public void actionPerformed(ActionEvent e) {
                 try {
-                    out.writeObject(new Command(textField.getText()));
+                    out.writeObject(new Message(username, textField.getText()));
                     out.flush();
                 } catch (IOException e1) {
                     e1.printStackTrace();
@@ -60,14 +62,14 @@ public class ChatClient {
                 JOptionPane.QUESTION_MESSAGE);
     }
 
-    private Command getLogin() {
+    private Message getLogin() {
         JTextField username = new JTextField();
         JTextField password = new JPasswordField();
         Object[] message = { "Username:", username, "Password:", password };
 
         int option = JOptionPane.showConfirmDialog(null, message, "Login", JOptionPane.OK_CANCEL_OPTION);
         if (option == JOptionPane.OK_OPTION) {
-            return new Command(Command.Action.LOGIN, username.getText(), password.getText());
+            return new Message(Message.Action.LOGIN, username.getText(), password.getText());
         }
 
         return null;
@@ -90,7 +92,7 @@ public class ChatClient {
                 out = new ObjectOutputStream(socket.getOutputStream());
 
                 while (true) {
-                    Command message = (Command) in.readObject();
+                    Message message = (Message) in.readObject();
 
                     switch (message.getAction()) {
                     case REQUEST_LOGIN:
@@ -99,9 +101,10 @@ public class ChatClient {
                         break;
                     case LOGGED:
                         textField.setEditable(true);
+                        username = message.getUsername();
                         break;
                     case MESSAGE:
-                        messageArea.append(message.getText().substring(8) + "\n");
+                        messageArea.append(message.getUsername () + " : " + message.getText() + "\n");
                         break;
                     case LOGIN_FAILED:
                         JOptionPane.showMessageDialog(frame, "Login failed!");

@@ -1,5 +1,6 @@
 package server;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -121,8 +122,12 @@ public class ChatServer {
                         output.writeObject(new Message(user.getUsername(), message.getText()));
                     }
                 }
-            } catch (IOException | ClassNotFoundException e) {
-                System.out.println(e);
+            } catch (EOFException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
             } finally {
                 // This client is going down! Remove its name and its print
                 // writer from the sets, and close its socket.
@@ -133,8 +138,11 @@ public class ChatServer {
                     outputs.remove(out);
                 }
                 try {
+                    out.close();
+                    in.close();
                     socket.close();
                 } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
         }

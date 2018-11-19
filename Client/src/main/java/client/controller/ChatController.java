@@ -68,7 +68,9 @@ public class ChatController {
                         break;
                     }
                 }
-            } catch (IOException | ClassNotFoundException e) {
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             } finally {
                 try {

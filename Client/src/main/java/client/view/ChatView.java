@@ -1,9 +1,12 @@
 package client.view;
 
+import java.awt.GridLayout;
 import java.time.format.DateTimeFormatter;
 
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -43,16 +46,30 @@ public class ChatView {
     }
 
     public Message getLogin() {
-        JTextField username = new JTextField();
-        JTextField password = new JPasswordField();
-        Object[] message = { "Username:", username, "Password:", password };
+        JPanel panel = new JPanel(new GridLayout(2, 2));
 
-        int option = JOptionPane.showConfirmDialog(null, message, "Login", JOptionPane.OK_CANCEL_OPTION);
-        if (option == JOptionPane.OK_OPTION) {
-            return new Message(Message.Action.LOGIN, username.getText(), password.getText());
-        }
+        final JTextField username = new JTextField(10);
+        final JPasswordField password = new JPasswordField(10);
 
-        return null;
+        panel.add(new JLabel("Username"));
+        panel.add(username);
+        panel.add(new JLabel("Password"));
+        panel.add(password);
+
+        JOptionPane pane = new JOptionPane(panel, JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE) {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public void selectInitialValue() {
+                username.requestFocusInWindow();
+            }
+        };
+
+        pane.createDialog(null, "Login").setVisible(true);
+
+        return username.getText().length() > 0 && password.getPassword().length > 0
+                ? new Message(Message.Action.LOGIN, username.getText(), new String(password.getPassword()))
+                : null;
     }
 
     public void setEditable() {

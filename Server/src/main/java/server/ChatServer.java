@@ -81,7 +81,7 @@ public class ChatServer {
 
                     Message message = (Message) in.readObject();
 
-                    if (message.getAction() != Message.Action.LOGIN || message.getUsername() == null) {
+                    if (message == null || message.getAction() != Message.Action.LOGIN || message.getUsername() == null) {
                         return;
                     }
 

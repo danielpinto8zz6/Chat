@@ -51,7 +51,7 @@ public class App {
         System.out.println("The chat server is running.");
 
         try {
-            new ChatServer(new ServerSocket(PORT), dbHelper);
+            new ChatServer(new ServerSocket(PORT), dbHelper).run();
         } catch (IOException e) {
             e.printStackTrace();
         }

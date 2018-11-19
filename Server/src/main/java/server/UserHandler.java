@@ -1,14 +1,13 @@
 package server;
 
-import java.io.EOFException;
 import java.io.IOException;
 
 import chatroomlibrary.Message;
 
-public class UserHandler implements Runnable {
+class UserHandler implements Runnable {
 
-    private Server server;
-    private User user;
+    private final Server server;
+    private final User user;
 
     public UserHandler(Server server, User user) {
         this.server = server;
@@ -23,11 +22,7 @@ public class UserHandler implements Runnable {
             while ((message = (Message) this.user.getObjectInputStream().readObject()) != null) {
                 server.broadcastMessages(message);
             }
-        } catch (EOFException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (ClassNotFoundException | IOException e) {
             e.printStackTrace();
         }
         // end of Thread

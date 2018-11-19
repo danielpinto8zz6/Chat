@@ -118,7 +118,7 @@ public class ChatView extends Thread {
         appendToPane(jtextFilDiscu, "<h4>Welcome:</h4>");
     }
 
-    public void appendToPane(JTextPane tp, String msg) {
+    private void appendToPane(JTextPane tp, String msg) {
         HTMLDocument doc = (HTMLDocument) tp.getDocument();
         HTMLEditorKit editorKit = (HTMLEditorKit) tp.getEditorKit();
         try {
@@ -155,14 +155,6 @@ public class ChatView extends Thread {
 
     public void showMessage(String text) {
         JOptionPane.showMessageDialog(null, text);
-    }
-
-    public JTextPane getJtextFilDiscu() {
-        return this.jtextFilDiscu;
-    }
-
-    public JTextPane getJtextListUsers() {
-        return this.jtextListUsers;
     }
 
     public JTextField getJtextInputChat() {

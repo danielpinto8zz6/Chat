@@ -8,13 +8,13 @@ public class Chat {
     private String host;
     private int Port;
 
-    private ArrayList<String> history;
+    private final ArrayList<String> history;
 
     public Chat() {
         this.setHost("localhost");
         this.username = "User";
         this.setPort(9001);
-        history = new ArrayList<String>();
+        history = new ArrayList<>();
     }
 
     /**

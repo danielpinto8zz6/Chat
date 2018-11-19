@@ -1,12 +1,9 @@
 package server;
 
-import java.io.IOException;
-
 /**
- *
  * @author daniel
  */
-public class App {
+class App {
 
     /**
      * The port that the server listens on.
@@ -17,14 +14,7 @@ public class App {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-
-        try {
-            new Server(PORT).run();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+        new Server(PORT).run();
     }
 
 }

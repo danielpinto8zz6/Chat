@@ -5,11 +5,11 @@ import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-public class TextListener implements DocumentListener {
-    JTextField jtf1;
-    JTextField jtf2;
-    JTextField jtf3;
-    JButton jcbtn;
+class TextListener implements DocumentListener {
+    private final JTextField jtf1;
+    private final JTextField jtf2;
+    private final JTextField jtf3;
+    private final JButton jcbtn;
 
     public TextListener(JTextField jtf1, JTextField jtf2, JTextField jtf3, JButton jcbtn) {
         this.jtf1 = jtf1;

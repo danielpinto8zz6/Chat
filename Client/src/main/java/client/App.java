@@ -5,10 +5,9 @@ import client.model.Chat;
 import client.view.ChatView;
 
 /**
- *
  * @author daniel
  */
-public class App {
+class App {
     /**
      * @param args the command line arguments
      */

@@ -1,7 +1,5 @@
 package client.controller;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
@@ -15,11 +13,11 @@ import client.model.Chat;
 import client.view.ChatView;
 
 public class ChatController {
-    public Chat model;
-    public ChatView view;
+    private final Chat model;
+    private final ChatView view;
 
-    Socket server = null;
-    ObjectOutputStream out = null;
+    private Socket server = null;
+    private ObjectOutputStream out = null;
     ObjectInputStream in = null;
 
     private Thread threadReceiver;
@@ -52,7 +50,7 @@ public class ChatController {
         view.updateUsersList(users);
     }
 
-    public void sendMessage() {
+    private void sendMessage() {
         try {
             Message message = new Message(model.getUsername(), view.getChatInput());
 
@@ -72,7 +70,7 @@ public class ChatController {
         }
     }
 
-    public void setupListeners() {
+    private void setupListeners() {
         view.getJtextInputChat().addKeyListener(new KeyAdapter() {
             // send message on Enter
             public void keyPressed(KeyEvent e) {
@@ -92,55 +90,46 @@ public class ChatController {
         });
 
         // Click on send button
-        view.getJsbtn().addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                sendMessage();
-            }
-        });
+        view.getJsbtn().addActionListener(ae -> sendMessage());
 
         // On connect
-        view.getJcbtn().addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                try {
-                    model.setUsername(view.getJtfName().getText());
-                    model.setHost(view.getJtfAddr().getText());
-                    model.setPort(Integer.parseInt(view.getJtfport().getText()));
+        view.getJcbtn().addActionListener(ae -> {
+            try {
+                model.setUsername(view.getJtfName().getText());
+                model.setHost(view.getJtfAddr().getText());
+                model.setPort(Integer.parseInt(view.getJtfport().getText()));
 
-                    view.appendText(
-                            "<span>Connecting to " + model.getHost() + " on port " + model.getHost() + "...</span>");
-                    server = new Socket(model.getHost(), model.getPort());
+                view.appendText(
+                        "<span>Connecting to " + model.getHost() + " on port " + model.getHost() + "...</span>");
+                server = new Socket(model.getHost(), model.getPort());
 
-                    view.appendText("<span>Connected to " + server.getRemoteSocketAddress() + "</span>");
+                view.appendText("<span>Connected to " + server.getRemoteSocketAddress() + "</span>");
 
-                    in = new ObjectInputStream(server.getInputStream());
-                    out = new ObjectOutputStream(server.getOutputStream());
+                in = new ObjectInputStream(server.getInputStream());
+                out = new ObjectOutputStream(server.getOutputStream());
 
-                    // send nickname to server
-                    out.writeObject(new Message(Message.Action.LOGIN, model.getUsername(), "password"));
-                    out.flush();
+                // send nickname to server
+                out.writeObject(new Message(Message.Action.LOGIN, model.getUsername(), "password"));
+                out.flush();
 
-                    startReceiver();
-                    view.connect();
-                } catch (Exception ex) {
-                    view.appendText("<span>Could not connect to Server</span>");
-                    view.showMessage(ex.getMessage());
-                }
+                startReceiver();
+                view.connect();
+            } catch (Exception ex) {
+                view.appendText("<span>Could not connect to Server</span>");
+                view.showMessage(ex.getMessage());
             }
-
         });
 
         // On disconnect
-        view.getJsbtndeco().addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                view.disconnect();
-                stopReceiver();
-                try {
-                    out.close();
-                    in.close();
-                    server.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+        view.getJsbtndeco().addActionListener(ae -> {
+            view.disconnect();
+            stopReceiver();
+            try {
+                out.close();
+                in.close();
+                server.close();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         });
     }

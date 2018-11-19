@@ -2,32 +2,25 @@ package chatroomlibrary;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 
 public class Message implements Serializable {
     private static final long serialVersionUID = 1L;
-
-    public enum Action {
-        REQUEST_LOGIN, LOGIN, LOGGED, LOGIN_FAILED, MESSAGE, BROADCAST_USERS
-    }
-
     private String text = null;
     private String username = null;
     private String password = null;
     private Action action;
     private LocalDateTime time;
-
     public Message(String text) {
         this.time = LocalDateTime.now();
         this.action = Action.MESSAGE;
-        this.setText(text);
+        this.text = text;
     }
 
     public Message(String username, String text) {
         this.time = LocalDateTime.now();
         this.action = Action.MESSAGE;
-        this.setUsername(username);
-        this.setText(text);
+        this.username = username;
+        this.text = text;
     }
 
     public Message(Action action) {
@@ -37,14 +30,14 @@ public class Message implements Serializable {
 
     public Message(Action action, String text) {
         this.time = LocalDateTime.now();
-        this.setAction(action);
-        this.setText(text);
+        this.action = action;
+        this.text = text;
     }
 
     public Message(Action action, String username, String password) {
-        this.setAction(action);
-        this.setUsername(username);
-        this.setPassword(password);
+        this.action = action;
+        this.username = username;
+        this.password = password;
     }
 
     /**
@@ -115,5 +108,9 @@ public class Message implements Serializable {
      */
     public void setText(String text) {
         this.text = text;
+    }
+
+    public enum Action {
+        REQUEST_LOGIN, LOGIN, LOGGED, LOGIN_FAILED, MESSAGE, BROADCAST_USERS
     }
 }

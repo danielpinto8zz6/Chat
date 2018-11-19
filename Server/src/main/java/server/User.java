@@ -1,20 +1,15 @@
 package server;
 
-import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.Socket;
 
-public class User {
-    private String username;
-    private Socket socket;
-
-    ObjectOutputStream objectOutputStream = null;
-    ObjectInputStream objectInputStream = null;
+class User {
+    private final ObjectOutputStream objectOutputStream;
+    private final ObjectInputStream objectInputStream;
+    private final String username;
 
     // constructor
-    public User(Socket socket, String username, ObjectInputStream in, ObjectOutputStream out) throws IOException {
-        this.socket = socket;
+    public User(String username, ObjectInputStream in, ObjectOutputStream out) {
         this.username = username;
 
         this.objectOutputStream = out;

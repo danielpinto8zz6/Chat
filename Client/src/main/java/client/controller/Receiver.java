@@ -6,8 +6,8 @@ import java.util.Arrays;
 
 import chatroomlibrary.Message;
 
-public class Receiver implements Runnable {
-    ChatController controller;
+class Receiver implements Runnable {
+    private final ChatController controller;
 
     public Receiver(ChatController controller) {
         this.controller = controller;
@@ -23,16 +23,16 @@ public class Receiver implements Runnable {
                 }
 
                 switch (message.getAction()) {
-                case MESSAGE:
-                    if (message.getText() != null) {
-                        controller.appendMessage(message);
-                    }
-                    break;
-                case BROADCAST_USERS:
-                    controller.updateUsersList(new ArrayList<String>(Arrays.asList(message.getText().split(", "))));
-                    break;
-                default:
-                    break;
+                    case MESSAGE:
+                        if (message.getText() != null) {
+                            controller.appendMessage(message);
+                        }
+                        break;
+                    case BROADCAST_USERS:
+                        controller.updateUsersList(new ArrayList<>(Arrays.asList(message.getText().split(", "))));
+                        break;
+                    default:
+                        break;
                 }
             } catch (IOException ex) {
                 System.err.println("Failed to parse incoming message");

@@ -1,31 +1,24 @@
 package server;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
+
 public class User {
-    public static final int LOGGED = 0;
-
-    private Integer id;
     private String username;
-    private String password;
-    private Integer state;
+    private Socket socket;
 
-    public User(String username, String password, Integer state) {
-        this.setUsername(username);
-        this.setPassword(password);
-        this.setState(state);
-    }
+    ObjectOutputStream objectOutputStream = null;
+    ObjectInputStream objectInputStream = null;
 
-    /**
-     * @return the password
-     */
-    public String getPassword() {
-        return password;
-    }
+    // constructor
+    public User(Socket socket, String username, ObjectInputStream in, ObjectOutputStream out) throws IOException {
+        this.socket = socket;
+        this.username = username;
 
-    /**
-     * @param password the password to set
-     */
-    public void setPassword(String password) {
-        this.password = password;
+        this.objectOutputStream = out;
+        this.objectInputStream = in;
     }
 
     /**
@@ -35,38 +28,18 @@ public class User {
         return username;
     }
 
-    /**
-     * @param username the username to set
-     */
-    public void setUsername(String username) {
-        this.username = username;
+    public ObjectOutputStream getObjectOutputStream() {
+        return this.objectOutputStream;
     }
 
-    /**
-     * @return the state
-     */
-    public Integer getState() {
-        return state;
+    public ObjectInputStream getObjectInputStream() {
+        return this.objectInputStream;
     }
 
-    /**
-     * @param state the state to set
-     */
-    public void setState(Integer state) {
-        this.state = state;
-    }
+    // print user with his color
+    public String toString() {
 
-    /**
-     * @return the id
-     */
-    public Integer getId() {
-        return id;
-    }
+        return "<u>" + this.getUsername() + "</u>";
 
-    /**
-     * @param id the id to set
-     */
-    public void setId(Integer id) {
-        this.id = id;
     }
 }

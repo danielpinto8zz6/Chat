@@ -2,12 +2,13 @@ package chatroomlibrary;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 
 public class Message implements Serializable {
     private static final long serialVersionUID = 1L;
 
     public enum Action {
-        REQUEST_LOGIN, LOGIN, LOGGED, LOGIN_FAILED, MESSAGE
+        REQUEST_LOGIN, LOGIN, LOGGED, LOGIN_FAILED, MESSAGE, BROADCAST_USERS
     }
 
     private String text = null;

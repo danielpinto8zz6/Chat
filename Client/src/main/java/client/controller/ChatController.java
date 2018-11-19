@@ -2,10 +2,13 @@ package client.controller;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
 
 import chatroomlibrary.Message;
 import client.model.Chat;
@@ -15,89 +18,130 @@ public class ChatController {
     public Chat model;
     public ChatView view;
 
+    Socket server = null;
     ObjectOutputStream out = null;
     ObjectInputStream in = null;
+
+    private Thread threadReceiver;
 
     public ChatController(Chat model, ChatView view) {
         this.model = model;
         this.view = view;
 
-        view.getTextField().addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                sendMessage(new Message(model.getUsername(), view.getTextField().getText()));
-                view.getTextField().setText("");
+        setupListeners();
+    }
+
+    private void startReceiver() {
+        if (in == null)
+            return;
+
+        threadReceiver = new Thread(new Receiver(this));
+        threadReceiver.start();
+    }
+
+    private void stopReceiver() {
+        if (threadReceiver != null)
+            threadReceiver.interrupt();
+    }
+
+    public void appendMessage(Message message) {
+        view.appendMessage(message);
+    }
+
+    public void updateUsersList(ArrayList<String> users) {
+        view.updateUsersList(users);
+    }
+
+    public void sendMessage() {
+        try {
+            Message message = new Message(model.getUsername(), view.getChatInput());
+
+            if (message.getText().equals("")) {
+                return;
+            }
+
+            model.appendHistory(message.getText());
+
+            out.writeObject(message);
+            out.flush();
+
+            view.clearChatInput();
+        } catch (Exception ex) {
+            view.showMessage(ex.toString());
+            System.exit(0);
+        }
+    }
+
+    public void setupListeners() {
+        view.getJtextInputChat().addKeyListener(new KeyAdapter() {
+            // send message on Enter
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    sendMessage();
+                }
+
+                // Get last message typed
+                if (e.getKeyCode() == KeyEvent.VK_UP) {
+                    view.getJtextInputChat().setText(model.getLastMessage());
+                }
+
+                if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+                    view.getJtextInputChat().setText(model.getLastMessage());
+                }
             }
         });
-    }
 
-    public void startReceiver() {
-        Thread thread = new Thread(new Receiver());
-        thread.start();
-    }
+        // Click on send button
+        view.getJsbtn().addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent ae) {
+                sendMessage();
+            }
+        });
 
-    public class Receiver implements Runnable {
-        @Override
-        public void run() {
-            String serverAddress = view.getServerAddress();
-            Socket socket = null;
-            try {
-                socket = new Socket(serverAddress, 9001);
-                in = new ObjectInputStream(socket.getInputStream());
-                out = new ObjectOutputStream(socket.getOutputStream());
-
-                while (true) {
-                    Message message = (Message) in.readObject();
-
-                    switch (message.getAction()) {
-                    case REQUEST_LOGIN:
-                        out.writeObject(view.getLogin());
-                        out.flush();
-                        break;
-                    case LOGGED:
-                        view.setEditable();
-                        model.setUsername(getUsername());
-                        break;
-                    case MESSAGE:
-                        view.addMessage(message);
-                        model.addMessage(message);
-                        break;
-                    case LOGIN_FAILED:
-                        view.showMessage("Login failed");
-                        break;
-                    default:
-                        break;
-                    }
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            } finally {
+        // On connect
+        view.getJcbtn().addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent ae) {
                 try {
-                    socket.close();
+                    model.setUsername(view.getJtfName().getText());
+                    model.setHost(view.getJtfAddr().getText());
+                    model.setPort(Integer.parseInt(view.getJtfport().getText()));
+
+                    view.appendText(
+                            "<span>Connecting to " + model.getHost() + " on port " + model.getHost() + "...</span>");
+                    server = new Socket(model.getHost(), model.getPort());
+
+                    view.appendText("<span>Connected to " + server.getRemoteSocketAddress() + "</span>");
+
+                    in = new ObjectInputStream(server.getInputStream());
+                    out = new ObjectOutputStream(server.getOutputStream());
+
+                    // send nickname to server
+                    out.writeObject(new Message(Message.Action.LOGIN, model.getUsername(), "password"));
+                    out.flush();
+
+                    startReceiver();
+                    view.connect();
+                } catch (Exception ex) {
+                    view.appendText("<span>Could not connect to Server</span>");
+                    view.showMessage(ex.getMessage());
+                }
+            }
+
+        });
+
+        // On disconnect
+        view.getJsbtndeco().addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent ae) {
+                view.disconnect();
+                stopReceiver();
+                try {
                     out.close();
                     in.close();
+                    server.close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
-        }
-
-    }
-
-    public void sendMessage(Message message) {
-        if (out == null)
-            return;
-
-        try {
-            out.writeObject(message);
-            out.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public String getUsername() {
-        return model.getUsername();
+        });
     }
 }

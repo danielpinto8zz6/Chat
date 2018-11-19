@@ -1,50 +1,68 @@
 package client.model;
 
 import java.util.ArrayList;
-import java.util.List;
-
-import chatroomlibrary.Message;
 
 public class Chat {
-    private String username = "User";
-    private List<Message> history;
+    private String username;
+
+    private String host;
+    private int Port;
+
+    private ArrayList<String> history;
 
     public Chat() {
-        setHistory(new ArrayList<Message>());
+        this.setHost("localhost");
+        this.username = "User";
+        this.setPort(9001);
+        history = new ArrayList<String>();
     }
 
     /**
-     * @param message Adds a message to history
+     * @return the port
      */
-    public void addMessage(Message message) {
-        history.add(message);
+    public int getPort() {
+        return Port;
     }
 
     /**
-     * @return the history
+     * @param port the port to set
      */
-    public List<Message> getHistory() {
-        return history;
+    public void setPort(int port) {
+        this.Port = port;
     }
 
     /**
-     * @param history the history to set
+     * @return the host
      */
-    public void setHistory(List<Message> history) {
-        this.history = history;
+    public String getHost() {
+        return host;
     }
 
     /**
-     * @return the username
+     * @param host the host to set
      */
+    public void setHost(String host) {
+        this.host = host;
+    }
+
     public String getUsername() {
-        return username;
+        return this.username;
     }
 
-    /**
-     * @param username the username to set
-     */
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public void appendHistory(String text) {
+        history.add(text);
+    }
+
+    public String getLastMessage() {
+        if (history.size() < 1)
+            return null;
+
+        String last = history.get(history.size() - 1);
+        history.remove(history.size() - 1);
+        return last;
     }
 }

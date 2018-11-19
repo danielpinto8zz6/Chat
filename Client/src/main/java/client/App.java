@@ -16,7 +16,5 @@ public class App {
         Chat chat = new Chat();
         ChatView chatView = new ChatView();
         ChatController chatController = new ChatController(chat, chatView);
-        chatController.startReceiver();
     }
-
 }

@@ -1,6 +1,8 @@
 package client;
 
-import javax.swing.JFrame;
+import client.controller.ChatController;
+import client.model.Chat;
+import client.view.ChatView;
 
 /**
  *
@@ -11,10 +13,10 @@ public class App {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        ChatClient client = new ChatClient();
-        client.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        client.frame.setVisible(true);
-        client.start();
+        Chat chat = new Chat();
+        ChatView chatView = new ChatView();
+        ChatController chatController = new ChatController(chat, chatView);
+        chatController.startReceiver();
     }
 
 }

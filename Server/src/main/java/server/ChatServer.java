@@ -78,8 +78,6 @@ public class ChatServer {
                     out.writeObject(new Message(Message.Action.REQUEST_LOGIN));
                     out.flush();
 
-                    System.out.println("Sending login request");
-
                     Message message = (Message) in.readObject();
 
                     if (message.getAction() != Message.Action.LOGIN || message.getUsername() == null) {
@@ -91,6 +89,7 @@ public class ChatServer {
                     if (user != null) {
                         synchronized (users) {
                             if (!users.contains(user)) {
+                                System.out.println(user.getUsername() + " : Logged");
                                 users.add(user);
                                 break;
                             }

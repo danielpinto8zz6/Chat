@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.time.format.DateTimeFormatter;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -104,7 +105,10 @@ public class ChatClient {
                         username = message.getUsername();
                         break;
                     case MESSAGE:
-                        messageArea.append(message.getUsername () + " : " + message.getText() + "\n");
+                        messageArea.append(message.getUsername()
+                                + " : " + message.getText() + "\n" + message.getTime()
+                                        .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")).toString()
+                                + "\n\n");
                         break;
                     case LOGIN_FAILED:
                         JOptionPane.showMessageDialog(frame, "Login failed!");

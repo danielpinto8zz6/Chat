@@ -6,14 +6,25 @@
     "configurations": [
         {
             "type": "java",
-            "name": "Debug App<Client>",
+            "name": "Debug (Launch)-App<Client>",
             "request": "launch",
             "cwd": "${workspaceFolder}",
-            "console": "integratedTerminal",
+            "console": "internalConsole",
             "stopOnEntry": false,
             "mainClass": "client.App",
             "args": "",
             "projectName": "Client"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-App<Server>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "stopOnEntry": false,
+            "mainClass": "server.App",
+            "args": "",
+            "projectName": "Server"
         }
     ]
 }

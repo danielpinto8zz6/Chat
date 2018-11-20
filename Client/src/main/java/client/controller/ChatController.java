@@ -20,10 +20,6 @@ public class ChatController extends Observable {
 
     private Thread threadReceiver;
 
-    /** hack */
-    public boolean checked = false;
-    public boolean newmsg = false;
-
     public ChatController(Chat model) {
         this.model = model;
     }
@@ -43,17 +39,16 @@ public class ChatController extends Observable {
 
     public void appendMessage(Message message) {
         model.appendMessage(message);
-        newmsg = true;
 
         setChanged();
-        notifyObservers();
+        notifyObservers(message);
     }
 
     public void updateUsersList(ArrayList<String> users) {
         model.setUsersList(users);
 
         setChanged();
-        notifyObservers();
+        notifyObservers(users);
     }
 
     public void sendMessage(String text) {
@@ -88,8 +83,6 @@ public class ChatController extends Observable {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        checked = false;
-        newmsg = false;
     }
 
     public void connect(String host, int port, String username) {
@@ -112,14 +105,9 @@ public class ChatController extends Observable {
         }
 
         startReceiver();
-        model.setConnected(true);
 
         setChanged();
-        notifyObservers();
-    }
-
-    public boolean isConnected() {
-        return model.isConnected();
+        notifyObservers("connected");
     }
 
     public String getRemoteSocketAddress() {

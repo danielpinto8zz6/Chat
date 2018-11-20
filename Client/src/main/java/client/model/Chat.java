@@ -13,8 +13,6 @@ public class Chat {
     private ArrayList<String> usersList;
     private ArrayList<Message> messages;
 
-    private boolean connected = false;
-
     public Chat() {
         this.setHost("localhost");
         this.username = "User";
@@ -23,20 +21,6 @@ public class Chat {
         usersList = new ArrayList<>();
         messages = new ArrayList<>();
 
-    }
-
-    /**
-     * @return the connected
-     */
-    public boolean isConnected() {
-        return connected;
-    }
-
-    /**
-     * @param connected the connected to set
-     */
-    public void setConnected(boolean connected) {
-        this.connected = connected;
     }
 
     /**

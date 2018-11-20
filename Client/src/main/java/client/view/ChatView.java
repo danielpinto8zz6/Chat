@@ -5,10 +5,6 @@ import java.awt.Font;
 import java.awt.Insets;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
@@ -141,7 +137,11 @@ public class ChatView implements Observer {
         });
 
         // Click on send button
-        jsbtn.addActionListener(ae -> controller.sendMessage(jtextInputChat.getText().trim()));
+        jsbtn.addActionListener(ae -> {
+            controller.sendMessage(jtextInputChat.getText().trim());
+            jtextInputChat.requestFocus();
+            jtextInputChat.setText(null);
+        });
 
         // On connect
         jcbtn.addActionListener(ae -> {
@@ -223,18 +223,19 @@ public class ChatView implements Observer {
 
     @Override
     public void update(Observable o, Object arg) {
-        // Update users list
-        updateUsersList(controller.getUsersList());
+        if (arg instanceof Message) {
+            Message message = (Message) arg;
 
-        if (controller.isConnected() && !controller.checked) {
-            connect();
-            controller.checked = true;
-        }
+            if (message != null)
+                appendMessage(message);
 
-        if (controller.newmsg) {
-            Message message = controller.getLastMessage();
-            appendMessage(message);
-            controller.newmsg = false;
+            return;
+        } else if (arg instanceof ArrayList) {
+            updateUsersList(controller.getUsersList());
+        } else if (arg instanceof String) {
+            String str = (String) arg;
+            if (str.equals("connected"))
+                connect();
         }
     }
 

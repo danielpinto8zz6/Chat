@@ -77,6 +77,7 @@ class Server {
     public void broadcastMessages(Message message) {
         for (User client : this.clients) {
             try {
+                System.out.println(message.getUsername() + ": " + message.getText());
                 client.getObjectOutputStream().writeObject(message);
                 client.getObjectOutputStream().flush();
             } catch (IOException e) {

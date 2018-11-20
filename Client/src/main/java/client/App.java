@@ -13,7 +13,7 @@ class App {
      */
     public static void main(String[] args) {
         Chat chat = new Chat();
-        ChatView chatView = new ChatView();
-        ChatController chatController = new ChatController(chat, chatView);
+        ChatController chatController = new ChatController(chat);
+        ChatView chatView = new ChatView(chatController);
     }
 }

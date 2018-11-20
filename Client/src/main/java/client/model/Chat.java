@@ -2,19 +2,73 @@ package client.model;
 
 import java.util.ArrayList;
 
+import chatroomlibrary.Message;
+
 public class Chat {
     private String username;
 
     private String host;
     private int Port;
 
-    private final ArrayList<String> history;
+    private ArrayList<String> usersList;
+    private ArrayList<Message> messages;
+
+    private boolean connected = false;
 
     public Chat() {
         this.setHost("localhost");
         this.username = "User";
         this.setPort(9001);
-        history = new ArrayList<>();
+
+        usersList = new ArrayList<>();
+        messages = new ArrayList<>();
+
+    }
+
+    /**
+     * @return the connected
+     */
+    public boolean isConnected() {
+        return connected;
+    }
+
+    /**
+     * @param connected the connected to set
+     */
+    public void setConnected(boolean connected) {
+        this.connected = connected;
+    }
+
+    /**
+     * @return the messages
+     */
+    public ArrayList<Message> getMessages() {
+        return messages;
+    }
+
+    /**
+     * @param messages the messages to set
+     */
+    public void setMessages(ArrayList<Message> messages) {
+        this.messages = messages;
+    }
+
+    public void appendMessage(Message message) {
+        this.messages.add(message);
+    }
+
+    /**
+     * @return the usersList
+     */
+    public ArrayList<String> getUsersList() {
+        return usersList;
+    }
+
+    /**
+     * @param usersList the usersList to set
+     */
+    public void setUsersList(ArrayList<String> usersList) {
+        this.usersList = usersList;
     }
 
     /**
@@ -53,16 +107,11 @@ public class Chat {
         this.username = username;
     }
 
-    public void appendHistory(String text) {
-        history.add(text);
-    }
-
-    public String getLastMessage() {
-        if (history.size() < 1)
+    public Message getLastMessage() {
+        if (messages.size() < 1)
             return null;
 
-        String last = history.get(history.size() - 1);
-        history.remove(history.size() - 1);
+        Message last = messages.get(messages.size() - 1);
         return last;
     }
 }

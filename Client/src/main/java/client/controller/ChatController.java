@@ -1,20 +1,18 @@
 package client.controller;
 
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Observable;
 
 import chatroomlibrary.Message;
 import client.model.Chat;
-import client.view.ChatView;
 
-public class ChatController {
+public class ChatController extends Observable {
     private final Chat model;
-    private final ChatView view;
 
     private Socket server = null;
     private ObjectOutputStream out = null;
@@ -22,11 +20,12 @@ public class ChatController {
 
     private Thread threadReceiver;
 
-    public ChatController(Chat model, ChatView view) {
-        this.model = model;
-        this.view = view;
+    /** hack */
+    public boolean checked = false;
+    public boolean newmsg = false;
 
-        setupListeners();
+    public ChatController(Chat model) {
+        this.model = model;
     }
 
     private void startReceiver() {
@@ -43,94 +42,87 @@ public class ChatController {
     }
 
     public void appendMessage(Message message) {
-        view.appendMessage(message);
+        model.appendMessage(message);
+        newmsg = true;
+
+        setChanged();
+        notifyObservers();
     }
 
     public void updateUsersList(ArrayList<String> users) {
-        view.updateUsersList(users);
+        model.setUsersList(users);
+
+        setChanged();
+        notifyObservers();
     }
 
-    private void sendMessage() {
+    public void sendMessage(String text) {
         try {
-            Message message = new Message(model.getUsername(), view.getChatInput());
+            Message message = new Message(model.getUsername(), text);
 
             if (message.getText().equals("")) {
                 return;
             }
 
-            model.appendHistory(message.getText());
-
             out.writeObject(message);
             out.flush();
-
-            view.clearChatInput();
         } catch (Exception ex) {
-            view.showMessage(ex.toString());
             System.exit(0);
         }
     }
 
-    private void setupListeners() {
-        view.getJtextInputChat().addKeyListener(new KeyAdapter() {
-            // send message on Enter
-            public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    sendMessage();
-                }
+    public ArrayList<String> getUsersList() {
+        return model.getUsersList();
+    }
 
-                // Get last message typed
-                if (e.getKeyCode() == KeyEvent.VK_UP) {
-                    view.getJtextInputChat().setText(model.getLastMessage());
-                }
+    public Message getLastMessage() {
+        return model.getLastMessage();
+    }
 
-                if (e.getKeyCode() == KeyEvent.VK_DOWN) {
-                    view.getJtextInputChat().setText(model.getLastMessage());
-                }
-            }
-        });
+    public void disconnect() {
+        stopReceiver();
+        try {
+            out.close();
+            in.close();
+            server.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        checked = false;
+        newmsg = false;
+    }
 
-        // Click on send button
-        view.getJsbtn().addActionListener(ae -> sendMessage());
+    public void connect(String host, int port, String username) {
+        model.setHost(host);
+        model.setPort(port);
+        model.setUsername(username);
 
-        // On connect
-        view.getJcbtn().addActionListener(ae -> {
-            try {
-                model.setUsername(view.getJtfName().getText());
-                model.setHost(view.getJtfAddr().getText());
-                model.setPort(Integer.parseInt(view.getJtfport().getText()));
+        try {
+            server = new Socket(host, port);
+            in = new ObjectInputStream(server.getInputStream());
+            out = new ObjectOutputStream(server.getOutputStream());
 
-                view.appendText(
-                        "<span>Connecting to " + model.getHost() + " on port " + model.getHost() + "...</span>");
-                server = new Socket(model.getHost(), model.getPort());
+            // send nickname to server
+            out.writeObject(new Message(Message.Action.LOGIN, username, "password"));
+            out.flush();
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-                view.appendText("<span>Connected to " + server.getRemoteSocketAddress() + "</span>");
+        startReceiver();
+        model.setConnected(true);
 
-                in = new ObjectInputStream(server.getInputStream());
-                out = new ObjectOutputStream(server.getOutputStream());
+        setChanged();
+        notifyObservers();
+    }
 
-                // send nickname to server
-                out.writeObject(new Message(Message.Action.LOGIN, model.getUsername(), "password"));
-                out.flush();
+    public boolean isConnected() {
+        return model.isConnected();
+    }
 
-                startReceiver();
-                view.connect();
-            } catch (Exception ex) {
-                view.appendText("<span>Could not connect to Server</span>");
-                view.showMessage(ex.getMessage());
-            }
-        });
-
-        // On disconnect
-        view.getJsbtndeco().addActionListener(ae -> {
-            view.disconnect();
-            stopReceiver();
-            try {
-                out.close();
-                in.close();
-                server.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
+    public String getRemoteSocketAddress() {
+        return server.getRemoteSocketAddress().toString();
     }
 }

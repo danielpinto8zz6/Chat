@@ -3,7 +3,15 @@ package client.view;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Insets;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Observable;
+import java.util.Observer;
 
 import javax.swing.JButton;
 import javax.swing.JEditorPane;
@@ -16,8 +24,9 @@ import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 
 import chatroomlibrary.Message;
+import client.controller.ChatController;
 
-public class ChatView extends Thread {
+public class ChatView implements Observer {
 
     private final JTextPane jtextFilDiscu;
     private final JTextPane jtextListUsers;
@@ -36,7 +45,12 @@ public class ChatView extends Thread {
 
     private final JScrollPane jtextInputChatSP;
 
-    public ChatView() {
+    private ChatController controller;
+
+    public ChatView(ChatController controller) {
+        this.controller = controller;
+        controller.addObserver(this);
+
         jtextFilDiscu = new JTextPane();
         jtextListUsers = new JTextPane();
 
@@ -115,6 +129,40 @@ public class ChatView extends Thread {
         jfr.add(jtfAddr);
         jfr.setVisible(true);
 
+        jtextInputChat.addKeyListener(new KeyAdapter() {
+            // send message on Enter
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    controller.sendMessage(jtextInputChat.getText().trim());
+                    jtextInputChat.requestFocus();
+                    jtextInputChat.setText(null);
+                }
+            }
+        });
+
+        // Click on send button
+        jsbtn.addActionListener(ae -> controller.sendMessage(jtextInputChat.getText().trim()));
+
+        // On connect
+        jcbtn.addActionListener(ae -> {
+            String username = jtfName.getText();
+            String host = jtfAddr.getText();
+            int port = Integer.parseInt(jtfport.getText());
+
+            controller.connect(host, port, username);
+
+            appendText("<span>Connecting to " + host + " on port " + host + "...</span>");
+
+            // appendText("<span>Could not connect to Server</span>");
+            // showMessage(ex.getMessage());
+        });
+
+        // On disconnect
+        jsbtndeco.addActionListener(ae -> {
+            disconnect();
+            controller.disconnect();
+        });
+
         appendToPane(jtextFilDiscu, "<h4>Welcome:</h4>");
     }
 
@@ -137,52 +185,8 @@ public class ChatView extends Thread {
         appendToPane(jtextFilDiscu, text);
     }
 
-    public void updateUsersList(ArrayList<String> users) {
-        jtextListUsers.setText(null);
-        for (String user : users) {
-            appendToPane(jtextListUsers, "@" + user);
-        }
-    }
-
-    public String getChatInput() {
-        return jtextInputChat.getText().trim();
-    }
-
-    public void clearChatInput() {
-        jtextInputChat.requestFocus();
-        jtextInputChat.setText(null);
-    }
-
     public void showMessage(String text) {
         JOptionPane.showMessageDialog(null, text);
-    }
-
-    public JTextField getJtextInputChat() {
-        return this.jtextInputChat;
-    }
-
-    public JButton getJsbtn() {
-        return this.jsbtn;
-    }
-
-    public JButton getJsbtndeco() {
-        return this.jsbtndeco;
-    }
-
-    public JButton getJcbtn() {
-        return this.jcbtn;
-    }
-
-    public JTextField getJtfName() {
-        return this.jtfName;
-    }
-
-    public JTextField getJtfport() {
-        return this.jtfport;
-    }
-
-    public JTextField getJtfAddr() {
-        return this.jtfAddr;
     }
 
     public void disconnect() {
@@ -202,6 +206,8 @@ public class ChatView extends Thread {
     }
 
     public void connect() {
+        appendText("<span>Connected to " + controller.getRemoteSocketAddress() + "</span>");
+
         jfr.remove(jtfName);
         jfr.remove(jtfport);
         jfr.remove(jtfAddr);
@@ -213,5 +219,29 @@ public class ChatView extends Thread {
         jfr.repaint();
         jtextFilDiscu.setBackground(Color.WHITE);
         jtextListUsers.setBackground(Color.WHITE);
+    }
+
+    @Override
+    public void update(Observable o, Object arg) {
+        // Update users list
+        updateUsersList(controller.getUsersList());
+
+        if (controller.isConnected() && !controller.checked) {
+            connect();
+            controller.checked = true;
+        }
+
+        if (controller.newmsg) {
+            Message message = controller.getLastMessage();
+            appendMessage(message);
+            controller.newmsg = false;
+        }
+    }
+
+    public void updateUsersList(ArrayList<String> users) {
+        jtextListUsers.setText(null);
+        for (String user : users) {
+            appendToPane(jtextListUsers, "@" + user);
+        }
     }
 }

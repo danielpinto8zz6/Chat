@@ -2,18 +2,28 @@ package server;
 
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.Socket;
 
 class User {
     private final ObjectOutputStream objectOutputStream;
     private final ObjectInputStream objectInputStream;
     private final String username;
+    private Socket socket;
 
     // constructor
-    public User(String username, ObjectInputStream in, ObjectOutputStream out) {
+    public User(String username, Socket socket, ObjectInputStream in, ObjectOutputStream out) {
         this.username = username;
 
+        this.socket = socket;
         this.objectOutputStream = out;
         this.objectInputStream = in;
+    }
+
+    /**
+     * @return the socket
+     */
+    public Socket getSocket() {
+        return socket;
     }
 
     /**

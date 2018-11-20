@@ -40,10 +40,10 @@ class Server {
                 String username = message.getUsername();
 
                 System.out.println(
-                        "New Client: \"" + username + "\"\n\t     Host:" + client.getInetAddress().getHostAddress());
+                        "New Client: " + username + "\n\t     Host:" + client.getInetAddress().getHostAddress());
 
                 // create new User
-                User newUser = new User(username, in, out);
+                User newUser = new User(username, client, in, out);
 
                 // add newUser message to list
                 this.clients.add(newUser);

@@ -22,9 +22,20 @@ class UserHandler implements Runnable {
             while ((message = (Message) this.user.getObjectInputStream().readObject()) != null) {
                 server.broadcastMessages(message);
             }
-        } catch (ClassNotFoundException | IOException e) {
+        } catch (IOException e) {
+            System.out.println(user.getUsername() + " : has disconnected!");
+        } catch (ClassNotFoundException e) {
             e.printStackTrace();
+        } finally {
+            try {
+                user.getSocket().close();
+                user.getObjectInputStream().close();
+                user.getObjectInputStream().close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
+
         // end of Thread
         server.removeUser(user);
         this.server.broadcastAllUsers();

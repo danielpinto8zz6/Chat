@@ -10,6 +10,8 @@ public class Message implements Serializable {
     private String password = null;
     private Action action;
     private LocalDateTime time;
+    private String host;
+
     public Message(String text) {
         this.time = LocalDateTime.now();
         this.action = Action.MESSAGE;
@@ -110,7 +112,21 @@ public class Message implements Serializable {
         this.text = text;
     }
 
+    /**
+     * @return the host
+     */
+    public String getHost() {
+        return host;
+    }
+
+    /**
+     * @param host the host to set
+     */
+    public void setHost(String host) {
+        this.host = host;
+    }
+
     public enum Action {
-        REQUEST_LOGIN, LOGIN, LOGGED, LOGIN_FAILED, MESSAGE, BROADCAST_USERS
+        REQUEST_LOGIN, LOGIN, LOGGED, LOGIN_FAILED, MESSAGE, BROADCAST_USERS, REQUEST_FILE, FILE_ACCEPTED
     }
 }

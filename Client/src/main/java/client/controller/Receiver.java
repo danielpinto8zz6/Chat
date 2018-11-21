@@ -30,7 +30,14 @@ class Receiver implements Runnable {
                     }
                     break;
                 case BROADCAST_USERS:
-                    controller.updateUsersList(new ArrayList<>(Arrays.asList(message.getText().split(", "))));
+                    String users = message.getText().substring(1, message.getText().length() - 1);
+                    controller.updateUsersList(new ArrayList<>(Arrays.asList(users.split(", "))));
+                    break;
+                case REQUEST_FILE:
+                    controller.fileRequest(message);
+                    break;
+                case FILE_ACCEPTED:
+                    controller.fileAccepted(message.getHost());
                     break;
                 default:
                     break;

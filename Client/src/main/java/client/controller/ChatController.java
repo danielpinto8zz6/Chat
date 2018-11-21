@@ -1,5 +1,6 @@
 package client.controller;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -113,4 +114,51 @@ public class ChatController extends Observable {
     public String getRemoteSocketAddress() {
         return server.getRemoteSocketAddress().toString();
     }
+
+    public void sendFile(File file) {
+        Message message = new Message(Message.Action.REQUEST_FILE);
+        message.setText(file.getName());
+        message.setUsername(model.getUsername());
+
+        try {
+            out.writeObject(message);
+            out.flush();
+        } catch (Exception ex) {
+            System.exit(0);
+        }
+    }
+
+    public void fileRequest(Message message) {
+        // Do not ask to the sender
+        if (message.getUsername().equals(model.getUsername()))
+            return;
+
+        System.out.println(message.getUsername() + model.getUsername());
+
+        setChanged();
+        notifyObservers("filerequest");
+    }
+
+    public void acceptFile(String absolutePath) {
+        Message message = new Message(Message.Action.FILE_ACCEPTED);
+        message.setUsername(model.getUsername());
+
+        // send your ip to make connection
+        message.setHost(model.getHost());
+
+        model.setSaveLocation(absolutePath);
+
+        try {
+            out.writeObject(message);
+            out.flush();
+        } catch (Exception ex) {
+            System.exit(0);
+        }
+    }
+
+    public void fileAccepted(String host) {
+        /**
+         * Create connection with client and send the file.
+         */
+	}
 }

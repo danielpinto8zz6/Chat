@@ -13,6 +13,8 @@ public class Chat {
     private ArrayList<String> usersList;
     private ArrayList<Message> messages;
 
+    private String saveLocation;
+
     public Chat() {
         this.setHost("localhost");
         this.username = "User";
@@ -21,6 +23,20 @@ public class Chat {
         usersList = new ArrayList<>();
         messages = new ArrayList<>();
 
+    }
+
+    /**
+     * @return the saveLocation
+     */
+    public String getSaveLocation() {
+        return saveLocation;
+    }
+
+    /**
+     * @param saveLocation the saveLocation to set
+     */
+    public void setSaveLocation(String saveLocation) {
+        this.saveLocation = saveLocation;
     }
 
     /**

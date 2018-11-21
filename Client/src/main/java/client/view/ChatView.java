@@ -5,17 +5,20 @@ import java.awt.Font;
 import java.awt.Insets;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 
 import javax.swing.JButton;
 import javax.swing.JEditorPane;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
+import javax.swing.filechooser.FileSystemView;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 
@@ -32,6 +35,7 @@ public class ChatView implements Observer {
     private final JButton jsbtn;
     private final JButton jsbtndeco;
     private final JButton jcbtn;
+    private final JButton jubtn;
 
     private final JFrame jfr;
 
@@ -55,6 +59,7 @@ public class ChatView implements Observer {
         jsbtn = new JButton("Send");
         jsbtndeco = new JButton("Disconnect");
         jcbtn = new JButton("Connect");
+        jubtn = new JButton("Upload");
 
         jfr = new JFrame("Chat");
 
@@ -101,6 +106,9 @@ public class ChatView implements Observer {
         jsbtn.setFont(font);
         jsbtn.setBounds(575, 410, 100, 35);
 
+        jubtn.setFont(font);
+        jubtn.setBounds(450, 410, 100, 35);
+
         jsbtndeco.setFont(font);
         jsbtndeco.setBounds(25, 410, 130, 35);
 
@@ -141,6 +149,20 @@ public class ChatView implements Observer {
             controller.sendMessage(jtextInputChat.getText().trim());
             jtextInputChat.requestFocus();
             jtextInputChat.setText(null);
+        });
+
+        // Click on upload button
+        jubtn.addActionListener(ae -> {
+            JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
+
+            int returnValue = jfc.showOpenDialog(jfr);
+            // int returnValue = jfc.showSaveDialog(null);
+
+            if (returnValue == JFileChooser.APPROVE_OPTION) {
+                File selectedFile = jfc.getSelectedFile();
+                System.out.println(selectedFile.getAbsolutePath());
+                controller.sendFile(selectedFile);
+            }
         });
 
         // On connect
@@ -195,6 +217,7 @@ public class ChatView implements Observer {
         jfr.add(jtfAddr);
         jfr.add(jcbtn);
         jfr.remove(jsbtn);
+        jfr.remove(jubtn);
         jfr.remove(jtextInputChatSP);
         jfr.remove(jsbtndeco);
         jfr.revalidate();
@@ -213,6 +236,7 @@ public class ChatView implements Observer {
         jfr.remove(jtfAddr);
         jfr.remove(jcbtn);
         jfr.add(jsbtn);
+        jfr.add(jubtn);
         jfr.add(jtextInputChatSP);
         jfr.add(jsbtndeco);
         jfr.revalidate();
@@ -234,8 +258,37 @@ public class ChatView implements Observer {
             updateUsersList(controller.getUsersList());
         } else if (arg instanceof String) {
             String str = (String) arg;
-            if (str.equals("connected"))
+            switch (str) {
+            case "connected":
                 connect();
+                break;
+            case "filerequest":
+                fileRequest();
+                break;
+            default:
+                break;
+            }
+        }
+    }
+
+    private void fileRequest() {
+        int dialogResult = JOptionPane.showConfirmDialog(jfr, "Would You Like to accept file?", "Warning",
+                JOptionPane.YES_NO_OPTION);
+        if (dialogResult == JOptionPane.YES_OPTION) {
+            JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
+            jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+            jfc.setAcceptAllFileFilterUsed(false);
+
+            int returnValue = jfc.showSaveDialog(jfr);
+
+            if (returnValue == JFileChooser.APPROVE_OPTION) {
+                File selectedFile = jfc.getSelectedFile();
+                System.out.println(selectedFile.getAbsolutePath());
+
+                controller.acceptFile(selectedFile.getAbsolutePath());
+            }
+        } else {
+
         }
     }
 

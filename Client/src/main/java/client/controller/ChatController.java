@@ -19,7 +19,7 @@ public class ChatController extends Observable {
     private ObjectOutputStream out = null;
     ObjectInputStream in = null;
 
-    private Thread threadReceiver;
+    private Thread threadReceiver = null;
 
     public ChatController(Chat model) {
         this.model = model;
@@ -76,23 +76,24 @@ public class ChatController extends Observable {
     }
 
     public void disconnect() {
-        stopReceiver();
-        try {
-            out.close();
-            in.close();
-            server.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (threadReceiver != null) {
+            stopReceiver();
+            try {
+                out.close();
+                in.close();
+                server.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
-    public void connect(String host, int port, String username) {
+    public void connect(String host, String username) {
         model.setHost(host);
-        model.setPort(port);
         model.setUsername(username);
 
         try {
-            server = new Socket(host, port);
+            server = new Socket(host, model.getPort());
             in = new ObjectInputStream(server.getInputStream());
             out = new ObjectOutputStream(server.getOutputStream());
 
@@ -160,5 +161,9 @@ public class ChatController extends Observable {
         /**
          * Create connection with client and send the file.
          */
-	}
+    }
+
+    public boolean authenticate(String username, String password) {
+        return true;
+    }
 }

@@ -2,7 +2,8 @@ package client;
 
 import client.controller.ChatController;
 import client.model.Chat;
-import client.view.ChatView;
+import client.view.LoginView;
+import client.view.MainView;
 
 /**
  * @author daniel
@@ -14,6 +15,7 @@ class App {
     public static void main(String[] args) {
         Chat chat = new Chat();
         ChatController chatController = new ChatController(chat);
-        ChatView chatView = new ChatView(chatController);
+        MainView mainView = new MainView(chatController);
+        mainView.setVisible(true);
     }
 }

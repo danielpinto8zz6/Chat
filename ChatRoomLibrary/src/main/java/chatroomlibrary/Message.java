@@ -11,6 +11,7 @@ public class Message implements Serializable {
     private Action action;
     private LocalDateTime time;
     private String host;
+    private boolean isPrivate = false;
 
     public Message(String text) {
         this.time = LocalDateTime.now();
@@ -124,6 +125,20 @@ public class Message implements Serializable {
      */
     public void setHost(String host) {
         this.host = host;
+    }
+
+    /**
+     * @return the isPrivate
+     */
+    public boolean isPrivate() {
+        return isPrivate;
+    }
+
+    /**
+     * @param isPrivate the isPrivate to set
+     */
+    public void setPrivate(boolean isPrivate) {
+        this.isPrivate = isPrivate;
     }
 
     public enum Action {

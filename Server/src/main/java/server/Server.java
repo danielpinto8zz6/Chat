@@ -102,9 +102,12 @@ class Server {
 
     public void sendMessageToUser(Message message, User sender, String user) throws IOException {
         boolean find = false;
+        message.setPrivate(true);
         for (User client : this.clients) {
-            if (client.getUsername().equals(user) && client != sender) {
+            if (client.getUsername().equals(user)) {
                 find = true;
+                client.getObjectOutputStream().writeObject(message);
+                client.getObjectOutputStream().flush();
                 sender.getObjectOutputStream().writeObject(message);
                 sender.getObjectOutputStream().flush();
             }

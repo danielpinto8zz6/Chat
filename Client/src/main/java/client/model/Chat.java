@@ -17,8 +17,8 @@ public class Chat {
 
     public Chat() {
         this.setHost("localhost");
-        this.username = "User";
-        this.setPort(9001);
+        this.username = "username";
+        this.Port = 9001;
 
         usersList = new ArrayList<>();
         messages = new ArrayList<>();

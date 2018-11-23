@@ -20,7 +20,18 @@ class UserHandler implements Runnable {
 
         try {
             while ((message = (Message) this.user.getObjectInputStream().readObject()) != null) {
-                server.broadcastMessages(message);
+                String text = message.getText();
+                if (text.charAt(0) == '@') {
+                    if (text.contains(" ")) {
+                        System.out.println("private msg : " + text);
+                        int firstSpace = text.indexOf(" ");
+                        String userPrivate = text.substring(1, firstSpace);
+                        message.setText(text.substring(firstSpace + 1, text.length()));
+                        server.sendMessageToUser(message, user, userPrivate);
+                    }
+                } else {
+                    server.broadcastMessages(message);
+                }
             }
         } catch (IOException e) {
             System.out.println(user.getUsername() + " : has disconnected!");

@@ -19,6 +19,7 @@ import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 
 import chatroomlibrary.Message;
+import chatroomlibrary.User;
 import client.controller.ChatController;
 
 /**
@@ -158,11 +159,11 @@ public class ChatView extends javax.swing.JPanel implements Observer {
 
     public void appendMessage(Message message) {
         System.out.println(message.getText());
-        if (message.isPrivate())
-            appendToPane(jtextFilDiscu,
-                    "(<b>Private</b>)" + "@" + message.getUsername() + "<span> : " + message.getText() + "</span>");
+        if (message.getTo() != null)
+            appendToPane(jtextFilDiscu, "(<b>Private</b>)" + "@" + message.getUser().getUsername() + "<span> : "
+                    + message.getText() + "</span>");
         else
-            appendToPane(jtextFilDiscu, "@" + message.getUsername() + " : " + message.getText());
+            appendToPane(jtextFilDiscu, "@" + message.getUser().getUsername() + " : " + message.getText());
     }
 
     public void appendText(String text) {
@@ -217,10 +218,10 @@ public class ChatView extends javax.swing.JPanel implements Observer {
         }
     }
 
-    public void updateUsersList(ArrayList<String> users) {
+    public void updateUsersList(ArrayList<User> users) {
         jtextListUsers.setText(null);
-        for (String user : users) {
-            appendToPane(jtextListUsers, "@" + user);
+        for (User user : users) {
+            appendToPane(jtextListUsers, "@" + user.getUsername());
         }
     }
 

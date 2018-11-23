@@ -6,53 +6,60 @@ import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
+import chatroomlibrary.Command;
 import chatroomlibrary.Message;
+import chatroomlibrary.User;
 
 class Server {
 
-    private final int port;
-    private final List<User> clients;
+    private final List<Client> clients;
+    private User serv;
 
     public Server(int port) {
-        this.port = port;
         this.clients = new ArrayList<>();
+
+        try {
+            this.serv = new User("Server", InetAddress.getLocalHost().getHostAddress(), port);
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
     }
 
     public void run() {
         ServerSocket server = null;
         try {
-            server = new ServerSocket(port);
+            server = new ServerSocket(serv.getPort());
 
-            System.out.println("Port " + port + " is now open at " + InetAddress.getLocalHost().getHostAddress());
+            System.out.println("Port " + serv.getPort() + " is now open at " + serv.getHost());
 
             while (true) {
                 // accepts a new client
-                Socket client = server.accept();
+                Socket socket = server.accept();
 
-                ObjectOutputStream out = new ObjectOutputStream(client.getOutputStream());
-                ObjectInputStream in = new ObjectInputStream(client.getInputStream());
+                ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+                ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
 
-                Message message = (Message) in.readObject();
+                Command command = (Command) in.readObject();
 
-                String username = message.getUsername();
+                User user = command.getMessage().getUser();
 
-                System.out.println(
-                        "New Client: " + username + "\n\t     Host:" + client.getInetAddress().getHostAddress());
+                System.out.println("New Client: " + user.getUsername() + "\n\t     Host:"
+                        + socket.getInetAddress().getHostAddress());
 
-                // create new User
-                User newUser = new User(username, client, in, out);
+                Client newClient = new Client(user, socket, in, out);
 
                 // add newUser message to list
-                this.clients.add(newUser);
+                this.clients.add(newClient);
 
-                newUser.getObjectOutputStream().writeObject(new Message(Message.Action.LOGGED));
-                newUser.getObjectOutputStream().flush();
+                newClient.getObjectOutputStream().writeObject(new Command(Command.Action.LOGGED));
+                newClient.getObjectOutputStream().flush();
 
                 // create a new thread for newUser incoming messages handling
-                new Thread(new UserHandler(this, newUser)).start();
+                new Thread(new ClientHandler(this, newClient)).start();
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -69,16 +76,15 @@ class Server {
     }
 
     // delete a user from the list
-    public void removeUser(User user) {
-        this.clients.remove(user);
+    public void removeClient(Client client) {
+        this.clients.remove(client);
     }
 
     // send incoming msg to all Users
-    public void broadcastMessages(Message message) {
-        for (User client : this.clients) {
+    public void broadcastCommand(Command command) {
+        for (Client client : this.clients) {
             try {
-                System.out.println(message.getUsername() + ": " + message.getText());
-                client.getObjectOutputStream().writeObject(message);
+                client.getObjectOutputStream().writeObject(command);
                 client.getObjectOutputStream().flush();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -88,11 +94,12 @@ class Server {
 
     // send list of clients to all Users
     public void broadcastAllUsers() {
-        Message message = new Message(Message.Action.BROADCAST_USERS, this.clients.toString());
+        Command command = new Command(Command.Action.BROADCAST_USERS);
+        command.setExtraParameters(getUsers());
 
-        for (User client : this.clients) {
+        for (Client client : this.clients) {
             try {
-                client.getObjectOutputStream().writeObject(message);
+                client.getObjectOutputStream().writeObject(command);
                 client.getObjectOutputStream().flush();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -100,20 +107,28 @@ class Server {
         }
     }
 
-    public void sendMessageToUser(Message message, User sender, String user) throws IOException {
+    private ArrayList<User> getUsers() {
+        ArrayList<User> users = new ArrayList<>();
+        for (Client client : clients) {
+            users.add(client.getUser());
+        }
+        return users;
+    }
+
+    public void sendCommandToUser(Command command, Client sender, String user) throws IOException {
         boolean find = false;
-        message.setPrivate(true);
-        for (User client : this.clients) {
-            if (client.getUsername().equals(user)) {
+        for (Client client : this.clients) {
+            if (client.getUser().getUsername().equals(user)) {
                 find = true;
-                client.getObjectOutputStream().writeObject(message);
+                client.getObjectOutputStream().writeObject(command);
                 client.getObjectOutputStream().flush();
-                sender.getObjectOutputStream().writeObject(message);
+                sender.getObjectOutputStream().writeObject(command);
                 sender.getObjectOutputStream().flush();
             }
         }
         if (!find) {
-            sender.getObjectOutputStream().writeObject(new Message("User not found"));
+            sender.getObjectOutputStream()
+                    .writeObject(new Command(Command.Action.MESSAGE, new Message(serv, "User not found")));
             sender.getObjectOutputStream().flush();
         }
     }

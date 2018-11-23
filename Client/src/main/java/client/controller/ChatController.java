@@ -9,7 +9,9 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Observable;
 
+import chatroomlibrary.Command;
 import chatroomlibrary.Message;
+import chatroomlibrary.User;
 import client.model.Chat;
 
 public class ChatController extends Observable {
@@ -45,30 +47,41 @@ public class ChatController extends Observable {
         notifyObservers(message);
     }
 
-    public void updateUsersList(ArrayList<String> users) {
-        model.setUsersList(users);
+    public void updateUsers(ArrayList<User> users) {
+        model.setUsers(users);
 
         setChanged();
         notifyObservers(users);
     }
 
     public void sendMessage(String text) {
-        try {
-            Message message = new Message(model.getUsername(), text);
+        if (text == "")
+            return;
 
-            if (message.getText().equals("")) {
-                return;
+        Message message = new Message(model.getUser(), text);
+
+        if (text.charAt(0) == '@') {
+            if (text.contains(" ")) {
+                System.out.println("private msg : " + text);
+                int firstSpace = text.indexOf(" ");
+                String to = text.substring(1, firstSpace);
+                message.setText(text.substring(firstSpace + 1, text.length()));
+                message.setTo(to);
             }
+        }
 
-            out.writeObject(message);
+        Command command = new Command(Command.Action.MESSAGE, message);
+
+        try {
+            out.writeObject(command);
             out.flush();
         } catch (Exception ex) {
             System.exit(0);
         }
     }
 
-    public ArrayList<String> getUsersList() {
-        return model.getUsersList();
+    public ArrayList<User> getUsersList() {
+        return model.getUsers();
     }
 
     public Message getLastMessage() {
@@ -88,17 +101,18 @@ public class ChatController extends Observable {
         }
     }
 
-    public void connect(String host, String username) {
-        model.setHost(host);
-        model.setUsername(username);
+    public void connect(String username, String host, int port) {
+        model.getUser().setUsername(username);
+        model.getUser().setHost(host);
+        model.getUser().setPort(port);
 
         try {
-            server = new Socket(host, model.getPort());
+            server = new Socket(host, port);
             in = new ObjectInputStream(server.getInputStream());
             out = new ObjectOutputStream(server.getOutputStream());
 
             // send nickname to server
-            out.writeObject(new Message(Message.Action.LOGIN, username, "password"));
+            out.writeObject(new Command(Command.Action.LOGIN, new Message(model.getUser())));
             out.flush();
         } catch (UnknownHostException e) {
             e.printStackTrace();
@@ -117,12 +131,10 @@ public class ChatController extends Observable {
     }
 
     public void sendFile(File file) {
-        Message message = new Message(Message.Action.REQUEST_FILE);
-        message.setText(file.getName());
-        message.setUsername(model.getUsername());
+        Command command = new Command(Command.Action.REQUEST_FILE, new Message(model.getUser(), file.getName()));
 
         try {
-            out.writeObject(message);
+            out.writeObject(command);
             out.flush();
         } catch (Exception ex) {
             System.exit(0);
@@ -131,33 +143,29 @@ public class ChatController extends Observable {
 
     public void fileRequest(Message message) {
         // Do not ask to the sender
-        if (message.getUsername().equals(model.getUsername()))
+        if (message.getUser().equals(model.getUser()))
             return;
 
-        System.out.println(message.getUsername() + model.getUsername());
+        System.out.println(message.getUser().getUsername() + model.getUser().getUsername());
 
         setChanged();
         notifyObservers("filerequest");
     }
 
     public void acceptFile(String absolutePath) {
-        Message message = new Message(Message.Action.FILE_ACCEPTED);
-        message.setUsername(model.getUsername());
-
-        // send your ip to make connection
-        message.setHost(model.getHost());
+        Command command = new Command(Command.Action.FILE_ACCEPTED, new Message(model.getUser()));
 
         model.setSaveLocation(absolutePath);
 
         try {
-            out.writeObject(message);
+            out.writeObject(command);
             out.flush();
         } catch (Exception ex) {
             System.exit(0);
         }
     }
 
-    public void fileAccepted(String host) {
+    public void fileAccepted(Message message) {
         /**
          * Create connection with client and send the file.
          */

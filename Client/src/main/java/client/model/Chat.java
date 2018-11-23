@@ -3,26 +3,49 @@ package client.model;
 import java.util.ArrayList;
 
 import chatroomlibrary.Message;
+import chatroomlibrary.User;
 
 public class Chat {
-    private String username;
+    private User user;
 
-    private String host;
-    private int Port;
-
-    private ArrayList<String> usersList;
+    private ArrayList<User> users;
     private ArrayList<Message> messages;
 
     private String saveLocation;
 
     public Chat() {
-        this.setHost("localhost");
-        this.username = "username";
-        this.Port = 9001;
+        this.user = new User("username", "localhost", 9001);
 
-        usersList = new ArrayList<>();
+        setUsers(new ArrayList<>());
         messages = new ArrayList<>();
+    }
 
+    /**
+     * @return the users
+     */
+    public ArrayList<User> getUsers() {
+        return users;
+    }
+
+    /**
+     * @param users the users to set
+     */
+    public void setUsers(ArrayList<User> users) {
+        this.users = users;
+    }
+
+    /**
+     * @return the user
+     */
+    public User getUser() {
+        return user;
+    }
+
+    /**
+     * @param user the user to set
+     */
+    public void setUser(User user) {
+        this.user = user;
     }
 
     /**
@@ -55,56 +78,6 @@ public class Chat {
 
     public void appendMessage(Message message) {
         this.messages.add(message);
-    }
-
-    /**
-     * @return the usersList
-     */
-    public ArrayList<String> getUsersList() {
-        return usersList;
-    }
-
-    /**
-     * @param usersList the usersList to set
-     */
-    public void setUsersList(ArrayList<String> usersList) {
-        this.usersList = usersList;
-    }
-
-    /**
-     * @return the port
-     */
-    public int getPort() {
-        return Port;
-    }
-
-    /**
-     * @param port the port to set
-     */
-    public void setPort(int port) {
-        this.Port = port;
-    }
-
-    /**
-     * @return the host
-     */
-    public String getHost() {
-        return host;
-    }
-
-    /**
-     * @param host the host to set
-     */
-    public void setHost(String host) {
-        this.host = host;
-    }
-
-    public String getUsername() {
-        return this.username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
     }
 
     public Message getLastMessage() {

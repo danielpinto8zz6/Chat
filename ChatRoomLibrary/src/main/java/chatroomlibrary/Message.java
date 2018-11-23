@@ -5,42 +5,41 @@ import java.time.LocalDateTime;
 
 public class Message implements Serializable {
     private static final long serialVersionUID = 1L;
+    private User user;
     private String text = null;
-    private String username = null;
-    private String password = null;
-    private Action action;
     private LocalDateTime time;
-    private String host;
-    private boolean isPrivate = false;
+    private String to = null;
 
-    public Message(String text) {
+    public Message(User user, String text) {
         this.time = LocalDateTime.now();
-        this.action = Action.MESSAGE;
+        this.user = user;
         this.text = text;
     }
 
-    public Message(String username, String text) {
+    public Message(User user, String text, String to) {
         this.time = LocalDateTime.now();
-        this.action = Action.MESSAGE;
-        this.username = username;
+        this.user = user;
         this.text = text;
+        this.to = to;
     }
 
-    public Message(Action action) {
+    /**
+     * @return the to
+     */
+    public String getTo() {
+        return to;
+    }
+
+    /**
+     * @param to the to to set
+     */
+    public void setTo(String to) {
+        this.to = to;
+    }
+
+    public Message(User user) {
         this.time = LocalDateTime.now();
-        this.action = action;
-    }
-
-    public Message(Action action, String text) {
-        this.time = LocalDateTime.now();
-        this.action = action;
-        this.text = text;
-    }
-
-    public Message(Action action, String username, String password) {
-        this.action = action;
-        this.username = username;
-        this.password = password;
+        this.user = user;
     }
 
     /**
@@ -58,48 +57,6 @@ public class Message implements Serializable {
     }
 
     /**
-     * @return the action
-     */
-    public Action getAction() {
-        return action;
-    }
-
-    /**
-     * @param action the action to set
-     */
-    public void setAction(Action action) {
-        this.action = action;
-    }
-
-    /**
-     * @return the password
-     */
-    public String getPassword() {
-        return password;
-    }
-
-    /**
-     * @param password the password to set
-     */
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    /**
-     * @return the username
-     */
-    public String getUsername() {
-        return username;
-    }
-
-    /**
-     * @param username the username to set
-     */
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    /**
      * @return the text
      */
     public String getText() {
@@ -114,34 +71,16 @@ public class Message implements Serializable {
     }
 
     /**
-     * @return the host
+     * @return the user
      */
-    public String getHost() {
-        return host;
+    public User getUser() {
+        return user;
     }
 
     /**
-     * @param host the host to set
+     * @param user the user to set
      */
-    public void setHost(String host) {
-        this.host = host;
-    }
-
-    /**
-     * @return the isPrivate
-     */
-    public boolean isPrivate() {
-        return isPrivate;
-    }
-
-    /**
-     * @param isPrivate the isPrivate to set
-     */
-    public void setPrivate(boolean isPrivate) {
-        this.isPrivate = isPrivate;
-    }
-
-    public enum Action {
-        REQUEST_LOGIN, LOGIN, LOGGED, LOGIN_FAILED, MESSAGE, BROADCAST_USERS, REQUEST_FILE, FILE_ACCEPTED
+    public void setUser(User user) {
+        this.user = user;
     }
 }

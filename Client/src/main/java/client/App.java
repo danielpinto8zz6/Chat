@@ -2,7 +2,6 @@ package client;
 
 import client.controller.ChatController;
 import client.model.Chat;
-import client.view.LoginView;
 import client.view.MainView;
 
 /**

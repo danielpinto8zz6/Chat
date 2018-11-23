@@ -2,9 +2,9 @@ package client.controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 
-import chatroomlibrary.Message;
+import chatroomlibrary.Command;
+import chatroomlibrary.User;
 
 class Receiver implements Runnable {
     private final ChatController controller;
@@ -17,27 +17,28 @@ class Receiver implements Runnable {
     public void run() {
         while (!Thread.currentThread().isInterrupted()) {
             try {
-                Message message = (Message) controller.in.readObject();
+                Command command = (Command) controller.in.readObject();
 
-                if (message == null) {
+                if (command == null) {
                     continue;
                 }
 
-                switch (message.getAction()) {
+                switch (command.getAction()) {
                 case MESSAGE:
-                    if (message.getText() != null) {
-                        controller.appendMessage(message);
+                    if (command.getMessage().getText() != null) {
+                        controller.appendMessage(command.getMessage());
                     }
                     break;
                 case BROADCAST_USERS:
-                    String users = message.getText().substring(1, message.getText().length() - 1);
-                    controller.updateUsersList(new ArrayList<>(Arrays.asList(users.split(", "))));
+                    @SuppressWarnings("unchecked")
+                    ArrayList<User> users = (ArrayList<User>) command.getExtraParameters();
+                    controller.updateUsers(users);
                     break;
                 case REQUEST_FILE:
-                    controller.fileRequest(message);
+                    controller.fileRequest(command.getMessage());
                     break;
                 case FILE_ACCEPTED:
-                    controller.fileAccepted(message.getHost());
+                    controller.fileAccepted(command.getMessage());
                     break;
                 default:
                     break;

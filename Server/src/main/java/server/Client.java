@@ -4,19 +4,27 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-class User {
+import chatroomlibrary.User;
+
+class Client {
     private final ObjectOutputStream objectOutputStream;
     private final ObjectInputStream objectInputStream;
-    private final String username;
+    private User user;
     private Socket socket;
 
     // constructor
-    public User(String username, Socket socket, ObjectInputStream in, ObjectOutputStream out) {
-        this.username = username;
-
+    public Client(User user, Socket socket, ObjectInputStream in, ObjectOutputStream out) {
+        this.user = user;
         this.socket = socket;
         this.objectOutputStream = out;
         this.objectInputStream = in;
+    }
+
+    /**
+     * @return the user
+     */
+    public User getUser() {
+        return user;
     }
 
     /**
@@ -24,13 +32,6 @@ class User {
      */
     public Socket getSocket() {
         return socket;
-    }
-
-    /**
-     * @return the username
-     */
-    public String getUsername() {
-        return username;
     }
 
     public ObjectOutputStream getObjectOutputStream() {
@@ -41,10 +42,9 @@ class User {
         return this.objectInputStream;
     }
 
-    // print user with his color
     public String toString() {
 
-        return "<u>" + this.getUsername() + "</u>";
+        return "<u>" + this.getUser().getUsername() + "</u>";
 
     }
 }

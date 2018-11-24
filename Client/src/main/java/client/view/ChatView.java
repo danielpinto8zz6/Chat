@@ -29,10 +29,19 @@ import client.controller.ChatController;
 public class ChatView extends javax.swing.JPanel implements Observer {
     private static final long serialVersionUID = 1L;
     private ChatController controller;
+    private String title = null;
 
     /**
      * Creates new form NewJPanel
      */
+    public ChatView(ChatController controller, String title) {
+        this.controller = controller;
+        this.title = title;
+        controller.addObserver(this);
+
+        initComponents();
+    }
+
     public ChatView(ChatController controller) {
         this.controller = controller;
         controller.addObserver(this);
@@ -133,14 +142,28 @@ public class ChatView extends javax.swing.JPanel implements Observer {
     }// GEN-LAST:event_jubtnActionPerformed
 
     private void jsbtnActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_jsbtnActionPerformed
-        controller.sendMessage(jtextInputChat.getText().trim());
+        String message = jtextInputChat.getText().trim();
+
+        if (title != null) {
+            message = "@" + title + " " + message;
+            System.out.println(message);
+        }
+
+        controller.sendMessage(message);
         jtextInputChat.requestFocus();
         jtextInputChat.setText(null);
     }// GEN-LAST:event_jsbtnActionPerformed
 
     private void jtextInputChatKeyPressed(java.awt.event.KeyEvent evt) {// GEN-FIRST:event_jtextInputChatKeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            controller.sendMessage(jtextInputChat.getText().trim());
+            String message = jtextInputChat.getText().trim();
+
+            if (title != null) {
+                message = "@" + title + " " + message;
+                System.out.println(message);
+            }
+    
+            controller.sendMessage(message);
             jtextInputChat.requestFocus();
             jtextInputChat.setText(null);
         }
@@ -176,28 +199,10 @@ public class ChatView extends javax.swing.JPanel implements Observer {
 
     @Override
     public void update(Observable o, Object arg) {
-        if (arg instanceof Message) {
-            Message message = (Message) arg;
 
-            if (message != null)
-                appendMessage(message);
-
-            return;
-        } else if (arg instanceof ArrayList) {
-            updateUsersList(controller.getUsersList());
-        } else if (arg instanceof String) {
-            String str = (String) arg;
-            switch (str) {
-            case "filerequest":
-                fileRequest();
-                break;
-            default:
-                break;
-            }
-        }
     }
 
-    private void fileRequest() {
+    public void fileRequest() {
         int dialogResult = JOptionPane.showConfirmDialog(this, "Would You Like to accept file?", "Warning",
                 JOptionPane.YES_NO_OPTION);
         if (dialogResult == JOptionPane.YES_OPTION) {
@@ -223,6 +228,20 @@ public class ChatView extends javax.swing.JPanel implements Observer {
         for (User user : users) {
             appendToPane(jtextListUsers, "@" + user.getUsername());
         }
+    }
+
+    /**
+     * @return the title
+     */
+    public String getTitle() {
+        return title;
+    }
+
+    /**
+     * @param title the title to set
+     */
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

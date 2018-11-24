@@ -13,6 +13,7 @@ import chatroomlibrary.Command;
 import chatroomlibrary.Message;
 import chatroomlibrary.User;
 import client.model.Chat;
+import client.model.Conversation;
 
 public class ChatController extends Observable {
     private final Chat model;
@@ -40,11 +41,30 @@ public class ChatController extends Observable {
             threadReceiver.interrupt();
     }
 
-    public void appendMessage(Message message) {
-        model.appendMessage(message);
+    public void addMessage(Message message) {
+        if (message.getTo() == null) {
+            model.addMessage(message);
+        } else {
+            Conversation conversation = getConversation(message.getTo());
+            if (conversation == null) {
+                conversation = new Conversation(message.getUser());
+                model.addConversation(conversation);
+            }
+            conversation.addMessage(message);
+        }
 
         setChanged();
         notifyObservers(message);
+    }
+
+    private Conversation getConversation(String to) {
+        for (Conversation conversation : model.getConversations()) {
+            if (conversation.getUser().getUsername() == to) {
+                return conversation;
+            }
+        }
+
+        return null;
     }
 
     public void updateUsers(ArrayList<User> users) {

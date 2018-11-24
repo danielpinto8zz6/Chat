@@ -11,13 +11,29 @@ public class Chat {
     private ArrayList<User> users;
     private ArrayList<Message> messages;
 
+    private ArrayList<Conversation> conversations;
+
     private String saveLocation;
 
     public Chat() {
         this.user = new User("username", "localhost", 9001);
+        this.users = new ArrayList<>();
+        this.messages = new ArrayList<>();
+        this.conversations = new ArrayList<>();
+    }
 
-        setUsers(new ArrayList<>());
-        messages = new ArrayList<>();
+    /**
+     * @return the conversation
+     */
+    public ArrayList<Conversation> getConversations() {
+        return conversations;
+    }
+
+    /**
+     * @param conversation the conversation to set
+     */
+    public void setConversations(ArrayList<Conversation> conversations) {
+        this.conversations = conversations;
     }
 
     /**
@@ -76,7 +92,7 @@ public class Chat {
         this.messages = messages;
     }
 
-    public void appendMessage(Message message) {
+    public void addMessage(Message message) {
         this.messages.add(message);
     }
 
@@ -87,4 +103,8 @@ public class Chat {
         Message last = messages.get(messages.size() - 1);
         return last;
     }
+
+    public void addConversation(Conversation conversation) {
+        conversations.add(conversation);
+	}
 }

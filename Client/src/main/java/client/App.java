@@ -9,6 +9,8 @@ import client.view.MainView;
  */
 class App {
     /**
+     * <p>main.</p>
+     *
      * @param args the command line arguments
      */
     public static void main(String[] args) {

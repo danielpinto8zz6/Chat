@@ -9,10 +9,16 @@ import chatroomlibrary.User;
 class Receiver implements Runnable {
     private final ChatController controller;
 
+    /**
+     * <p>Constructor for Receiver.</p>
+     *
+     * @param controller a {@link client.controller.ChatController} object.
+     */
     public Receiver(ChatController controller) {
         this.controller = controller;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void run() {
         while (!Thread.currentThread().isInterrupted()) {

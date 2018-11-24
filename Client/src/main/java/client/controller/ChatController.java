@@ -15,6 +15,12 @@ import chatroomlibrary.User;
 import client.model.Chat;
 import client.model.Conversation;
 
+/**
+ * <p>ChatController class.</p>
+ *
+ * @author daniel
+ * @version $Id: $Id
+ */
 public class ChatController extends Observable {
     private final Chat model;
 
@@ -24,6 +30,11 @@ public class ChatController extends Observable {
 
     private Thread threadReceiver = null;
 
+    /**
+     * <p>Constructor for ChatController.</p>
+     *
+     * @param model a {@link client.model.Chat} object.
+     */
     public ChatController(Chat model) {
         this.model = model;
     }
@@ -41,6 +52,11 @@ public class ChatController extends Observable {
             threadReceiver.interrupt();
     }
 
+    /**
+     * <p>addMessage.</p>
+     *
+     * @param message a {@link chatroomlibrary.Message} object.
+     */
     public void addMessage(Message message) {
         if (message.getTo() == null) {
             model.addMessage(message);
@@ -67,6 +83,11 @@ public class ChatController extends Observable {
         return null;
     }
 
+    /**
+     * <p>updateUsers.</p>
+     *
+     * @param users a {@link java.util.ArrayList} object.
+     */
     public void updateUsers(ArrayList<User> users) {
         model.setUsers(users);
 
@@ -74,6 +95,11 @@ public class ChatController extends Observable {
         notifyObservers(users);
     }
 
+    /**
+     * <p>sendMessage.</p>
+     *
+     * @param text a {@link java.lang.String} object.
+     */
     public void sendMessage(String text) {
         if (text == "")
             return;
@@ -100,14 +126,27 @@ public class ChatController extends Observable {
         }
     }
 
+    /**
+     * <p>getUsersList.</p>
+     *
+     * @return a {@link java.util.ArrayList} object.
+     */
     public ArrayList<User> getUsersList() {
         return model.getUsers();
     }
 
+    /**
+     * <p>getLastMessage.</p>
+     *
+     * @return a {@link chatroomlibrary.Message} object.
+     */
     public Message getLastMessage() {
         return model.getLastMessage();
     }
 
+    /**
+     * <p>disconnect.</p>
+     */
     public void disconnect() {
         if (threadReceiver != null) {
             stopReceiver();
@@ -121,6 +160,13 @@ public class ChatController extends Observable {
         }
     }
 
+    /**
+     * <p>connect.</p>
+     *
+     * @param username a {@link java.lang.String} object.
+     * @param host a {@link java.lang.String} object.
+     * @param port a int.
+     */
     public void connect(String username, String host, int port) {
         model.getUser().setUsername(username);
         model.getUser().setHost(host);
@@ -146,10 +192,20 @@ public class ChatController extends Observable {
         notifyObservers("connected");
     }
 
+    /**
+     * <p>getRemoteSocketAddress.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
     public String getRemoteSocketAddress() {
         return server.getRemoteSocketAddress().toString();
     }
 
+    /**
+     * <p>sendFile.</p>
+     *
+     * @param file a {@link java.io.File} object.
+     */
     public void sendFile(File file) {
         Command command = new Command(Command.Action.REQUEST_FILE, new Message(model.getUser(), file.getName()));
 
@@ -161,6 +217,11 @@ public class ChatController extends Observable {
         }
     }
 
+    /**
+     * <p>fileRequest.</p>
+     *
+     * @param message a {@link chatroomlibrary.Message} object.
+     */
     public void fileRequest(Message message) {
         // Do not ask to the sender
         if (message.getUser().equals(model.getUser()))
@@ -172,6 +233,11 @@ public class ChatController extends Observable {
         notifyObservers("filerequest");
     }
 
+    /**
+     * <p>acceptFile.</p>
+     *
+     * @param absolutePath a {@link java.lang.String} object.
+     */
     public void acceptFile(String absolutePath) {
         Command command = new Command(Command.Action.FILE_ACCEPTED, new Message(model.getUser()));
 
@@ -185,12 +251,24 @@ public class ChatController extends Observable {
         }
     }
 
+    /**
+     * <p>fileAccepted.</p>
+     *
+     * @param message a {@link chatroomlibrary.Message} object.
+     */
     public void fileAccepted(Message message) {
         /**
          * Create connection with client and send the file.
          */
     }
 
+    /**
+     * <p>authenticate.</p>
+     *
+     * @param username a {@link java.lang.String} object.
+     * @param password a {@link java.lang.String} object.
+     * @return a boolean.
+     */
     public boolean authenticate(String username, String password) {
         return true;
     }

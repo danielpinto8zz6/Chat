@@ -19,6 +19,11 @@ class Server {
     private final List<Client> clients;
     private User serv;
 
+    /**
+     * <p>Constructor for Server.</p>
+     *
+     * @param port a int.
+     */
     public Server(int port) {
         this.clients = new ArrayList<>();
 
@@ -29,6 +34,9 @@ class Server {
         }
     }
 
+    /**
+     * <p>run.</p>
+     */
     public void run() {
         ServerSocket server = null;
         try {
@@ -76,11 +84,21 @@ class Server {
     }
 
     // delete a user from the list
+    /**
+     * <p>removeClient.</p>
+     *
+     * @param client a {@link server.Client} object.
+     */
     public void removeClient(Client client) {
         this.clients.remove(client);
     }
 
     // send incoming msg to all Users
+    /**
+     * <p>broadcastCommand.</p>
+     *
+     * @param command a {@link chatroomlibrary.Command} object.
+     */
     public void broadcastCommand(Command command) {
         for (Client client : this.clients) {
             try {
@@ -93,6 +111,9 @@ class Server {
     }
 
     // send list of clients to all Users
+    /**
+     * <p>broadcastAllUsers.</p>
+     */
     public void broadcastAllUsers() {
         Command command = new Command(Command.Action.BROADCAST_USERS);
         command.setExtraParameters(getUsers());
@@ -115,6 +136,14 @@ class Server {
         return users;
     }
 
+    /**
+     * <p>sendCommandToUser.</p>
+     *
+     * @param command a {@link chatroomlibrary.Command} object.
+     * @param sender a {@link server.Client} object.
+     * @param user a {@link java.lang.String} object.
+     * @throws java.io.IOException if any.
+     */
     public void sendCommandToUser(Command command, Client sender, String user) throws IOException {
         boolean find = false;
         for (Client client : this.clients) {

@@ -9,12 +9,21 @@ class ClientHandler implements Runnable {
     private final Server server;
     private final Client client;
 
+    /**
+     * <p>Constructor for ClientHandler.</p>
+     *
+     * @param server a {@link server.Server} object.
+     * @param client a {@link server.Client} object.
+     */
     public ClientHandler(Server server, Client client) {
         this.server = server;
         this.client = client;
         this.server.broadcastAllUsers();
     }
 
+    /**
+     * <p>run.</p>
+     */
     public void run() {
         Command command;
 

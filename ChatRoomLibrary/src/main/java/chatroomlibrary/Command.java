@@ -2,22 +2,41 @@ package chatroomlibrary;
 
 import java.io.Serializable;
 
+/**
+ * <p>Command class.</p>
+ *
+ * @author daniel
+ * @version $Id: $Id
+ */
 public class Command implements Serializable {
     private static final long serialVersionUID = 1L;
     private Action action;
     private Message message;
     private Object extraParameters;
 
+    /**
+     * <p>Constructor for Command.</p>
+     *
+     * @param action a {@link chatroomlibrary.Command.Action} object.
+     */
     public Command(Action action) {
         this.action = action;
     }
 
+    /**
+     * <p>Constructor for Command.</p>
+     *
+     * @param action a {@link chatroomlibrary.Command.Action} object.
+     * @param message a {@link chatroomlibrary.Message} object.
+     */
     public Command(Action action, Message message) {
         this.action = action;
         this.message = message;
     }
 
     /**
+     * <p>Getter for the field <code>extraParameters</code>.</p>
+     *
      * @return the extraParameters
      */
     public Object getExtraParameters() {
@@ -25,6 +44,8 @@ public class Command implements Serializable {
     }
 
     /**
+     * <p>Setter for the field <code>extraParameters</code>.</p>
+     *
      * @param extraParameters the extraParameters to set
      */
     public void setExtraParameters(Object extraParameters) {
@@ -32,6 +53,8 @@ public class Command implements Serializable {
     }
 
     /**
+     * <p>Getter for the field <code>message</code>.</p>
+     *
      * @return the message
      */
     public Message getMessage() {
@@ -39,6 +62,8 @@ public class Command implements Serializable {
     }
 
     /**
+     * <p>Setter for the field <code>message</code>.</p>
+     *
      * @param message the message to set
      */
     public void setMessage(Message message) {
@@ -46,6 +71,8 @@ public class Command implements Serializable {
     }
 
     /**
+     * <p>Getter for the field <code>action</code>.</p>
+     *
      * @return the action
      */
     public Action getAction() {
@@ -53,6 +80,8 @@ public class Command implements Serializable {
     }
 
     /**
+     * <p>Setter for the field <code>action</code>.</p>
+     *
      * @param action the action to set
      */
     public void setAction(Action action) {

@@ -11,6 +11,8 @@ class App {
     private static final int PORT = 9001;
 
     /**
+     * <p>main.</p>
+     *
      * @param args the command line arguments
      */
     public static void main(String[] args) {

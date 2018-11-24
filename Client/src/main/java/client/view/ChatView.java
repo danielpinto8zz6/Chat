@@ -214,7 +214,26 @@ public class ChatView extends javax.swing.JPanel implements Observer {
 
     @Override
     public void update(Observable o, Object arg) {
+        if (arg instanceof Message) {
+            Message message = (Message) arg;
 
+            if (message != null) {
+                appendMessage(message);
+            }
+
+            return;
+        } else if (arg instanceof ArrayList) {
+            updateUsersList(controller.getUsersList());
+        } else if (arg instanceof String) {
+            String str = (String) arg;
+            switch (str) {
+            case "filerequest":
+                fileRequest();
+                break;
+            default:
+                break;
+            }
+        }
     }
 
     public void fileRequest() {

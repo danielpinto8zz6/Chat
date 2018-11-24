@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 
-import chatroomlibrary.Message;
 import client.controller.ChatController;
 
 /**
@@ -106,55 +105,12 @@ public class MainView extends javax.swing.JFrame implements Observer {
             String str = (String) arg;
             switch (str) {
             case "connected":
+                jTabbedPane.removeAll();
                 jTabbedPane.addTab("General", chatView);
-                jTabbedPane.removeTabAt(0);
-                break;
-            default:
-                break;
-            }
-        } else if (arg instanceof Message) {
-            Message message = (Message) arg;
-
-            if (message != null) {
-                if (message.getTo() == null) {
-                    chatView.appendMessage(message);
-                    jTabbedPane.setSelectedComponent(chatView);
-                } else {
-                    ChatView privateChatView = getChatView(message.getTo());
-                    if (privateChatView != null) {
-                        privateChatView.appendMessage(message);
-                    } else {
-                        privateChatView = new ChatView(controller, message.getTo());
-                        chatViews.add(privateChatView);
-                        privateChatView.appendMessage(message);
-                        jTabbedPane.addTab(privateChatView.getTitle(), privateChatView);
-                    }
-                    jTabbedPane.setSelectedComponent(privateChatView);
-                }
-            }
-
-            return;
-        } else if (arg instanceof ArrayList) {
-            chatView.updateUsersList(controller.getUsersList());
-        } else if (arg instanceof String) {
-            String str = (String) arg;
-            switch (str) {
-            case "filerequest":
-                chatView.fileRequest();
                 break;
             default:
                 break;
             }
         }
     }
-
-    private ChatView getChatView(String to) {
-        for (ChatView c : chatViews) {
-            if (c.getTitle().equals(to)) {
-                return c;
-            }
-        }
-        return null;
-    }
-
 }

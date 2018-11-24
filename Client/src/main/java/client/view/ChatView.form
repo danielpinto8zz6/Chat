@@ -29,9 +29,9 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="jsbtn" min="-2" pref="82" max="-2" attributes="0"/>
                   </Group>
-                  <Component id="jScrollPane4" max="32767" attributes="0"/>
+                  <Component id="jScrollPane1" pref="0" max="32767" attributes="0"/>
               </Group>
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -40,8 +40,8 @@
           <Group type="102" alignment="1" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jScrollPane2" max="32767" attributes="0"/>
-                  <Component id="jScrollPane4" pref="420" max="32767" attributes="0"/>
+                  <Component id="jScrollPane2" pref="420" max="32767" attributes="0"/>
+                  <Component id="jScrollPane1" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="1" max="-2" attributes="0">
@@ -58,7 +58,6 @@
     <Component class="javax.swing.JButton" name="jsbtn">
       <Properties>
         <Property name="text" type="java.lang.String" value="Send"/>
-        <Property name="enabled" type="boolean" value="false"/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jsbtnActionPerformed"/>
@@ -70,9 +69,6 @@
       <SubComponents>
         <Component class="javax.swing.JTextField" name="jtextInputChat">
           <Properties>
-            <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-              <Color blue="66" green="33" red="ff" type="rgb"/>
-            </Property>
             <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
               <Border info="null"/>
             </Property>
@@ -86,7 +82,6 @@
     <Component class="javax.swing.JButton" name="jubtn">
       <Properties>
         <Property name="text" type="java.lang.String" value="Upload"/>
-        <Property name="enabled" type="boolean" value="false"/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jubtnActionPerformed"/>
@@ -104,15 +99,23 @@
         </Component>
       </SubComponents>
     </Container>
-    <Container class="javax.swing.JScrollPane" name="jScrollPane4">
+    <Container class="javax.swing.JScrollPane" name="jScrollPane1">
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
       <SubComponents>
-        <Component class="javax.swing.JTextPane" name="jtextListUsers">
+        <Component class="javax.swing.JList" name="jListUsers">
           <Properties>
-            <Property name="editable" type="boolean" value="false"/>
-            <Property name="contentType" type="java.lang.String" value="text/html" noResource="true"/>
+            <Property name="model" type="javax.swing.ListModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection component="jListUsers" name="model" type="property"/>
+            </Property>
+            <Property name="selectionMode" type="int" value="0"/>
           </Properties>
+          <Events>
+            <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="jListUsersMouseClicked"/>
+          </Events>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
+          </AuxValues>
         </Component>
       </SubComponents>
     </Container>

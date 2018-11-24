@@ -56,6 +56,8 @@ public class ChatView extends javax.swing.JPanel implements Observer {
      */
     // <editor-fold defaultstate="collapsed" desc="Generated
     // <editor-fold defaultstate="collapsed" desc="Generated
+    // <editor-fold defaultstate="collapsed" desc="Generated
+    // <editor-fold defaultstate="collapsed" desc="Generated
     // Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
@@ -65,8 +67,8 @@ public class ChatView extends javax.swing.JPanel implements Observer {
         jubtn = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
         jtextFilDiscu = new javax.swing.JTextPane();
-        jScrollPane4 = new javax.swing.JScrollPane();
-        jtextListUsers = new javax.swing.JTextPane();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jListUsers = new javax.swing.JList<>();
 
         jsbtn.setText("Send");
         jsbtn.addActionListener(new java.awt.event.ActionListener() {
@@ -94,9 +96,14 @@ public class ChatView extends javax.swing.JPanel implements Observer {
         jtextFilDiscu.setContentType("text/html"); // NOI18N
         jScrollPane2.setViewportView(jtextFilDiscu);
 
-        jtextListUsers.setEditable(false);
-        jtextListUsers.setContentType("text/html"); // NOI18N
-        jScrollPane4.setViewportView(jtextListUsers);
+        jListUsers.setModel(jListUsers.getModel());
+        jListUsers.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        jListUsers.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jListUsersMouseClicked(evt);
+            }
+        });
+        jScrollPane1.setViewportView(jListUsers);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -112,21 +119,29 @@ public class ChatView extends javax.swing.JPanel implements Observer {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).addComponent(jsbtn,
                                         javax.swing.GroupLayout.PREFERRED_SIZE, 82,
                                         javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addComponent(jScrollPane4))
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addContainerGap()));
         layout.setVerticalGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup().addContainerGap()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(jScrollPane2)
-                                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 420, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                .addComponent(jtextInputChatSP)
-                                .addComponent(jubtn, javax.swing.GroupLayout.DEFAULT_SIZE, 50, Short.MAX_VALUE)
-                                .addComponent(jsbtn, javax.swing.GroupLayout.DEFAULT_SIZE,
-                                        javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addContainerGap()));
+                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING,
+                        layout.createSequentialGroup().addContainerGap()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 420,
+                                                Short.MAX_VALUE)
+                                        .addComponent(jScrollPane1))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                        .addComponent(jtextInputChatSP)
+                                        .addComponent(jubtn, javax.swing.GroupLayout.DEFAULT_SIZE, 50, Short.MAX_VALUE)
+                                        .addComponent(jsbtn, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addContainerGap()));
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jListUsersMouseClicked(java.awt.event.MouseEvent evt) {// GEN-FIRST:event_jListUsersMouseClicked
+        String selectedItem = (String) jListUsers.getSelectedValue();
+        jtextInputChat.setText("@" + selectedItem + " ");
+        jtextInputChat.grabFocus();
+    }// GEN-LAST:event_jListUsersMouseClicked
 
     private void jubtnActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_jubtnActionPerformed
         JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
@@ -162,7 +177,7 @@ public class ChatView extends javax.swing.JPanel implements Observer {
                 message = "@" + title + " " + message;
                 System.out.println(message);
             }
-    
+
             controller.sendMessage(message);
             jtextInputChat.requestFocus();
             jtextInputChat.setText(null);
@@ -224,10 +239,15 @@ public class ChatView extends javax.swing.JPanel implements Observer {
     }
 
     public void updateUsersList(ArrayList<User> users) {
-        jtextListUsers.setText(null);
+        // jtextListUsers.setText(null);
+        jListUsers.clearSelection();
+        ArrayList<String> usernames = new ArrayList<>();
         for (User user : users) {
-            appendToPane(jtextListUsers, "@" + user.getUsername());
+            usernames.add(user.getUsername());
         }
+        String[] usernamesArr = new String[usernames.size()];
+        usernamesArr = usernames.toArray(usernamesArr);
+        jListUsers.setListData(usernamesArr);
     }
 
     /**
@@ -245,13 +265,13 @@ public class ChatView extends javax.swing.JPanel implements Observer {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JList<String> jListUsers;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JButton jsbtn;
     private javax.swing.JTextPane jtextFilDiscu;
     private javax.swing.JTextField jtextInputChat;
     private javax.swing.JScrollPane jtextInputChatSP;
-    private javax.swing.JTextPane jtextListUsers;
     private javax.swing.JButton jubtn;
     // End of variables declaration//GEN-END:variables
 }

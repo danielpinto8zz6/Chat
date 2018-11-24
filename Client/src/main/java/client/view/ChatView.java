@@ -258,8 +258,6 @@ public class ChatView extends javax.swing.JPanel implements Observer {
     }
 
     public void updateUsersList(ArrayList<User> users) {
-        // jtextListUsers.setText(null);
-        jListUsers.clearSelection();
         ArrayList<String> usernames = new ArrayList<>();
         for (User user : users) {
             usernames.add(user.getUsername());

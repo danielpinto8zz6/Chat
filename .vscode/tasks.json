@@ -6,7 +6,7 @@
         {
             "label": "clean install",
             "type": "shell",
-            "command": "mvn -B clean install",
+            "command": "mvn clean install",
             "group": "build"
         }
     ]

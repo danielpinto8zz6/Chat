@@ -20,7 +20,9 @@ class Server {
     private User serv;
 
     /**
-     * <p>Constructor for Server.</p>
+     * <p>
+     * Constructor for Server.
+     * </p>
      *
      * @param port a int.
      */
@@ -35,7 +37,9 @@ class Server {
     }
 
     /**
-     * <p>run.</p>
+     * <p>
+     * run.
+     * </p>
      */
     public void run() {
         ServerSocket server = null;
@@ -85,7 +89,9 @@ class Server {
 
     // delete a user from the list
     /**
-     * <p>removeClient.</p>
+     * <p>
+     * removeClient.
+     * </p>
      *
      * @param client a {@link server.Client} object.
      */
@@ -95,7 +101,9 @@ class Server {
 
     // send incoming msg to all Users
     /**
-     * <p>broadcastCommand.</p>
+     * <p>
+     * broadcastCommand.
+     * </p>
      *
      * @param command a {@link chatroomlibrary.Command} object.
      */
@@ -112,7 +120,9 @@ class Server {
 
     // send list of clients to all Users
     /**
-     * <p>broadcastAllUsers.</p>
+     * <p>
+     * broadcastAllUsers.
+     * </p>
      */
     public void broadcastAllUsers() {
         Command command = new Command(Command.Action.BROADCAST_USERS);
@@ -137,11 +147,13 @@ class Server {
     }
 
     /**
-     * <p>sendCommandToUser.</p>
+     * <p>
+     * sendCommandToUser.
+     * </p>
      *
      * @param command a {@link chatroomlibrary.Command} object.
-     * @param sender a {@link server.Client} object.
-     * @param user a {@link java.lang.String} object.
+     * @param sender  a {@link server.Client} object.
+     * @param user    a {@link java.lang.String} object.
      * @throws java.io.IOException if any.
      */
     public void sendCommandToUser(Command command, Client sender, String user) throws IOException {
@@ -151,8 +163,10 @@ class Server {
                 find = true;
                 client.getObjectOutputStream().writeObject(command);
                 client.getObjectOutputStream().flush();
-                sender.getObjectOutputStream().writeObject(command);
-                sender.getObjectOutputStream().flush();
+                if (command.getAction() != Command.Action.REQUEST_FILE) {
+                    sender.getObjectOutputStream().writeObject(command);
+                    sender.getObjectOutputStream().flush();
+                }
             }
         }
         if (!find) {

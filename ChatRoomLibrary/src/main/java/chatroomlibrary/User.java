@@ -3,7 +3,9 @@ package chatroomlibrary;
 import java.io.Serializable;
 
 /**
- * <p>User class.</p>
+ * <p>
+ * User class.
+ * </p>
  *
  * @author daniel
  * @version $Id: $Id
@@ -16,11 +18,13 @@ public class User implements Serializable {
     int port;
 
     /**
-     * <p>Constructor for User.</p>
+     * <p>
+     * Constructor for User.
+     * </p>
      *
      * @param username a {@link java.lang.String} object.
-     * @param host a {@link java.lang.String} object.
-     * @param port a int.
+     * @param host     a {@link java.lang.String} object.
+     * @param port     a int.
      */
     public User(String username, String host, int port) {
         this.username = username;
@@ -29,7 +33,9 @@ public class User implements Serializable {
     }
 
     /**
-     * <p>Getter for the field <code>username</code>.</p>
+     * <p>
+     * Getter for the field <code>username</code>.
+     * </p>
      *
      * @return a {@link java.lang.String} object.
      */
@@ -38,7 +44,9 @@ public class User implements Serializable {
     }
 
     /**
-     * <p>Setter for the field <code>username</code>.</p>
+     * <p>
+     * Setter for the field <code>username</code>.
+     * </p>
      *
      * @param username a {@link java.lang.String} object.
      */
@@ -47,7 +55,9 @@ public class User implements Serializable {
     }
 
     /**
-     * <p>Getter for the field <code>host</code>.</p>
+     * <p>
+     * Getter for the field <code>host</code>.
+     * </p>
      *
      * @return a {@link java.lang.String} object.
      */
@@ -56,7 +66,9 @@ public class User implements Serializable {
     }
 
     /**
-     * <p>Setter for the field <code>host</code>.</p>
+     * <p>
+     * Setter for the field <code>host</code>.
+     * </p>
      *
      * @param host a {@link java.lang.String} object.
      */
@@ -65,7 +77,9 @@ public class User implements Serializable {
     }
 
     /**
-     * <p>Getter for the field <code>port</code>.</p>
+     * <p>
+     * Getter for the field <code>port</code>.
+     * </p>
      *
      * @return a int.
      */
@@ -74,11 +88,27 @@ public class User implements Serializable {
     }
 
     /**
-     * <p>Setter for the field <code>port</code>.</p>
+     * <p>
+     * Setter for the field <code>port</code>.
+     * </p>
      *
      * @param port a int.
      */
     public void setPort(int port) {
         this.port = port;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this)
+            return true;
+        if (!(o instanceof User)) {
+            return false;
+        }
+        User user = (User) o;
+
+        return (username.equals(user.getUsername()) && host.equals(user.getHost()) && port == user.getPort()) ? true
+                : false;
+
     }
 }

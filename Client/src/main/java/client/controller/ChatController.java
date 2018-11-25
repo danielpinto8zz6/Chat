@@ -16,7 +16,9 @@ import client.model.Chat;
 import client.model.Conversation;
 
 /**
- * <p>ChatController class.</p>
+ * <p>
+ * ChatController class.
+ * </p>
  *
  * @author daniel
  * @version $Id: $Id
@@ -30,8 +32,12 @@ public class ChatController extends Observable {
 
     private Thread threadReceiver = null;
 
+    private User tmpUser;
+
     /**
-     * <p>Constructor for ChatController.</p>
+     * <p>
+     * Constructor for ChatController.
+     * </p>
      *
      * @param model a {@link client.model.Chat} object.
      */
@@ -53,7 +59,9 @@ public class ChatController extends Observable {
     }
 
     /**
-     * <p>addMessage.</p>
+     * <p>
+     * addMessage.
+     * </p>
      *
      * @param message a {@link chatroomlibrary.Message} object.
      */
@@ -84,7 +92,9 @@ public class ChatController extends Observable {
     }
 
     /**
-     * <p>updateUsers.</p>
+     * <p>
+     * updateUsers.
+     * </p>
      *
      * @param users a {@link java.util.ArrayList} object.
      */
@@ -96,7 +106,9 @@ public class ChatController extends Observable {
     }
 
     /**
-     * <p>sendMessage.</p>
+     * <p>
+     * sendMessage.
+     * </p>
      *
      * @param text a {@link java.lang.String} object.
      */
@@ -127,7 +139,9 @@ public class ChatController extends Observable {
     }
 
     /**
-     * <p>getUsersList.</p>
+     * <p>
+     * getUsersList.
+     * </p>
      *
      * @return a {@link java.util.ArrayList} object.
      */
@@ -136,7 +150,9 @@ public class ChatController extends Observable {
     }
 
     /**
-     * <p>getLastMessage.</p>
+     * <p>
+     * getLastMessage.
+     * </p>
      *
      * @return a {@link chatroomlibrary.Message} object.
      */
@@ -145,7 +161,9 @@ public class ChatController extends Observable {
     }
 
     /**
-     * <p>disconnect.</p>
+     * <p>
+     * disconnect.
+     * </p>
      */
     public void disconnect() {
         if (threadReceiver != null) {
@@ -161,11 +179,13 @@ public class ChatController extends Observable {
     }
 
     /**
-     * <p>connect.</p>
+     * <p>
+     * connect.
+     * </p>
      *
      * @param username a {@link java.lang.String} object.
-     * @param host a {@link java.lang.String} object.
-     * @param port a int.
+     * @param host     a {@link java.lang.String} object.
+     * @param port     a int.
      */
     public void connect(String username, String host, int port) {
         model.getUser().setUsername(username);
@@ -193,7 +213,9 @@ public class ChatController extends Observable {
     }
 
     /**
-     * <p>getRemoteSocketAddress.</p>
+     * <p>
+     * getRemoteSocketAddress.
+     * </p>
      *
      * @return a {@link java.lang.String} object.
      */
@@ -202,12 +224,15 @@ public class ChatController extends Observable {
     }
 
     /**
-     * <p>sendFile.</p>
+     * <p>
+     * sendFile.
+     * </p>
      *
      * @param file a {@link java.io.File} object.
      */
-    public void sendFile(File file) {
-        Command command = new Command(Command.Action.REQUEST_FILE, new Message(model.getUser(), file.getName()));
+    public void sendFile(File file, String username) {
+        Message message = new Message(model.getUser(), file.getName(), username);
+        Command command = new Command(Command.Action.REQUEST_FILE, message);
 
         try {
             out.writeObject(command);
@@ -218,7 +243,9 @@ public class ChatController extends Observable {
     }
 
     /**
-     * <p>fileRequest.</p>
+     * <p>
+     * fileRequest.
+     * </p>
      *
      * @param message a {@link chatroomlibrary.Message} object.
      */
@@ -227,6 +254,8 @@ public class ChatController extends Observable {
         if (message.getUser().equals(model.getUser()))
             return;
 
+        tmpUser = message.getUser();
+
         System.out.println(message.getUser().getUsername() + model.getUser().getUsername());
 
         setChanged();
@@ -234,12 +263,16 @@ public class ChatController extends Observable {
     }
 
     /**
-     * <p>acceptFile.</p>
+     * <p>
+     * acceptFile.
+     * 
+     * </p>
      *
      * @param absolutePath a {@link java.lang.String} object.
      */
     public void acceptFile(String absolutePath) {
         Command command = new Command(Command.Action.FILE_ACCEPTED, new Message(model.getUser()));
+        command.getMessage().setTo(tmpUser.getUsername());
 
         model.setSaveLocation(absolutePath);
 
@@ -252,7 +285,9 @@ public class ChatController extends Observable {
     }
 
     /**
-     * <p>fileAccepted.</p>
+     * <p>
+     * fileAccepted.
+     * </p>
      *
      * @param message a {@link chatroomlibrary.Message} object.
      */
@@ -260,10 +295,14 @@ public class ChatController extends Observable {
         /**
          * Create connection with client and send the file.
          */
+        System.out.println(message.getUser().getUsername());
+        System.out.println(message.getTo());
     }
 
     /**
-     * <p>authenticate.</p>
+     * <p>
+     * authenticate.
+     * </p>
      *
      * @param username a {@link java.lang.String} object.
      * @param password a {@link java.lang.String} object.
@@ -271,5 +310,16 @@ public class ChatController extends Observable {
      */
     public boolean authenticate(String username, String password) {
         return true;
+    }
+
+    public String[] getUsernames() {
+        ArrayList<String> usernames = new ArrayList<>();
+        for (User user : model.getUsers()) {
+            if (!user.equals(model.getUser()))
+                usernames.add(user.getUsername());
+        }
+        String[] usernamesArr = new String[usernames.size()];
+        usernamesArr = usernames.toArray(usernamesArr);
+        return usernamesArr;
     }
 }

@@ -10,7 +10,9 @@ class Receiver implements Runnable {
     private final ChatController controller;
 
     /**
-     * <p>Constructor for Receiver.</p>
+     * <p>
+     * Constructor for Receiver.
+     * </p>
      *
      * @param controller a {@link client.controller.ChatController} object.
      */
@@ -37,7 +39,7 @@ class Receiver implements Runnable {
                     break;
                 case BROADCAST_USERS:
                     @SuppressWarnings("unchecked")
-                    ArrayList<User> users = (ArrayList<User>) command.getExtraParameters();
+                    ArrayList<User> users = (ArrayList<User>) command.getMessage().getData();
                     controller.updateUsers(users);
                     break;
                 case REQUEST_FILE:

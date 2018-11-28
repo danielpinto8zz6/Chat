@@ -12,8 +12,10 @@ public class FileReceiver implements Runnable {
     private ServerSocket serverSocket;
     private File file;
     private String path;
+    private ChatController controller;
 
-    public FileReceiver(int port, File file, String path) {
+    public FileReceiver(ChatController controller, int port, File file, String path) {
+        this.controller = controller;
         this.file = file;
         this.path = path;
 
@@ -45,6 +47,7 @@ public class FileReceiver implements Runnable {
         dis.close();
 
         System.out.println("File received! Exiting!");
+        controller.fileReceived(newFile);
     }
 
     @Override

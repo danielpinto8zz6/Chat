@@ -12,6 +12,7 @@ import java.util.Observable;
 import chatroomlibrary.Command;
 import chatroomlibrary.Message;
 import chatroomlibrary.User;
+import chatroomlibrary.Command.Action;
 import client.model.Chat;
 import client.model.Conversation;
 
@@ -132,8 +133,8 @@ public class ChatController extends Observable {
         try {
             out.writeObject(command);
             out.flush();
-        } catch (Exception ex) {
-            System.exit(0);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -236,8 +237,8 @@ public class ChatController extends Observable {
         try {
             out.writeObject(command);
             out.flush();
-        } catch (Exception ex) {
-            System.exit(0);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -276,13 +277,13 @@ public class ChatController extends Observable {
         try {
             out.writeObject(command);
             out.flush();
-        } catch (Exception ex) {
-            System.exit(0);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         // File accepted, create FileReceiver thread and wait for user to connect and
         // send the file
-        Thread thread = new Thread(new FileReceiver(9002, file, path));
+        Thread thread = new Thread(new FileReceiver(this, 9002, file, path));
         thread.start();
     }
 
@@ -299,7 +300,7 @@ public class ChatController extends Observable {
          */
         File file = (File) message.getData();
 
-        Thread thread = new Thread(new FileSender(message.getUser().getHost(), 9002, file));
+        Thread thread = new Thread(new FileSender(this, message.getUser().getHost(), 9002, file));
         thread.start();
     }
 
@@ -325,5 +326,15 @@ public class ChatController extends Observable {
         String[] usernamesArr = new String[usernames.size()];
         usernamesArr = usernames.toArray(usernamesArr);
         return usernamesArr;
+    }
+
+    public void fileSent(String filePath) {
+        setChanged();
+        notifyObservers(new String[] { "file-sent", filePath });
+    }
+
+    public void fileReceived(String filePath) {
+        setChanged();
+        notifyObservers(new String[] { "file-received", filePath });
     }
 }

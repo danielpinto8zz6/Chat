@@ -10,8 +10,10 @@ public class FileSender implements Runnable {
 
     private Socket socket;
     private File file;
+    private ChatController controller;
 
-    public FileSender(String host, int port, File file) {
+    public FileSender(ChatController controller, String host, int port, File file) {
+        this.controller = controller;
         this.file = file;
         try {
             socket = new Socket(host, port);
@@ -39,6 +41,8 @@ public class FileSender implements Runnable {
             try {
                 fis.close();
                 dos.close();
+
+                controller.fileSent(file.getAbsolutePath());
             } catch (IOException e) {
                 e.printStackTrace();
             }

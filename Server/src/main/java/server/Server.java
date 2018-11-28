@@ -125,8 +125,7 @@ class Server {
      * </p>
      */
     public void broadcastAllUsers() {
-        Command command = new Command(Command.Action.BROADCAST_USERS);
-        command.setExtraParameters(getUsers());
+        Command command = new Command(Command.Action.BROADCAST_USERS, new Message(serv, getUsers()));
 
         for (Client client : this.clients) {
             try {
@@ -163,7 +162,7 @@ class Server {
                 find = true;
                 client.getObjectOutputStream().writeObject(command);
                 client.getObjectOutputStream().flush();
-                if (command.getAction() != Command.Action.REQUEST_FILE) {
+                if (command.getAction() == Command.Action.MESSAGE) {
                     sender.getObjectOutputStream().writeObject(command);
                     sender.getObjectOutputStream().flush();
                 }

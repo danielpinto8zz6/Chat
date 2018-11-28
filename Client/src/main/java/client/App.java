@@ -9,7 +9,9 @@ import client.view.MainView;
  */
 class App {
     /**
-     * <p>main.</p>
+     * <p>
+     * main.
+     * </p>
      *
      * @param args the command line arguments
      */

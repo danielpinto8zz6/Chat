@@ -12,7 +12,6 @@ public class Command implements Serializable {
     private static final long serialVersionUID = 1L;
     private Action action;
     private Message message;
-    private Object extraParameters;
 
     /**
      * <p>Constructor for Command.</p>
@@ -32,24 +31,6 @@ public class Command implements Serializable {
     public Command(Action action, Message message) {
         this.action = action;
         this.message = message;
-    }
-
-    /**
-     * <p>Getter for the field <code>extraParameters</code>.</p>
-     *
-     * @return the extraParameters
-     */
-    public Object getExtraParameters() {
-        return extraParameters;
-    }
-
-    /**
-     * <p>Setter for the field <code>extraParameters</code>.</p>
-     *
-     * @param extraParameters the extraParameters to set
-     */
-    public void setExtraParameters(Object extraParameters) {
-        this.extraParameters = extraParameters;
     }
 
     /**

@@ -284,6 +284,18 @@ public class ChatView extends javax.swing.JPanel implements Observer {
             return;
         } else if (arg instanceof ArrayList) {
             setUsersList(controller.getUsernames());
+        } else if (arg instanceof String[]) {
+            String str[] = (String[]) arg;
+            switch (str[0]) {
+            case "file-sent":
+                JOptionPane.showMessageDialog(this, "File " + str[1] + " sent!");
+                break;
+            case "file-received":
+                JOptionPane.showMessageDialog(this, "File " + str[1] + " received!");
+                break;
+            default:
+                break;
+            }
         }
     }
 

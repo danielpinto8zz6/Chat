@@ -32,8 +32,6 @@ public class ChatController extends Observable {
 
     private Thread threadReceiver = null;
 
-    private User tmpUser;
-
     /**
      * <p>
      * Constructor for ChatController.
@@ -123,7 +121,7 @@ public class ChatController extends Observable {
                 System.out.println("private msg : " + text);
                 int firstSpace = text.indexOf(" ");
                 String to = text.substring(1, firstSpace);
-                message.setText(text.substring(firstSpace + 1, text.length()));
+                message.setData(text.substring(firstSpace + 1, text.length()));
                 message.setTo(to);
             }
         }
@@ -231,7 +229,7 @@ public class ChatController extends Observable {
      * @param file a {@link java.io.File} object.
      */
     public void sendFile(File file, String username) {
-        Message message = new Message(model.getUser(), file.getName(), username);
+        Message message = new Message(model.getUser(), file, username);
         Command command = new Command(Command.Action.REQUEST_FILE, message);
 
         try {
@@ -254,12 +252,10 @@ public class ChatController extends Observable {
         if (message.getUser().equals(model.getUser()))
             return;
 
-        tmpUser = message.getUser();
-
         System.out.println(message.getUser().getUsername() + model.getUser().getUsername());
 
         setChanged();
-        notifyObservers("filerequest");
+        notifyObservers(message);
     }
 
     /**
@@ -270,11 +266,11 @@ public class ChatController extends Observable {
      *
      * @param absolutePath a {@link java.lang.String} object.
      */
-    public void acceptFile(String absolutePath) {
-        Command command = new Command(Command.Action.FILE_ACCEPTED, new Message(model.getUser()));
-        command.getMessage().setTo(tmpUser.getUsername());
+    public void acceptFile(String path, User user, File file) {
+        Command command = new Command(Command.Action.FILE_ACCEPTED, new Message(model.getUser(), file));
+        command.getMessage().setTo(user.getUsername());
 
-        model.setSaveLocation(absolutePath);
+        model.setSaveLocation(path);
 
         try {
             out.writeObject(command);
@@ -282,6 +278,11 @@ public class ChatController extends Observable {
         } catch (Exception ex) {
             System.exit(0);
         }
+
+        // File accepted, create FileReceiver thread and wait for user to connect and
+        // send the file
+        Thread thread = new Thread(new FileReceiver(9002, file, path));
+        thread.start();
     }
 
     /**
@@ -295,8 +296,10 @@ public class ChatController extends Observable {
         /**
          * Create connection with client and send the file.
          */
-        System.out.println(message.getUser().getUsername());
-        System.out.println(message.getTo());
+        File file = (File) message.getData();
+
+        Thread thread = new Thread(new FileSender(message.getUser().getHost(), 9002, file));
+        thread.start();
     }
 
     /**

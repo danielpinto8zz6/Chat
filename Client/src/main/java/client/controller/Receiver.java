@@ -31,7 +31,7 @@ class Receiver implements Runnable {
 
                 switch (command.getAction()) {
                 case MESSAGE:
-                    if (command.getMessage().getText() != null) {
+                    if (command.getMessage().getData() != null) {
                         controller.addMessage(command.getMessage());
                     }
                     break;

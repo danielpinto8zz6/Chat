@@ -12,7 +12,6 @@ class Client {
     private User user;
     private Socket socket;
 
-    // constructor
     /**
      * <p>Constructor for Client.</p>
      *

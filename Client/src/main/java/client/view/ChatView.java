@@ -7,6 +7,7 @@ package client.view;
 
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
@@ -238,12 +239,12 @@ public class ChatView extends javax.swing.JPanel implements Observer {
      * @param message a {@link chatroomlibrary.Message} object.
      */
     public void appendMessage(Message message) {
-        System.out.println(message.getText());
+        System.out.println(message.getData());
         if (message.getTo() != null)
             appendToPane(jtextFilDiscu, "(<b>Private</b>)" + "@" + message.getUser().getUsername() + "<span> : "
-                    + message.getText() + "</span>");
+                    + message.getData() + "</span>");
         else
-            appendToPane(jtextFilDiscu, "@" + message.getUser().getUsername() + " : " + message.getText());
+            appendToPane(jtextFilDiscu, "@" + message.getUser().getUsername() + " : " + message.getData());
     }
 
     /**
@@ -274,22 +275,14 @@ public class ChatView extends javax.swing.JPanel implements Observer {
         if (arg instanceof Message) {
             Message message = (Message) arg;
 
-            if (message != null) {
+            if (message.getData() instanceof String)
                 appendMessage(message);
-            }
+            else if (message.getData() instanceof File)
+                fileRequest((File) message.getData(), message.getUser());
 
             return;
         } else if (arg instanceof ArrayList) {
             setUsersList(controller.getUsernames());
-        } else if (arg instanceof String) {
-            String str = (String) arg;
-            switch (str) {
-            case "filerequest":
-                fileRequest();
-                break;
-            default:
-                break;
-            }
         }
     }
 
@@ -298,8 +291,9 @@ public class ChatView extends javax.swing.JPanel implements Observer {
      * fileRequest.
      * </p>
      */
-    public void fileRequest() {
-        int dialogResult = JOptionPane.showConfirmDialog(this, "Would You Like to accept file?", "Warning",
+    public void fileRequest(File file, User user) {
+        int dialogResult = JOptionPane.showConfirmDialog(this,
+                "Would You Like to accept file (" + file.getName() + ") from " + user.getUsername() + "?", "Warning",
                 JOptionPane.YES_NO_OPTION);
         if (dialogResult == JOptionPane.YES_OPTION) {
             JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
@@ -312,7 +306,11 @@ public class ChatView extends javax.swing.JPanel implements Observer {
                 File selectedFile = jfc.getSelectedFile();
                 System.out.println(selectedFile.getAbsolutePath());
 
-                controller.acceptFile(selectedFile.getAbsolutePath());
+                try {
+                    controller.acceptFile(selectedFile.getCanonicalPath(), user, file);
+                } catch (IOException e) {
+                    e.printStackTrace();
+				}
             }
         } else {
 

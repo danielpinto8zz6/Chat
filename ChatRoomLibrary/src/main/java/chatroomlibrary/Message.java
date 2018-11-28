@@ -4,7 +4,9 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * <p>Message class.</p>
+ * <p>
+ * Message class.
+ * </p>
  *
  * @author daniel
  * @version $Id: $Id
@@ -12,38 +14,58 @@ import java.time.LocalDateTime;
 public class Message implements Serializable {
     private static final long serialVersionUID = 1L;
     private User user;
-    private String text = null;
+    private Object data;
     private LocalDateTime time;
     private String to = null;
 
     /**
-     * <p>Constructor for Message.</p>
+     * <p>
+     * Constructor for Message.
+     * </p>
      *
      * @param user a {@link chatroomlibrary.User} object.
-     * @param text a {@link java.lang.String} object.
+     * @param data a {@link java.lang.String} object.
      */
-    public Message(User user, String text) {
+    public Message(User user, Object data) {
         this.time = LocalDateTime.now();
         this.user = user;
-        this.text = text;
+        this.data = data;
     }
 
     /**
-     * <p>Constructor for Message.</p>
+     * <p>
+     * Constructor for Message.
+     * </p>
      *
      * @param user a {@link chatroomlibrary.User} object.
-     * @param text a {@link java.lang.String} object.
-     * @param to a {@link java.lang.String} object.
+     * @param data a {@link java.lang.String} object.
+     * @param to   a {@link java.lang.String} object.
      */
-    public Message(User user, String text, String to) {
+    public Message(User user, Object data, String to) {
         this.time = LocalDateTime.now();
         this.user = user;
-        this.text = text;
+        this.data = data;
         this.to = to;
     }
 
     /**
-     * <p>Getter for the field <code>to</code>.</p>
+     * @return the data
+     */
+    public Object getData() {
+        return data;
+    }
+
+    /**
+     * @param data the data to set
+     */
+    public void setData(Object data) {
+        this.data = data;
+    }
+
+    /**
+     * <p>
+     * Getter for the field <code>to</code>.
+     * </p>
      *
      * @return the to
      */
@@ -52,7 +74,9 @@ public class Message implements Serializable {
     }
 
     /**
-     * <p>Setter for the field <code>to</code>.</p>
+     * <p>
+     * Setter for the field <code>to</code>.
+     * </p>
      *
      * @param to the to to set
      */
@@ -61,7 +85,9 @@ public class Message implements Serializable {
     }
 
     /**
-     * <p>Constructor for Message.</p>
+     * <p>
+     * Constructor for Message.
+     * </p>
      *
      * @param user a {@link chatroomlibrary.User} object.
      */
@@ -71,7 +97,9 @@ public class Message implements Serializable {
     }
 
     /**
-     * <p>Getter for the field <code>time</code>.</p>
+     * <p>
+     * Getter for the field <code>time</code>.
+     * </p>
      *
      * @return the time
      */
@@ -80,7 +108,9 @@ public class Message implements Serializable {
     }
 
     /**
-     * <p>Setter for the field <code>time</code>.</p>
+     * <p>
+     * Setter for the field <code>time</code>.
+     * </p>
      *
      * @param time the time to set
      */
@@ -89,25 +119,9 @@ public class Message implements Serializable {
     }
 
     /**
-     * <p>Getter for the field <code>text</code>.</p>
-     *
-     * @return the text
-     */
-    public String getText() {
-        return text;
-    }
-
-    /**
-     * <p>Setter for the field <code>text</code>.</p>
-     *
-     * @param text the text to set
-     */
-    public void setText(String text) {
-        this.text = text;
-    }
-
-    /**
-     * <p>Getter for the field <code>user</code>.</p>
+     * <p>
+     * Getter for the field <code>user</code>.
+     * </p>
      *
      * @return the user
      */
@@ -116,7 +130,9 @@ public class Message implements Serializable {
     }
 
     /**
-     * <p>Setter for the field <code>user</code>.</p>
+     * <p>
+     * Setter for the field <code>user</code>.
+     * </p>
      *
      * @param user the user to set
      */

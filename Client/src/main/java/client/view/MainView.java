@@ -17,6 +17,7 @@ import client.controller.ChatController;
  * @author daniel
  * @version $Id: $Id
  */
+@SuppressWarnings("deprecation")
 public class MainView extends javax.swing.JFrame implements Observer {
 
     private static final long serialVersionUID = 1L;

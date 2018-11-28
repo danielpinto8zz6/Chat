@@ -23,6 +23,7 @@ import client.model.Conversation;
  * @author daniel
  * @version $Id: $Id
  */
+@SuppressWarnings("deprecation")
 public class ChatController extends Observable {
     private final Chat model;
 

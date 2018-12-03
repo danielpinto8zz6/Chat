@@ -116,7 +116,8 @@ public class MainView extends javax.swing.JFrame implements Observer {
             switch (str) {
             case "connected":
                 jTabbedPane.removeAll();
-                jTabbedPane.addTab("General", chatView);
+                jTabbedPane.addTab("Chat", chatView);
+                jTabbedPane.addTab("Transfer history", new HistoryView(controller));
                 break;
             default:
                 break;

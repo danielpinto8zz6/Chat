@@ -6,13 +6,15 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Observable;
 
 import chatroomlibrary.Command;
+import chatroomlibrary.FileInfo;
 import chatroomlibrary.Message;
 import chatroomlibrary.User;
-import chatroomlibrary.Command.Action;
 import client.model.Chat;
 import client.model.Conversation;
 
@@ -102,7 +104,7 @@ public class ChatController extends Observable {
         model.setUsers(users);
 
         setChanged();
-        notifyObservers(users);
+        notifyObservers("update-users");
     }
 
     /**
@@ -187,9 +189,9 @@ public class ChatController extends Observable {
      * @param host     a {@link java.lang.String} object.
      * @param port     a int.
      */
-    public void connect(String username, String host, int port) {
+    public void connect(String username, String password, String host, int port, Command.Action action) {
         model.getUser().setUsername(username);
-        model.getUser().setHost(host);
+        model.getUser().setPassword(password);
         model.getUser().setPort(port);
 
         try {
@@ -197,8 +199,7 @@ public class ChatController extends Observable {
             in = new ObjectInputStream(server.getInputStream());
             out = new ObjectOutputStream(server.getOutputStream());
 
-            // send nickname to server
-            out.writeObject(new Command(Command.Action.LOGIN, new Message(model.getUser())));
+            out.writeObject(new Command(action, new Message(model.getUser())));
             out.flush();
         } catch (UnknownHostException e) {
             e.printStackTrace();
@@ -207,9 +208,6 @@ public class ChatController extends Observable {
         }
 
         startReceiver();
-
-        setChanged();
-        notifyObservers("connected");
     }
 
     /**
@@ -231,7 +229,9 @@ public class ChatController extends Observable {
      * @param file a {@link java.io.File} object.
      */
     public void sendFile(File file, String username) {
-        Message message = new Message(model.getUser(), file, username);
+        FileInfo fileInfo = new FileInfo(file);
+        System.out.println(fileInfo.getName() + "\n" + fileInfo.getPath() + "\n" + fileInfo.getSize());
+        Message message = new Message(model.getUser(), fileInfo, username);
         Command command = new Command(Command.Action.REQUEST_FILE, message);
 
         try {
@@ -268,11 +268,9 @@ public class ChatController extends Observable {
      *
      * @param absolutePath a {@link java.lang.String} object.
      */
-    public void acceptFile(String path, User user, File file) {
-        Command command = new Command(Command.Action.FILE_ACCEPTED, new Message(model.getUser(), file));
+    public void acceptFile(String path, User user, FileInfo fileInfo) {
+        Command command = new Command(Command.Action.FILE_ACCEPTED, new Message(model.getUser(), fileInfo));
         command.getMessage().setTo(user.getUsername());
-
-        model.setSaveLocation(path);
 
         try {
             out.writeObject(command);
@@ -283,7 +281,7 @@ public class ChatController extends Observable {
 
         // File accepted, create FileReceiver thread and wait for user to connect and
         // send the file
-        Thread thread = new Thread(new FileReceiver(this, 9002, file, path));
+        Thread thread = new Thread(new FileReceiver(this, 9002, fileInfo, path, user));
         thread.start();
     }
 
@@ -298,23 +296,10 @@ public class ChatController extends Observable {
         /**
          * Create connection with client and send the file.
          */
-        File file = (File) message.getData();
+        FileInfo fileInfo = (FileInfo) message.getData();
 
-        Thread thread = new Thread(new FileSender(this, message.getUser().getHost(), 9002, file));
+        Thread thread = new Thread(new FileSender(this, message.getUser(), 9002, fileInfo));
         thread.start();
-    }
-
-    /**
-     * <p>
-     * authenticate.
-     * </p>
-     *
-     * @param username a {@link java.lang.String} object.
-     * @param password a {@link java.lang.String} object.
-     * @return a boolean.
-     */
-    public boolean authenticate(String username, String password) {
-        return true;
     }
 
     public String[] getUsernames() {
@@ -328,13 +313,23 @@ public class ChatController extends Observable {
         return usernamesArr;
     }
 
-    public void fileSent(String filePath) {
+    public void fileSent(String filename, String receiver) {
         setChanged();
-        notifyObservers(new String[] { "file-sent", filePath });
+        notifyObservers(new String[] { "file-sent", model.getUser().getUsername(), receiver, filename });
     }
 
-    public void fileReceived(String filePath) {
+    public void fileReceived(String filename, String sender) {
         setChanged();
-        notifyObservers(new String[] { "file-received", filePath });
+        notifyObservers(new String[] { "file-received", sender, model.getUser().getUsername(), filename });
+    }
+
+    public void logged() {
+        setChanged();
+        notifyObservers("connected");
+    }
+
+    public void login_failed() {
+        setChanged();
+        notifyObservers("login-failed");
     }
 }

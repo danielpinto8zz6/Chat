@@ -48,11 +48,17 @@ class Receiver implements Runnable {
                 case FILE_ACCEPTED:
                     controller.fileAccepted(command.getMessage());
                     break;
+                case LOGGED:
+                    controller.logged();
+                    break;
+                case LOGIN_FAILED:
+                    controller.login_failed();
+                    break;
                 default:
                     break;
                 }
             } catch (IOException ex) {
-                System.err.println("Failed to parse incoming message");
+                // System.err.println("Failed to parse incoming message");
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }

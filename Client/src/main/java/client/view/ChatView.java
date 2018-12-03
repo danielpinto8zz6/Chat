@@ -19,6 +19,7 @@ import javax.swing.filechooser.FileSystemView;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 
+import chatroomlibrary.FileInfo;
 import chatroomlibrary.Message;
 import chatroomlibrary.User;
 import client.controller.ChatController;
@@ -278,20 +279,26 @@ public class ChatView extends javax.swing.JPanel implements Observer {
 
             if (message.getData() instanceof String)
                 appendMessage(message);
-            else if (message.getData() instanceof File)
-                fileRequest((File) message.getData(), message.getUser());
-
-            return;
-        } else if (arg instanceof ArrayList) {
-            setUsersList(controller.getUsernames());
+            else if (message.getData() instanceof FileInfo) {
+                fileRequest((FileInfo) message.getData(), message.getUser());
+            }
+        } else if (arg instanceof String) {
+            String str = (String) arg;
+            switch (str) {
+            case "update-users":
+                setUsersList(controller.getUsernames());
+                break;
+            default:
+                break;
+            }
         } else if (arg instanceof String[]) {
             String str[] = (String[]) arg;
             switch (str[0]) {
             case "file-sent":
-                JOptionPane.showMessageDialog(this, "File " + str[1] + " sent!");
+                JOptionPane.showMessageDialog(this, "File " + str[3] + " sent!");
                 break;
             case "file-received":
-                JOptionPane.showMessageDialog(this, "File " + str[1] + " received!");
+                JOptionPane.showMessageDialog(this, "File " + str[3] + " received!");
                 break;
             default:
                 break;
@@ -304,10 +311,10 @@ public class ChatView extends javax.swing.JPanel implements Observer {
      * fileRequest.
      * </p>
      */
-    public void fileRequest(File file, User user) {
+    public void fileRequest(FileInfo fileInfo, User user) {
         int dialogResult = JOptionPane.showConfirmDialog(this,
-                "Would You Like to accept file (" + file.getName() + ") from " + user.getUsername() + "?", "Warning",
-                JOptionPane.YES_NO_OPTION);
+                "Would You Like to accept file (" + fileInfo.getName() + ") from " + user.getUsername() + "?",
+                "Warning", JOptionPane.YES_NO_OPTION);
         if (dialogResult == JOptionPane.YES_OPTION) {
             JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
             jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -320,7 +327,7 @@ public class ChatView extends javax.swing.JPanel implements Observer {
                 System.out.println(selectedFile.getAbsolutePath());
 
                 try {
-                    controller.acceptFile(selectedFile.getCanonicalPath(), user, file);
+                    controller.acceptFile(selectedFile.getCanonicalPath(), user, fileInfo);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

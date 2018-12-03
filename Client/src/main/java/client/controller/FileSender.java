@@ -6,17 +6,23 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.Socket;
 
+import chatroomlibrary.FileInfo;
+import chatroomlibrary.User;
+
 public class FileSender implements Runnable {
 
-    private Socket socket;
-    private File file;
+    private Socket socket = null;
+    private FileInfo fileInfo;
     private ChatController controller;
+    private User user;
 
-    public FileSender(ChatController controller, String host, int port, File file) {
+    public FileSender(ChatController controller, User user, int port, FileInfo fileInfo) {
         this.controller = controller;
-        this.file = file;
+        this.fileInfo = fileInfo;
+        this.user = user;
+
         try {
-            socket = new Socket(host, port);
+            socket = new Socket(user.getHost(), port);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -26,12 +32,14 @@ public class FileSender implements Runnable {
     public void run() {
         DataOutputStream dos = null;
         FileInputStream fis = null;
+
         try {
+            int read = 0;
+
             dos = new DataOutputStream(socket.getOutputStream());
-            fis = new FileInputStream(file);
+            fis = new FileInputStream(fileInfo.getPath());
             byte[] buffer = new byte[4096];
 
-            int read;
             while ((read = fis.read(buffer)) > 0) {
                 dos.write(buffer, 0, read);
             }
@@ -42,7 +50,13 @@ public class FileSender implements Runnable {
                 fis.close();
                 dos.close();
 
-                controller.fileSent(file.getAbsolutePath());
+                try {
+                    socket.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                controller.fileSent(fileInfo.getName(), user.getUsername());
             } catch (IOException e) {
                 e.printStackTrace();
             }

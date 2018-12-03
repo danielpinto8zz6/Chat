@@ -3,7 +3,9 @@ package chatroomlibrary;
 import java.io.Serializable;
 
 /**
- * <p>Command class.</p>
+ * <p>
+ * Command class.
+ * </p>
  *
  * @author daniel
  * @version $Id: $Id
@@ -14,7 +16,9 @@ public class Command implements Serializable {
     private Message message;
 
     /**
-     * <p>Constructor for Command.</p>
+     * <p>
+     * Constructor for Command.
+     * </p>
      *
      * @param action a {@link chatroomlibrary.Command.Action} object.
      */
@@ -23,9 +27,11 @@ public class Command implements Serializable {
     }
 
     /**
-     * <p>Constructor for Command.</p>
+     * <p>
+     * Constructor for Command.
+     * </p>
      *
-     * @param action a {@link chatroomlibrary.Command.Action} object.
+     * @param action  a {@link chatroomlibrary.Command.Action} object.
      * @param message a {@link chatroomlibrary.Message} object.
      */
     public Command(Action action, Message message) {
@@ -34,7 +40,9 @@ public class Command implements Serializable {
     }
 
     /**
-     * <p>Getter for the field <code>message</code>.</p>
+     * <p>
+     * Getter for the field <code>message</code>.
+     * </p>
      *
      * @return the message
      */
@@ -43,7 +51,9 @@ public class Command implements Serializable {
     }
 
     /**
-     * <p>Setter for the field <code>message</code>.</p>
+     * <p>
+     * Setter for the field <code>message</code>.
+     * </p>
      *
      * @param message the message to set
      */
@@ -52,7 +62,9 @@ public class Command implements Serializable {
     }
 
     /**
-     * <p>Getter for the field <code>action</code>.</p>
+     * <p>
+     * Getter for the field <code>action</code>.
+     * </p>
      *
      * @return the action
      */
@@ -61,7 +73,9 @@ public class Command implements Serializable {
     }
 
     /**
-     * <p>Setter for the field <code>action</code>.</p>
+     * <p>
+     * Setter for the field <code>action</code>.
+     * </p>
      *
      * @param action the action to set
      */
@@ -70,6 +84,6 @@ public class Command implements Serializable {
     }
 
     public enum Action {
-        REQUEST_LOGIN, LOGIN, LOGGED, LOGIN_FAILED, MESSAGE, BROADCAST_USERS, REQUEST_FILE, FILE_ACCEPTED
+        REGISTER, REQUEST_LOGIN, LOGIN, LOGGED, LOGIN_FAILED, MESSAGE, BROADCAST_USERS, REQUEST_FILE, FILE_ACCEPTED
     }
 }

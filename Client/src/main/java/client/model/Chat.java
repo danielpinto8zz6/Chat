@@ -4,9 +4,12 @@ import java.util.ArrayList;
 
 import chatroomlibrary.Message;
 import chatroomlibrary.User;
+import client.Utils;
 
 /**
- * <p>Chat class.</p>
+ * <p>
+ * Chat class.
+ * </p>
  *
  * @author daniel
  * @version $Id: $Id
@@ -22,17 +25,22 @@ public class Chat {
     private String saveLocation;
 
     /**
-     * <p>Constructor for Chat.</p>
+     * <p>
+     * Constructor for Chat.
+     * </p>
      */
     public Chat() {
-        this.user = new User("username", "localhost", 9001);
+        String address = Utils.getAdress();
+        this.user = new User("username", address, 9001);
         this.users = new ArrayList<>();
         this.messages = new ArrayList<>();
         this.conversations = new ArrayList<>();
     }
 
     /**
-     * <p>Getter for the field <code>conversations</code>.</p>
+     * <p>
+     * Getter for the field <code>conversations</code>.
+     * </p>
      *
      * @return the conversation
      */
@@ -41,7 +49,9 @@ public class Chat {
     }
 
     /**
-     * <p>Setter for the field <code>conversations</code>.</p>
+     * <p>
+     * Setter for the field <code>conversations</code>.
+     * </p>
      *
      * @param conversations a {@link java.util.ArrayList} object.
      */
@@ -50,7 +60,9 @@ public class Chat {
     }
 
     /**
-     * <p>Getter for the field <code>users</code>.</p>
+     * <p>
+     * Getter for the field <code>users</code>.
+     * </p>
      *
      * @return the users
      */
@@ -59,7 +71,9 @@ public class Chat {
     }
 
     /**
-     * <p>Setter for the field <code>users</code>.</p>
+     * <p>
+     * Setter for the field <code>users</code>.
+     * </p>
      *
      * @param users the users to set
      */
@@ -68,7 +82,9 @@ public class Chat {
     }
 
     /**
-     * <p>Getter for the field <code>user</code>.</p>
+     * <p>
+     * Getter for the field <code>user</code>.
+     * </p>
      *
      * @return the user
      */
@@ -77,7 +93,9 @@ public class Chat {
     }
 
     /**
-     * <p>Setter for the field <code>user</code>.</p>
+     * <p>
+     * Setter for the field <code>user</code>.
+     * </p>
      *
      * @param user the user to set
      */
@@ -86,7 +104,9 @@ public class Chat {
     }
 
     /**
-     * <p>Getter for the field <code>saveLocation</code>.</p>
+     * <p>
+     * Getter for the field <code>saveLocation</code>.
+     * </p>
      *
      * @return the saveLocation
      */
@@ -95,7 +115,9 @@ public class Chat {
     }
 
     /**
-     * <p>Setter for the field <code>saveLocation</code>.</p>
+     * <p>
+     * Setter for the field <code>saveLocation</code>.
+     * </p>
      *
      * @param saveLocation the saveLocation to set
      */
@@ -104,7 +126,9 @@ public class Chat {
     }
 
     /**
-     * <p>Getter for the field <code>messages</code>.</p>
+     * <p>
+     * Getter for the field <code>messages</code>.
+     * </p>
      *
      * @return the messages
      */
@@ -113,7 +137,9 @@ public class Chat {
     }
 
     /**
-     * <p>Setter for the field <code>messages</code>.</p>
+     * <p>
+     * Setter for the field <code>messages</code>.
+     * </p>
      *
      * @param messages the messages to set
      */
@@ -122,7 +148,9 @@ public class Chat {
     }
 
     /**
-     * <p>addMessage.</p>
+     * <p>
+     * addMessage.
+     * </p>
      *
      * @param message a {@link chatroomlibrary.Message} object.
      */
@@ -131,7 +159,9 @@ public class Chat {
     }
 
     /**
-     * <p>getLastMessage.</p>
+     * <p>
+     * getLastMessage.
+     * </p>
      *
      * @return a {@link chatroomlibrary.Message} object.
      */
@@ -144,11 +174,13 @@ public class Chat {
     }
 
     /**
-     * <p>addConversation.</p>
+     * <p>
+     * addConversation.
+     * </p>
      *
      * @param conversation a {@link client.model.Conversation} object.
      */
     public void addConversation(Conversation conversation) {
         conversations.add(conversation);
-	}
+    }
 }

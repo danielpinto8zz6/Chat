@@ -18,6 +18,8 @@ class Server {
 
     private final List<Client> clients;
     private User serv;
+    private DBHelper dbHelper;
+    boolean testing = true;
 
     /**
      * <p>
@@ -34,6 +36,8 @@ class Server {
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
+
+        dbHelper = new DBHelper("sql2264793", "jG1%xX8!", "sql2.freemysqlhosting.net", "sql2264793");
     }
 
     /**
@@ -58,6 +62,23 @@ class Server {
                 Command command = (Command) in.readObject();
 
                 User user = command.getMessage().getUser();
+
+                if (!testing) {
+                    if (command.getAction() == Command.Action.LOGIN) {
+                        if (!authenticate(user) && !testing) {
+                            System.out.println("User not autenticated");
+                            out.writeObject(new Command(Command.Action.LOGIN_FAILED));
+                            out.flush();
+                            continue;
+                        }
+                    } else if (command.getAction() == Command.Action.REGISTER) {
+                        if (!register(user)) {
+                            out.writeObject(new Command(Command.Action.LOGIN_FAILED));
+                            out.flush();
+                            continue;
+                        }
+                    }
+                }
 
                 System.out.println("New Client: " + user.getUsername() + "\n\t     Host:"
                         + socket.getInetAddress().getHostAddress());
@@ -173,5 +194,27 @@ class Server {
                     .writeObject(new Command(Command.Action.MESSAGE, new Message(serv, "User not found")));
             sender.getObjectOutputStream().flush();
         }
+    }
+
+    private boolean authenticate(User user) {
+        dbHelper.open();
+        int id = dbHelper.authenticate(user.getUsername(), user.getPassword());
+        if (id != -1) {
+            user.setId(id);
+            user.setState(0);
+            dbHelper.updateUser(user);
+        }
+
+        dbHelper.close();
+
+        return (id != -1) ? true : false;
+    }
+
+    private boolean register(User user) {
+        dbHelper.open();
+        boolean success = dbHelper.insertUser(user);
+        dbHelper.close();
+
+        return success;
     }
 }

@@ -11,9 +11,12 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Observable;
 
+import javax.swing.tree.DefaultMutableTreeNode;
+
 import chatroomlibrary.Command;
 import chatroomlibrary.FileInfo;
 import chatroomlibrary.Message;
+import chatroomlibrary.SharedFiles;
 import chatroomlibrary.User;
 import client.model.Chat;
 import client.model.Conversation;
@@ -35,6 +38,8 @@ public class ChatController extends Observable {
     ObjectInputStream in = null;
 
     private Thread threadReceiver = null;
+
+    boolean logged = false;
 
     /**
      * <p>
@@ -324,6 +329,8 @@ public class ChatController extends Observable {
     }
 
     public void logged() {
+        logged = true;
+
         setChanged();
         notifyObservers("connected");
     }
@@ -331,5 +338,42 @@ public class ChatController extends Observable {
     public void login_failed() {
         setChanged();
         notifyObservers("login-failed");
+    }
+
+    public void updateFiles(DefaultMutableTreeNode files) {
+        model.setFiles(files);
+
+        setChanged();
+        notifyObservers("update-files");
+    }
+
+    public DefaultMutableTreeNode getFiles() {
+        return model.getFiles();
+    }
+
+    public void setSharedFolder(File file) {
+        Thread thread = new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                SharedFiles sharedFiles = new SharedFiles(model.getUser().getUsername(), file);
+                model.getUser().setFiles(sharedFiles);
+                if (logged)
+                    sendSharedFiles(sharedFiles);
+            }
+        });
+        thread.start();
+    }
+
+    private void sendSharedFiles(DefaultMutableTreeNode sharedFiles) {
+        Message message = new Message(model.getUser(), sharedFiles);
+        Command command = new Command(Command.Action.SEND_SHARED_FILES, message);
+
+        try {
+            out.writeObject(command);
+            out.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

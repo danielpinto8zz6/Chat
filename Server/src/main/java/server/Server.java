@@ -10,6 +10,8 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.tree.DefaultMutableTreeNode;
+
 import chatroomlibrary.Command;
 import chatroomlibrary.Message;
 import chatroomlibrary.User;
@@ -156,6 +158,30 @@ class Server {
                 e.printStackTrace();
             }
         }
+    }
+
+    public void broadcastFiles() {
+        Command command = new Command(Command.Action.BROADCAST_FILES, new Message(serv, getFiles()));
+
+        for (Client client : this.clients) {
+            try {
+                client.getObjectOutputStream().writeObject(command);
+                client.getObjectOutputStream().flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private DefaultMutableTreeNode getFiles() {
+        DefaultMutableTreeNode files = new DefaultMutableTreeNode(new String("Files"));
+
+        for (Client client : clients) {
+            DefaultMutableTreeNode sharedFiles = client.getUser().getFiles();
+            if (sharedFiles != null)
+                files.add(sharedFiles);
+        }
+        return files;
     }
 
     private ArrayList<User> getUsers() {

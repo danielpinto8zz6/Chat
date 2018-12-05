@@ -57,4 +57,13 @@ public class FileInfo implements Serializable {
     public void setPath(String path) {
         this.path = path;
     }
+
+    @Override
+    public String toString() {
+        if (name.equals("")) {
+            return path;
+        } else {
+            return name;
+        }
+    }
 }

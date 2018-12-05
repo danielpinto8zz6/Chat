@@ -2,6 +2,8 @@ package chatroomlibrary;
 
 import java.io.Serializable;
 
+import javax.swing.tree.DefaultMutableTreeNode;
+
 /**
  * <p>
  * User class.
@@ -18,7 +20,7 @@ public class User implements Serializable {
     private String host;
     private int port;
     private int state;
-    private String[] files;
+    private DefaultMutableTreeNode files;
 
     public User(int id, String username, String password, String host, int port, int state) {
         this.id = id;
@@ -45,20 +47,6 @@ public class User implements Serializable {
     }
 
     public User() {
-    }
-
-    /**
-     * @return the files
-     */
-    public String[] getFiles() {
-        return files;
-    }
-
-    /**
-     * @param files the files to set
-     */
-    public void setFiles(String[] files) {
-        this.files = files;
     }
 
     /**
@@ -167,6 +155,20 @@ public class User implements Serializable {
      */
     public void setPort(int port) {
         this.port = port;
+    }
+
+    /**
+     * @return the files
+     */
+    public DefaultMutableTreeNode getFiles() {
+        return files;
+    }
+
+    /**
+     * @param files the files to set
+     */
+    public void setFiles(DefaultMutableTreeNode files) {
+        this.files = files;
     }
 
     @Override

@@ -2,6 +2,8 @@ package client.model;
 
 import java.util.ArrayList;
 
+import javax.swing.tree.DefaultMutableTreeNode;
+
 import chatroomlibrary.Message;
 import chatroomlibrary.User;
 import client.Utils;
@@ -23,6 +25,8 @@ public class Chat {
     private ArrayList<Conversation> conversations;
 
     private String saveLocation;
+
+    private DefaultMutableTreeNode files;
 
     /**
      * <p>
@@ -182,5 +186,13 @@ public class Chat {
      */
     public void addConversation(Conversation conversation) {
         conversations.add(conversation);
+    }
+
+    public void setFiles(DefaultMutableTreeNode files) {
+        this.files = files;
+    }
+    
+    public DefaultMutableTreeNode getFiles () {
+        return files;
     }
 }

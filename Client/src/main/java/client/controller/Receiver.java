@@ -3,6 +3,8 @@ package client.controller;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import javax.swing.tree.DefaultMutableTreeNode;
+
 import chatroomlibrary.Command;
 import chatroomlibrary.User;
 
@@ -53,6 +55,10 @@ class Receiver implements Runnable {
                     break;
                 case LOGIN_FAILED:
                     controller.login_failed();
+                    break;
+                case BROADCAST_FILES:
+                    DefaultMutableTreeNode files = (DefaultMutableTreeNode) command.getMessage().getData();
+                    controller.updateFiles(files);
                     break;
                 default:
                     break;

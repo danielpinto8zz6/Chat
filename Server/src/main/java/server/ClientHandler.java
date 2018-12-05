@@ -2,6 +2,8 @@ package server;
 
 import java.io.IOException;
 
+import javax.swing.tree.DefaultMutableTreeNode;
+
 import chatroomlibrary.Command;
 
 class ClientHandler implements Runnable {
@@ -10,7 +12,9 @@ class ClientHandler implements Runnable {
     private final Client client;
 
     /**
-     * <p>Constructor for ClientHandler.</p>
+     * <p>
+     * Constructor for ClientHandler.
+     * </p>
      *
      * @param server a {@link server.Server} object.
      * @param client a {@link server.Client} object.
@@ -19,17 +23,25 @@ class ClientHandler implements Runnable {
         this.server = server;
         this.client = client;
         this.server.broadcastAllUsers();
+        if (this.client.getUser().getFiles() != null)
+            this.server.broadcastFiles();
     }
 
     /**
-     * <p>run.</p>
+     * <p>
+     * run.
+     * </p>
      */
     public void run() {
         Command command;
 
         try {
             while ((command = (Command) this.client.getObjectInputStream().readObject()) != null) {
-                if (command.getMessage().getTo() != null) {
+                if (command.getAction() == Command.Action.SEND_SHARED_FILES) {
+                    DefaultMutableTreeNode files = (DefaultMutableTreeNode) command.getMessage().getData();
+                    client.getUser().setFiles(files);
+                    server.broadcastFiles();
+                } else if (command.getMessage().getTo() != null) {
                     server.sendCommandToUser(command, client, command.getMessage().getTo());
                 } else {
                     server.broadcastCommand(command);

@@ -15,7 +15,21 @@ public class ServerView implements Observer {
     }
 
     @Override
-    public void update(Observable arg0, Object arg1) {
+    public void update(Observable o, Object arg) {
+        if (arg instanceof String[]) {
+            String[] str = (String[]) arg;
+            switch (str[0]) {
+            case "user-joined":
+                System.out.println("User joined : " + str[1] + "\n\t     Host : " + str[2]);
+                break;
+            case "user-exited":
+                System.out.println("User exited : " + str[1] + "\n\t     Host : " + str[2]);
+                break;
+            case "login-failed":
+                System.out.println("[" + str[1] + "]" + " - (" + str[2] + ") tried to login but failed");
+                break;
+            }
+        }
 
     }
 }

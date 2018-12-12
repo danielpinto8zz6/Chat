@@ -1,5 +1,6 @@
 package server.controller;
 
+import java.io.EOFException;
 import java.io.IOException;
 
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -49,15 +50,17 @@ class ClientHandler implements Runnable {
                     controller.broadcastCommand(command);
                 }
             }
+        } catch (EOFException e) {
+            // Client disconnected
         } catch (IOException e) {
-            System.out.println(client.getUser().getUsername() + " : has disconnected!");
+            e.printStackTrace();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         } finally {
             try {
+                client.getObjectInputStream().close();
+                client.getObjectInputStream().close();
                 client.getSocket().close();
-                client.getObjectInputStream().close();
-                client.getObjectInputStream().close();
             } catch (IOException e) {
                 e.printStackTrace();
             }

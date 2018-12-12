@@ -81,8 +81,6 @@ public class Client {
      * @return a {@link java.lang.String} object.
      */
     public String toString() {
-
         return "<u>" + this.getUser().getUsername() + "</u>";
-
     }
 }

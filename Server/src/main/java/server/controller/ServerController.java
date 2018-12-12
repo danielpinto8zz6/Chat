@@ -53,13 +53,10 @@ public class ServerController extends Observable {
      * </p>
      */
     public void broadcastAllUsers() {
-        System.out.println("Broadcasting");
         Command command = new Command(Command.Action.BROADCAST_USERS,
                 new Message(model.getServerDetails(), model.getUsers()));
 
         for (Client client : model.getClients()) {
-            System.out.println("hey");
-
             try {
                 client.getObjectOutputStream().writeObject(command);
                 client.getObjectOutputStream().flush();
@@ -149,20 +146,32 @@ public class ServerController extends Observable {
         return success;
     }
 
-    public boolean removeClient(Client client) {
-        return model.removeClient(client);
-    }
+    public void removeClient(Client client) {
+        User user = client.getUser();
 
-    public boolean addClient(Client client) {
-        return model.addClient(client);
+        setChanged();
+        notifyObservers(new String[] { "user-exited", user.getUsername(), user.getHost() });
+
+        model.removeClient(client);
     }
 
     public int getPort() {
         return model.getPort();
     }
 
-    public void handleClient(Client newClient) {
+    public void addClient(Client client) {
+        model.addClient(client);
         // create a new thread for newUser incoming messages handling
-        new Thread(new ClientHandler(this, newClient)).start();
+        new Thread(new ClientHandler(this, client)).start();
+
+        User user = client.getUser();
+
+        setChanged();
+        notifyObservers(new String[] { "user-joined", user.getUsername(), user.getHost() });
     }
+
+    public void loginFailed(User user) {
+        setChanged();
+        notifyObservers(new String[] { "login-failed", user.getUsername(), user.getHost() });
+	}
 }

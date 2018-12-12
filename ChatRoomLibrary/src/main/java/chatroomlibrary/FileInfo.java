@@ -9,11 +9,42 @@ public class FileInfo implements Serializable {
     private String path;
     private String name;
     private int size;
+    private boolean isDirectory;
+    private String owner;
 
     public FileInfo(File file) {
         path = file.getAbsolutePath();
         name = file.getName();
         size = (int) file.length();
+        isDirectory = file.isDirectory();
+    }
+
+    /**
+     * @return the owner
+     */
+    public String getOwner() {
+        return owner;
+    }
+
+    /**
+     * @param owner the owner to set
+     */
+    public void setOwner(String owner) {
+        this.owner = owner;
+    }
+
+    /**
+     * @return the isDirectory
+     */
+    public boolean isDirectory() {
+        return isDirectory;
+    }
+
+    /**
+     * @param isDirectory the isDirectory to set
+     */
+    public void setDirectory(boolean isDirectory) {
+        this.isDirectory = isDirectory;
     }
 
     /**

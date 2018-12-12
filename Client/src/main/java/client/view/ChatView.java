@@ -18,6 +18,7 @@ import javax.swing.filechooser.FileSystemView;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 
+import chatroomlibrary.Command;
 import chatroomlibrary.FileInfo;
 import chatroomlibrary.Message;
 import chatroomlibrary.User;
@@ -294,14 +295,26 @@ public class ChatView extends javax.swing.JPanel implements Observer {
             String str[] = (String[]) arg;
             switch (str[0]) {
             case "file-sent":
-                JOptionPane.showMessageDialog(this, "File " + str[3] + " sent!");
+                JOptionPane.showMessageDialog(getParent(), "File " + str[3] + " sent!");
                 break;
             case "file-received":
-                JOptionPane.showMessageDialog(this, "File " + str[3] + " received!");
+                JOptionPane.showMessageDialog(getParent(), "File " + str[3] + " received!");
                 break;
             default:
                 break;
             }
+        } else if (arg instanceof Command) {
+            Command command = (Command) arg;
+            switch (command.getAction()) {
+            case REQUEST_FILE:
+                FileInfo fileInfo = (FileInfo) command.getMessage().getData();
+                String username = command.getMessage().getUser().getUsername();
+                fileRequested(username, fileInfo);
+                break;
+            default:
+                break;
+            }
+
         }
     }
 
@@ -333,6 +346,14 @@ public class ChatView extends javax.swing.JPanel implements Observer {
             }
         } else {
 
+        }
+    }
+
+    public void fileRequested(String username, FileInfo fileInfo) {
+        int dialogResult = JOptionPane.showConfirmDialog(this,
+                username + "Requested (" + fileInfo.getName() + ")! Send?", "Warning", JOptionPane.YES_NO_OPTION);
+        if (dialogResult == JOptionPane.YES_OPTION) {
+            controller.acceptTransfer(username, fileInfo);
         }
     }
 

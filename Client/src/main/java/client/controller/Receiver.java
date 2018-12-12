@@ -44,7 +44,7 @@ class Receiver implements Runnable {
                     ArrayList<User> users = (ArrayList<User>) command.getMessage().getData();
                     controller.updateUsers(users);
                     break;
-                case REQUEST_FILE:
+                case SEND_FILE:
                     controller.fileRequest(command.getMessage());
                     break;
                 case FILE_ACCEPTED:
@@ -59,6 +59,15 @@ class Receiver implements Runnable {
                 case BROADCAST_FILES:
                     DefaultMutableTreeNode files = (DefaultMutableTreeNode) command.getMessage().getData();
                     controller.updateFiles(files);
+                    break;
+                case REQUEST_FILE:
+                    controller.fileRequested(command);
+                    break;
+                case TRANSFER_ACCEPTED:
+                    controller.transferAccepted(command.getMessage());
+                    break;
+                case START_TRANSFER:
+                    controller.startTransfer(command.getMessage());
                     break;
                 default:
                     break;

@@ -1,5 +1,6 @@
 package client.model;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -24,7 +25,7 @@ public class Chat {
 
     private ArrayList<Conversation> conversations;
 
-    private String saveLocation;
+    private File saveLocation;
 
     private DefaultMutableTreeNode files;
 
@@ -114,7 +115,7 @@ public class Chat {
      *
      * @return the saveLocation
      */
-    public String getSaveLocation() {
+    public File getSaveLocation() {
         return saveLocation;
     }
 
@@ -125,7 +126,7 @@ public class Chat {
      *
      * @param saveLocation the saveLocation to set
      */
-    public void setSaveLocation(String saveLocation) {
+    public void setSaveLocation(File saveLocation) {
         this.saveLocation = saveLocation;
     }
 
@@ -191,8 +192,8 @@ public class Chat {
     public void setFiles(DefaultMutableTreeNode files) {
         this.files = files;
     }
-    
-    public DefaultMutableTreeNode getFiles () {
+
+    public DefaultMutableTreeNode getFiles() {
         return files;
     }
 }

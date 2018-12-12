@@ -184,4 +184,9 @@ public class User implements Serializable {
                 : false;
 
     }
+
+    @Override
+    public String toString() {
+        return username;
+    }
 }

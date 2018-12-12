@@ -6,7 +6,6 @@
 package client.view;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
@@ -30,7 +29,6 @@ public class MainView extends javax.swing.JFrame implements Observer {
     private static final long serialVersionUID = 1L;
     private ChatController controller;
     private ChatView chatView;
-    private ArrayList<ChatView> chatViews;
 
     /**
      * Creates new form MainView
@@ -42,7 +40,6 @@ public class MainView extends javax.swing.JFrame implements Observer {
         this.controller = controller;
         controller.addObserver(this);
         chatView = new ChatView(controller);
-        chatViews = new ArrayList<>();
 
         jTabbedPane.addTab("Login", new LoginView(controller));
 
@@ -67,19 +64,21 @@ public class MainView extends javax.swing.JFrame implements Observer {
     // <editor-fold defaultstate="collapsed" desc="Generated
     // <editor-fold defaultstate="collapsed" desc="Generated
     // <editor-fold defaultstate="collapsed" desc="Generated
+    // <editor-fold defaultstate="collapsed" desc="Generated
     // Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         jTabbedPane = new javax.swing.JTabbedPane();
         jMenuBar1 = new javax.swing.JMenuBar();
-        jMenu1 = new javax.swing.JMenu();
+        jMenuSetDownloads = new javax.swing.JMenu();
         jMenuItemSharedFolder = new javax.swing.JMenuItem();
+        jMenuItem1 = new javax.swing.JMenuItem();
         jMenuItemExit = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setResizable(false);
 
-        jMenu1.setText("File");
+        jMenuSetDownloads.setText("File");
 
         jMenuItemSharedFolder.setText("Set shared folder");
         jMenuItemSharedFolder.addActionListener(new java.awt.event.ActionListener() {
@@ -87,7 +86,15 @@ public class MainView extends javax.swing.JFrame implements Observer {
                 jMenuItemSharedFolderActionPerformed(evt);
             }
         });
-        jMenu1.add(jMenuItemSharedFolder);
+        jMenuSetDownloads.add(jMenuItemSharedFolder);
+
+        jMenuItem1.setText("Set downloads folder");
+        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem1ActionPerformed(evt);
+            }
+        });
+        jMenuSetDownloads.add(jMenuItem1);
 
         jMenuItemExit.setAccelerator(
                 javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Q, java.awt.event.InputEvent.CTRL_MASK));
@@ -97,9 +104,9 @@ public class MainView extends javax.swing.JFrame implements Observer {
                 jMenuItemExitActionPerformed(evt);
             }
         });
-        jMenu1.add(jMenuItemExit);
+        jMenuSetDownloads.add(jMenuItemExit);
 
-        jMenuBar1.add(jMenu1);
+        jMenuBar1.add(jMenuSetDownloads);
 
         setJMenuBar(jMenuBar1);
 
@@ -113,6 +120,20 @@ public class MainView extends javax.swing.JFrame implements Observer {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_jMenuItem1ActionPerformed
+        JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
+        jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        jfc.setAcceptAllFileFilterUsed(false);
+
+        int returnValue = jfc.showSaveDialog(this);
+
+        if (returnValue == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = jfc.getSelectedFile();
+
+            controller.setSaveLocation(selectedFile);
+        }
+    }// GEN-LAST:event_jMenuItem1ActionPerformed
 
     private void jMenuItemSharedFolderActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_jMenuItemSharedFolderActionPerformed
         JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
@@ -133,10 +154,11 @@ public class MainView extends javax.swing.JFrame implements Observer {
     }// GEN-LAST:event_jMenuItemExitActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JMenu jMenu1;
     private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItemExit;
     private javax.swing.JMenuItem jMenuItemSharedFolder;
+    private javax.swing.JMenu jMenuSetDownloads;
     private javax.swing.JTabbedPane jTabbedPane;
     // End of variables declaration//GEN-END:variables
 

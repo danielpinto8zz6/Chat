@@ -1,14 +1,15 @@
-package server;
+package server.controller;
 
 import java.io.IOException;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import chatroomlibrary.Command;
+import server.model.Client;
 
 class ClientHandler implements Runnable {
 
-    private final Server server;
+    private final ServerController controller;
     private final Client client;
 
     /**
@@ -19,12 +20,13 @@ class ClientHandler implements Runnable {
      * @param server a {@link server.Server} object.
      * @param client a {@link server.Client} object.
      */
-    public ClientHandler(Server server, Client client) {
-        this.server = server;
+    public ClientHandler(ServerController controller, Client client) {
+        this.controller = controller;
         this.client = client;
-        this.server.broadcastAllUsers();
+
+        this.controller.broadcastAllUsers();
         if (this.client.getUser().getFiles() != null)
-            this.server.broadcastFiles();
+            this.controller.broadcastFiles();
     }
 
     /**
@@ -40,11 +42,11 @@ class ClientHandler implements Runnable {
                 if (command.getAction() == Command.Action.SEND_SHARED_FILES) {
                     DefaultMutableTreeNode files = (DefaultMutableTreeNode) command.getMessage().getData();
                     client.getUser().setFiles(files);
-                    server.broadcastFiles();
+                    controller.broadcastFiles();
                 } else if (command.getMessage().getTo() != null) {
-                    server.sendCommandToUser(command, client, command.getMessage().getTo());
+                    controller.sendCommandToUser(command, client, command.getMessage().getTo());
                 } else {
-                    server.broadcastCommand(command);
+                    controller.broadcastCommand(command);
                 }
             }
         } catch (IOException e) {
@@ -62,7 +64,7 @@ class ClientHandler implements Runnable {
         }
 
         // end of Thread
-        server.removeClient(client);
-        this.server.broadcastAllUsers();
+        controller.removeClient(client);
+        controller.broadcastAllUsers();
     }
 }

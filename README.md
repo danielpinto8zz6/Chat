@@ -6,3 +6,4 @@
 - [ ] Request upload of file
 - [ ] Transfer history
 - [x] Notify after file transfer
+- [ ] Specify downloaded files directory

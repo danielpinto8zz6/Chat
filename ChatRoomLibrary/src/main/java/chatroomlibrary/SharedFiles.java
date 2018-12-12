@@ -8,14 +8,13 @@ import chatroomlibrary.FileInfo;
 
 public class SharedFiles extends DefaultMutableTreeNode {
     private static final long serialVersionUID = 1L;
+    private String owner;
 
-    public SharedFiles(String title, File rootFolder) {
-        super(title);
+    public SharedFiles(File rootFolder, String owner) {
+        super(rootFolder.getName());
+        this.owner = owner;
 
-        DefaultMutableTreeNode root = new DefaultMutableTreeNode(new FileInfo(rootFolder));
-        add(root);
-
-        CreateChildNodes ccn = new CreateChildNodes(rootFolder, root);
+        new CreateChildNodes(rootFolder, this);
     }
 
     public class CreateChildNodes {
@@ -30,7 +29,9 @@ public class SharedFiles extends DefaultMutableTreeNode {
                 return;
 
             for (File file : files) {
-                DefaultMutableTreeNode childNode = new DefaultMutableTreeNode(new FileInfo(file));
+                FileInfo fileInfo = new FileInfo(file);
+                fileInfo.setOwner(owner);
+                DefaultMutableTreeNode childNode = new DefaultMutableTreeNode(fileInfo);
                 node.add(childNode);
                 if (file.isDirectory()) {
                     createChildren(file, childNode);

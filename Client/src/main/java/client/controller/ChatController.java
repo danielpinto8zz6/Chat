@@ -6,8 +6,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Observable;
 
@@ -237,7 +235,7 @@ public class ChatController extends Observable {
         FileInfo fileInfo = new FileInfo(file);
         System.out.println(fileInfo.getName() + "\n" + fileInfo.getPath() + "\n" + fileInfo.getSize());
         Message message = new Message(model.getUser(), fileInfo, username);
-        Command command = new Command(Command.Action.REQUEST_FILE, message);
+        Command command = new Command(Command.Action.SEND_FILE, message);
 
         try {
             out.writeObject(command);
@@ -356,13 +354,17 @@ public class ChatController extends Observable {
 
             @Override
             public void run() {
-                SharedFiles sharedFiles = new SharedFiles(model.getUser().getUsername(), file);
+                SharedFiles sharedFiles = new SharedFiles(file, model.getUser().getUsername());
                 model.getUser().setFiles(sharedFiles);
                 if (logged)
                     sendSharedFiles(sharedFiles);
             }
         });
         thread.start();
+    }
+
+    public void setSaveLocation(File file) {
+        model.setSaveLocation(file);
     }
 
     private void sendSharedFiles(DefaultMutableTreeNode sharedFiles) {
@@ -375,5 +377,76 @@ public class ChatController extends Observable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void fileRequested(Command command) {
+        setChanged();
+        notifyObservers(command);
+    }
+
+    public void fileSend(File file, User user) {
+        FileInfo fileInfo = new FileInfo(file);
+
+        Thread thread = new Thread(new FileSender(this, user, 9002, fileInfo));
+        thread.start();
+    }
+
+    public void requestFile(FileInfo fileInfo) {
+        if (fileInfo.getOwner() == null) {
+            return;
+        }
+
+        Message message = new Message(model.getUser(), fileInfo, fileInfo.getOwner());
+        Command command = new Command(Command.Action.REQUEST_FILE, message);
+
+        try {
+            out.writeObject(command);
+            out.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
+    }
+
+    public void acceptTransfer(String username, FileInfo fileInfo) {
+        Message message = new Message(model.getUser(), fileInfo, username);
+        Command command = new Command(Command.Action.TRANSFER_ACCEPTED, message);
+
+        try {
+            out.writeObject(command);
+            out.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
+    }
+
+    public void transferAccepted(Message message) {
+        FileInfo fileInfo = (FileInfo) message.getData();
+        User user = message.getUser();
+
+        Thread thread = new Thread(
+                new FileReceiver(this, 9002, fileInfo, model.getSaveLocation().getAbsolutePath(), user));
+        thread.start();
+
+        // Transfer accepted, start receiving thread and ask the user to send
+        Message m = new Message(model.getUser(), fileInfo, user.getUsername());
+        Command command = new Command(Command.Action.START_TRANSFER, m);
+
+        try {
+            out.writeObject(command);
+            out.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
+    }
+
+    public void startTransfer(Message message) {
+        FileInfo fileInfo = (FileInfo) message.getData();
+        User user = message.getUser();
+
+        Thread thread = new Thread(new FileSender(this, user, 9002, fileInfo));
+        thread.start();
     }
 }

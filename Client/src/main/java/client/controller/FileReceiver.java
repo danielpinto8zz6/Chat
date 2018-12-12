@@ -1,11 +1,13 @@
 package client.controller;
 
-import java.io.DataInputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.UnknownHostException;
 
 import chatroomlibrary.FileInfo;
 import chatroomlibrary.User;
@@ -31,50 +33,54 @@ public class FileReceiver implements Runnable {
         }
     }
 
-    private void saveFile(Socket clientSock) throws IOException {
+    private void saveFile(Socket socket) throws IOException {
         String newFile = path + File.separator + fileInfo.getName();
-        DataInputStream dis = new DataInputStream(clientSock.getInputStream());
-        FileOutputStream fos = new FileOutputStream(newFile);
-        byte[] buffer = new byte[4096];
+        FileOutputStream fileWritter;
+        byte[] buffer = new byte[fileInfo.getSize()];
+        long startTime = System.currentTimeMillis();
 
-        int filesize = (int) fileInfo.getSize();
-        int read = 0;
+        int count;
         int totalRead = 0;
-        int remaining = filesize;
-        while ((read = dis.read(buffer, 0, Math.min(buffer.length, remaining))) > 0) {
-            totalRead += read;
-            remaining -= read;
-            System.out.println("read " + totalRead + " bytes.");
-            fos.write(buffer, 0, read);
-        }
 
-        fos.close();
-        dis.close();
+        try {
+            fileWritter = new FileOutputStream(newFile);
+            InputStream inputStream = socket.getInputStream();
 
-        if (totalRead == fileInfo.getSize()) {
-            System.out.println("File received! Exiting!");
-            controller.fileReceived(fileInfo.getName(), user.getUsername());
+            while ((count = inputStream.read(buffer)) > 0) {
+                totalRead += count;
+                fileWritter.write(buffer, 0, count);
+            }
+
+            fileWritter.close();
+
+            if (totalRead == fileInfo.getSize()) {
+                controller.fileReceived(fileInfo.getName(), user.getUsername());
+                long endTime = System.currentTimeMillis();
+                printTransferDetails(startTime, endTime, totalRead);
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
     @Override
     public void run() {
-        while (true) {
-            Socket socket = null;
-            try {
-                socket = serverSocket.accept();
-                saveFile(socket);
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                if (socket != null) {
-                    try {
-                        socket.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
+        Socket socket = null;
+        try {
+            socket = serverSocket.accept();
+            saveFile(socket);
+            socket.close();
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+    }
+
+    public void printTransferDetails(long startTime, long endTime, int totalRead) {
+        System.out.println("Transfer begun......");
+        System.out.println(totalRead + " bytes written in " + (endTime - startTime) + " ms.");
     }
 }

@@ -8,12 +8,6 @@ import server.view.ServerView;
  * @author daniel
  */
 class App {
-
-    /**
-     * The port that the server listens on.
-     */
-    private static final int PORT = 9001;
-
     /**
      * <p>
      * main.
@@ -22,7 +16,7 @@ class App {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        Server server = new Server(PORT);
+        Server server = new Server(Constants.PORT);
         ServerController controller = new ServerController(server);
         ServerView view = new ServerView(controller);
 

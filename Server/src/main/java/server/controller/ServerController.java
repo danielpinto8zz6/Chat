@@ -23,8 +23,12 @@ public class ServerController extends Observable {
     }
 
     public void startServer() {
-        Thread thread = new Thread(new Receiver(this));
+        Thread thread = new Thread(new ClientReceiver(this));
         thread.start();
+    }
+
+    public void stopServer() {
+        model.setRunning(false);
     }
 
     // send incoming msg to all Users
@@ -146,7 +150,7 @@ public class ServerController extends Observable {
         return success;
     }
 
-    public void removeClient(Client client) {
+    public synchronized void removeClient(Client client) {
         User user = client.getUser();
 
         setChanged();
@@ -159,7 +163,7 @@ public class ServerController extends Observable {
         return model.getPort();
     }
 
-    public void addClient(Client client) {
+    public synchronized void addClient(Client client) {
         model.addClient(client);
         // create a new thread for newUser incoming messages handling
         new Thread(new ClientHandler(this, client)).start();
@@ -173,5 +177,9 @@ public class ServerController extends Observable {
     public void loginFailed(User user) {
         setChanged();
         notifyObservers(new String[] { "login-failed", user.getUsername(), user.getHost() });
-	}
+    }
+
+    public boolean isRunning() {
+        return model.isRunning();
+    }
 }

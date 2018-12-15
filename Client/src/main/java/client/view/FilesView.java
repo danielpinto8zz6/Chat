@@ -65,6 +65,8 @@ public class FilesView extends javax.swing.JPanel implements Observer {
                 jTreeMouseClicked(evt);
             }
         });
+        jTree.setRootVisible(false);
+
         jScrollPane2.setViewportView(jTree);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);

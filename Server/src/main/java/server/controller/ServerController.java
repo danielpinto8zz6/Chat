@@ -130,12 +130,15 @@ public class ServerController extends Observable {
     }
 
     public boolean authenticate(User user) {
+        Connection connection = DbHelper.getConnection();
         try {
-            User userFromDb = UserDao.getObject(DbHelper.getConnection(), user.getUsername());
+            User userFromDb = UserDao.getObject(connection, user.getUsername());
 
-            if (userFromDb.match(user)) {
+            if (userFromDb.match(user) && userFromDb.getState() == 0) {
                 // Login succeed
                 user.setState(1);
+                UserDao.save(connection, user);
+
                 return true;
             }
         } catch (NotFoundException | SQLException e) {
@@ -146,11 +149,17 @@ public class ServerController extends Observable {
     }
 
     public boolean register(User user) {
-        Connection conn = DbHelper.getConnection();
+        Connection connection = DbHelper.getConnection();
         try {
-            UserDao.create(conn, user);
+            UserDao.create(connection, user);
+            user.setState(1);
+            UserDao.save(connection, user);
+
             return true;
         } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        } catch (NotFoundException e) {
             e.printStackTrace();
             return false;
         }
@@ -158,6 +167,16 @@ public class ServerController extends Observable {
 
     public synchronized void removeClient(Client client) {
         User user = client.getUser();
+
+        user.setState(0);
+
+        try {
+            UserDao.save(DbHelper.getConnection(), user);
+        } catch (NotFoundException e) {
+            e.printStackTrace();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
         setChanged();
         notifyObservers(new String[] { "user-exited", user.getUsername(), user.getAddress() });
@@ -193,8 +212,8 @@ public class ServerController extends Observable {
         return model.isRunning();
     }
 
-	public String getHostAddress() {
-		return model.getHostAddress();
-	}
+    public String getHostAddress() {
+        return model.getHostAddress();
+    }
 
 }

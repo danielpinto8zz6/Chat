@@ -18,7 +18,11 @@ class App {
     public static void main(String[] args) {
         Chat chat = new Chat();
         ChatController chatController = new ChatController(chat);
-        MainView mainView = new MainView(chatController);
-        mainView.setVisible(true);
+
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new MainView(chatController).setVisible(true);
+            }
+        });
     }
 }

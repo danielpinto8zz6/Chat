@@ -126,7 +126,6 @@ public class UserDao {
 
         String sql = "";
         PreparedStatement stmt = null;
-        ResultSet result = null;
 
         try {
             sql = "INSERT INTO users ( username, password, state, " + "tcp_port, udp_port, address, "

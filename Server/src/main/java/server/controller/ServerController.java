@@ -16,7 +16,6 @@ import server.database.DbHelper;
 import server.model.Client;
 import server.model.Server;
 
-@SuppressWarnings("deprecation")
 public class ServerController extends Observable {
     private final Server model;
 
@@ -193,5 +192,9 @@ public class ServerController extends Observable {
     public boolean isRunning() {
         return model.isRunning();
     }
+
+	public String getHostAddress() {
+		return model.getHostAddress();
+	}
 
 }

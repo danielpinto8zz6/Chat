@@ -1,7 +1,6 @@
 package client.controller;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Observable;
 
@@ -27,7 +26,6 @@ import client.network.tcp.FileSender;
  * @author daniel
  * @version $Id: $Id
  */
-@SuppressWarnings("deprecation")
 public class ChatController extends Observable {
     private final Chat model;
     private Client client;

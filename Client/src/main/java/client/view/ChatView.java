@@ -32,7 +32,6 @@ import client.controller.ChatController;
  * @author daniel
  * @version $Id: $Id
  */
-@SuppressWarnings("deprecation")
 public class ChatView extends javax.swing.JPanel implements Observer {
     private static final long serialVersionUID = 1L;
     private ChatController controller;

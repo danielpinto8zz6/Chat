@@ -7,7 +7,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import chatroomlibrary.Message;
 import chatroomlibrary.User;
-import client.Utils;
+import chatroomlibrary.Utils;
 
 /**
  * <p>
@@ -35,8 +35,8 @@ public class Chat {
      * </p>
      */
     public Chat() {
-        String address = Utils.getAdress();
-        this.user = new User("username", address, 9001);
+        String address = Utils.getaddress();
+        this.user = new User("username", address, 9001, 6001);
         this.users = new ArrayList<>();
         this.messages = new ArrayList<>();
         this.conversations = new ArrayList<>();

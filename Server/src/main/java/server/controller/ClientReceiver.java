@@ -16,7 +16,7 @@ public class ClientReceiver implements Runnable {
         ServerSocket server = null;
 
         try {
-            server = new ServerSocket(controller.getPort());
+            server = new ServerSocket(controller.getTcpPort());
 
             while (controller.isRunning()) {
                 // accepts a new client

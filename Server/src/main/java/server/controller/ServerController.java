@@ -1,25 +1,27 @@
 package server.controller;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Observable;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import chatroomlibrary.Command;
 import chatroomlibrary.Message;
+import chatroomlibrary.NotFoundException;
 import chatroomlibrary.User;
+import chatroomlibrary.UserDao;
+import server.database.DbHelper;
 import server.model.Client;
 import server.model.Server;
 
 @SuppressWarnings("deprecation")
 public class ServerController extends Observable {
     private final Server model;
-    private DBHelper dbHelper;
 
     public ServerController(Server model) {
         this.model = model;
-
-        dbHelper = new DBHelper("sql2264793", "jG1%xX8!", "sql2.freemysqlhosting.net", "sql2264793");
     }
 
     public void startServer() {
@@ -89,7 +91,7 @@ public class ServerController extends Observable {
 
         for (Client client : model.getClients()) {
             DefaultMutableTreeNode user = new DefaultMutableTreeNode(client.getUser().getUsername());
-            DefaultMutableTreeNode sharedFiles = client.getUser().getFiles();
+            DefaultMutableTreeNode sharedFiles = client.getFiles();
             if (sharedFiles != null) {
                 user.add(sharedFiles);
             }
@@ -129,38 +131,47 @@ public class ServerController extends Observable {
     }
 
     public boolean authenticate(User user) {
-        dbHelper.open();
-        int id = dbHelper.authenticate(user.getUsername(), user.getPassword());
-        if (id != -1) {
-            user.setId(id);
-            user.setState(0);
-            dbHelper.updateUser(user);
+        try {
+            User userFromDb = UserDao.getObject(DbHelper.getConnection(), user.getUsername());
+
+            if (userFromDb.match(user)) {
+                // Login succeed
+                user.setState(1);
+                return true;
+            }
+        } catch (NotFoundException | SQLException e) {
+            e.printStackTrace();
         }
 
-        dbHelper.close();
-
-        return (id != -1) ? true : false;
+        return false;
     }
 
     public boolean register(User user) {
-        dbHelper.open();
-        boolean success = dbHelper.insertUser(user);
-        dbHelper.close();
-
-        return success;
+        Connection conn = DbHelper.getConnection();
+        try {
+            UserDao.create(conn, user);
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     public synchronized void removeClient(Client client) {
         User user = client.getUser();
 
         setChanged();
-        notifyObservers(new String[] { "user-exited", user.getUsername(), user.getHost() });
+        notifyObservers(new String[] { "user-exited", user.getUsername(), user.getAddress() });
 
         model.removeClient(client);
     }
 
-    public int getPort() {
-        return model.getPort();
+    public int getTcpPort() {
+        return model.getTcpPort();
+    }
+
+    public int getUdpPort() {
+        return model.getUdpPort();
     }
 
     public synchronized void addClient(Client client) {
@@ -171,15 +182,16 @@ public class ServerController extends Observable {
         User user = client.getUser();
 
         setChanged();
-        notifyObservers(new String[] { "user-joined", user.getUsername(), user.getHost() });
+        notifyObservers(new String[] { "user-joined", user.getUsername(), user.getAddress() });
     }
 
     public void loginFailed(User user) {
         setChanged();
-        notifyObservers(new String[] { "login-failed", user.getUsername(), user.getHost() });
+        notifyObservers(new String[] { "login-failed", user.getUsername(), user.getAddress() });
     }
 
     public boolean isRunning() {
         return model.isRunning();
     }
+
 }

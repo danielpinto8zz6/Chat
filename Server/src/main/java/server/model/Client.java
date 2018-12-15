@@ -4,6 +4,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
+import javax.swing.tree.DefaultMutableTreeNode;
+
 import chatroomlibrary.User;
 
 public class Client {
@@ -11,6 +13,7 @@ public class Client {
     private final ObjectInputStream objectInputStream;
     private User user;
     private Socket socket;
+    private DefaultMutableTreeNode files;
 
     /**
      * <p>
@@ -27,6 +30,20 @@ public class Client {
         this.socket = socket;
         this.objectOutputStream = out;
         this.objectInputStream = in;
+    }
+
+    /**
+     * @return the files
+     */
+    public DefaultMutableTreeNode getFiles() {
+        return files;
+    }
+
+    /**
+     * @param files the files to set
+     */
+    public void setFiles(DefaultMutableTreeNode files) {
+        this.files = files;
     }
 
     /**

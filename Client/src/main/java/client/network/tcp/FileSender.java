@@ -1,4 +1,4 @@
-package client.controller;
+package client.network.tcp;
 
 import java.io.DataOutputStream;
 import java.io.FileInputStream;
@@ -8,6 +8,7 @@ import java.net.Socket;
 
 import chatroomlibrary.FileInfo;
 import chatroomlibrary.User;
+import client.controller.ChatController;
 
 public class FileSender implements Runnable {
 
@@ -22,7 +23,7 @@ public class FileSender implements Runnable {
         this.user = user;
 
         try {
-            socket = new Socket(user.getHost(), port);
+            socket = new Socket(user.getAddress(), port);
         } catch (Exception e) {
             e.printStackTrace();
         }

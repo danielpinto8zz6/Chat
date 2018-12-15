@@ -1,4 +1,4 @@
-package client.controller;
+package client.network.tcp;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -11,6 +11,7 @@ import java.net.UnknownHostException;
 
 import chatroomlibrary.FileInfo;
 import chatroomlibrary.User;
+import client.controller.ChatController;
 
 public class FileReceiver implements Runnable {
 

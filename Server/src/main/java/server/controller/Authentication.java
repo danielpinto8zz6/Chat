@@ -39,12 +39,14 @@ class Authentication implements Runnable {
                         controller.loginFailed(user);
                         out.writeObject(new Command(Command.Action.LOGIN_FAILED));
                         out.flush();
+                        return;
                     }
                 } else if (command.getAction() == Command.Action.REGISTER) {
                     if (!controller.register(user)) {
                         controller.loginFailed(user);
                         out.writeObject(new Command(Command.Action.LOGIN_FAILED));
                         out.flush();
+                        return;
                     }
                 }
             }

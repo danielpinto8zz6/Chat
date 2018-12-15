@@ -42,7 +42,7 @@ class ClientHandler implements Runnable {
             while ((command = (Command) this.client.getObjectInputStream().readObject()) != null) {
                 if (command.getAction() == Command.Action.SEND_SHARED_FILES) {
                     DefaultMutableTreeNode files = (DefaultMutableTreeNode) command.getMessage().getData();
-                    client.getUser().setFiles(files);
+                    client.setFiles(files);
                     controller.broadcastFiles();
                 } else if (command.getMessage().getTo() != null) {
                     controller.sendCommandToUser(command, client, command.getMessage().getTo());

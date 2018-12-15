@@ -19,10 +19,10 @@ public class Server {
      *
      * @param port a int.
      */
-    public Server(int port) {
+    public Server(int tcpPort, int udpPort) {
         this.clients = new ArrayList<>();
 
-        this.serverDetails = new User("Server", getHostAddress(), port);
+        this.serverDetails = new User("Server", getHostAddress(), tcpPort, udpPort);
     }
 
     /**
@@ -63,8 +63,12 @@ public class Server {
         return hostAddress.getHostAddress();
     }
 
-    public int getPort() {
-        return serverDetails.getPort();
+    public int getTcpPort() {
+        return serverDetails.getTcpPort();
+    }
+
+    public int getUdpPort() {
+        return serverDetails.getUdpPort();
     }
 
     public boolean removeClient(Client client) {

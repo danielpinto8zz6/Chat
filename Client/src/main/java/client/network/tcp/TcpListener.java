@@ -1,15 +1,18 @@
-package client.controller;
+package client.network.tcp;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.ArrayList;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import chatroomlibrary.Command;
 import chatroomlibrary.User;
+import client.controller.ChatController;
 
-class Receiver implements Runnable {
+public class TcpListener implements Runnable {
     private final ChatController controller;
+    private ObjectInputStream in = null;
 
     /**
      * <p>
@@ -18,8 +21,9 @@ class Receiver implements Runnable {
      *
      * @param controller a {@link client.controller.ChatController} object.
      */
-    public Receiver(ChatController controller) {
+    public TcpListener(ChatController controller, ObjectInputStream in) {
         this.controller = controller;
+        this.in = in;
     }
 
     /** {@inheritDoc} */
@@ -27,7 +31,7 @@ class Receiver implements Runnable {
     public void run() {
         while (!Thread.currentThread().isInterrupted()) {
             try {
-                Command command = (Command) controller.in.readObject();
+                Command command = (Command) in.readObject();
 
                 if (command == null) {
                     continue;

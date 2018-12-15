@@ -1,10 +1,10 @@
-package client;
+package chatroomlibrary;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 public class Utils {
-    public static String getAdress() {
+    public static String getaddress() {
         InetAddress ip = null;
         try {
             ip = InetAddress.getLocalHost();

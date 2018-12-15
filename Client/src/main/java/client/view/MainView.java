@@ -6,7 +6,6 @@
 package client.view;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -46,7 +45,7 @@ public class MainView extends javax.swing.JFrame implements Observer {
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
-                controller.disconnect();
+                controller.close();
             }
         });
     }
@@ -144,7 +143,6 @@ public class MainView extends javax.swing.JFrame implements Observer {
 
         if (returnValue == JFileChooser.APPROVE_OPTION) {
             File selectedFile = jfc.getSelectedFile();
-            System.out.println(selectedFile.getAbsolutePath());
             controller.setSharedFolder(selectedFile);
         }
     }// GEN-LAST:event_jMenuItemSharedFolderActionPerformed
@@ -169,10 +167,12 @@ public class MainView extends javax.swing.JFrame implements Observer {
             String str = (String) arg;
             switch (str) {
             case "connected":
-                jTabbedPane.removeAll();
-                jTabbedPane.addTab("Chat", chatView);
-                jTabbedPane.addTab("Transfer history", new HistoryView(controller));
-                jTabbedPane.add("Files", new FilesView(controller));
+                if (controller.logged) {
+                    jTabbedPane.removeAll();
+                    jTabbedPane.addTab("Chat", chatView);
+                    jTabbedPane.addTab("Transfer history", new HistoryView(controller));
+                    jTabbedPane.add("Files", new FilesView(controller));
+                }
                 break;
             default:
                 break;

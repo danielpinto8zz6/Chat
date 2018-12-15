@@ -176,7 +176,6 @@ public class ChatView extends javax.swing.JPanel implements Observer {
 
         if (returnValue == JFileChooser.APPROVE_OPTION) {
             File selectedFile = jfc.getSelectedFile();
-            System.out.println(selectedFile.getAbsolutePath());
 
             String username = getUsernameDialog(controller.getUsernames());
 
@@ -195,7 +194,6 @@ public class ChatView extends javax.swing.JPanel implements Observer {
 
         if (title != null) {
             message = "@" + title + " " + message;
-            System.out.println(message);
         }
 
         controller.sendMessage(message);
@@ -209,7 +207,6 @@ public class ChatView extends javax.swing.JPanel implements Observer {
 
             if (title != null) {
                 message = "@" + title + " " + message;
-                System.out.println(message);
             }
 
             controller.sendMessage(message);
@@ -237,7 +234,6 @@ public class ChatView extends javax.swing.JPanel implements Observer {
      * @param message a {@link chatroomlibrary.Message} object.
      */
     public void appendMessage(Message message) {
-        System.out.println(message.getData());
         if (message.getTo() != null)
             appendToPane(jtextFilDiscu, "(<b>Private</b>)" + "@" + message.getUser().getUsername() + "<span> : "
                     + message.getData() + "</span>");
@@ -332,7 +328,6 @@ public class ChatView extends javax.swing.JPanel implements Observer {
 
             if (returnValue == JFileChooser.APPROVE_OPTION) {
                 File selectedFile = jfc.getSelectedFile();
-                System.out.println(selectedFile.getAbsolutePath());
 
                 try {
                     controller.acceptFile(selectedFile.getCanonicalPath(), user, fileInfo);

@@ -83,7 +83,6 @@ public class FilesView extends javax.swing.JPanel implements Observer {
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_jMenuItem1ActionPerformed
         DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) jTree.getLastSelectedPathComponent();
         FileInfo fileInfo = (FileInfo) selectedNode.getUserObject();
-        System.out.println(fileInfo);
         controller.requestFile(fileInfo);
     }// GEN-LAST:event_jMenuItem1ActionPerformed
 

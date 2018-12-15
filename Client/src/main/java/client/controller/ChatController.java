@@ -2,22 +2,22 @@ package client.controller;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Observable;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import chatroomlibrary.Command;
+import chatroomlibrary.Command.Action;
 import chatroomlibrary.FileInfo;
 import chatroomlibrary.Message;
 import chatroomlibrary.SharedFiles;
 import chatroomlibrary.User;
 import client.model.Chat;
 import client.model.Conversation;
+import client.network.Client;
+import client.network.tcp.FileReceiver;
+import client.network.tcp.FileSender;
 
 /**
  * <p>
@@ -30,14 +30,9 @@ import client.model.Conversation;
 @SuppressWarnings("deprecation")
 public class ChatController extends Observable {
     private final Chat model;
+    private Client client;
 
-    private Socket server = null;
-    private ObjectOutputStream out = null;
-    ObjectInputStream in = null;
-
-    private Thread threadReceiver = null;
-
-    boolean logged = false;
+    public boolean logged = false;
 
     /**
      * <p>
@@ -48,19 +43,7 @@ public class ChatController extends Observable {
      */
     public ChatController(Chat model) {
         this.model = model;
-    }
-
-    private void startReceiver() {
-        if (in == null)
-            return;
-
-        threadReceiver = new Thread(new Receiver(this));
-        threadReceiver.start();
-    }
-
-    private void stopReceiver() {
-        if (threadReceiver != null)
-            threadReceiver.interrupt();
+        this.client = new Client(this);
     }
 
     /**
@@ -125,7 +108,6 @@ public class ChatController extends Observable {
 
         if (text.charAt(0) == '@') {
             if (text.contains(" ")) {
-                System.out.println("private msg : " + text);
                 int firstSpace = text.indexOf(" ");
                 String to = text.substring(1, firstSpace);
                 message.setData(text.substring(firstSpace + 1, text.length()));
@@ -135,12 +117,7 @@ public class ChatController extends Observable {
 
         Command command = new Command(Command.Action.MESSAGE, message);
 
-        try {
-            out.writeObject(command);
-            out.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        client.sendTcpCommand(command);
     }
 
     /**
@@ -167,65 +144,6 @@ public class ChatController extends Observable {
 
     /**
      * <p>
-     * disconnect.
-     * </p>
-     */
-    public void disconnect() {
-        if (threadReceiver != null) {
-            stopReceiver();
-            try {
-                out.close();
-                in.close();
-                server.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    /**
-     * <p>
-     * connect.
-     * </p>
-     *
-     * @param username a {@link java.lang.String} object.
-     * @param host     a {@link java.lang.String} object.
-     * @param port     a int.
-     */
-    public void connect(String username, String password, String host, int port, Command.Action action) {
-        model.getUser().setUsername(username);
-        model.getUser().setPassword(password);
-        model.getUser().setPort(port);
-
-        try {
-            server = new Socket(host, port);
-            in = new ObjectInputStream(server.getInputStream());
-            out = new ObjectOutputStream(server.getOutputStream());
-
-            out.writeObject(new Command(action, new Message(model.getUser())));
-            out.flush();
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        startReceiver();
-    }
-
-    /**
-     * <p>
-     * getRemoteSocketAddress.
-     * </p>
-     *
-     * @return a {@link java.lang.String} object.
-     */
-    public String getRemoteSocketAddress() {
-        return server.getRemoteSocketAddress().toString();
-    }
-
-    /**
-     * <p>
      * sendFile.
      * </p>
      *
@@ -233,16 +151,10 @@ public class ChatController extends Observable {
      */
     public void sendFile(File file, String username) {
         FileInfo fileInfo = new FileInfo(file);
-        System.out.println(fileInfo.getName() + "\n" + fileInfo.getPath() + "\n" + fileInfo.getSize());
         Message message = new Message(model.getUser(), fileInfo, username);
         Command command = new Command(Command.Action.SEND_FILE, message);
 
-        try {
-            out.writeObject(command);
-            out.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        client.sendTcpCommand(command);
     }
 
     /**
@@ -256,8 +168,6 @@ public class ChatController extends Observable {
         // Do not ask to the sender
         if (message.getUser().equals(model.getUser()))
             return;
-
-        System.out.println(message.getUser().getUsername() + model.getUser().getUsername());
 
         setChanged();
         notifyObservers(message);
@@ -275,12 +185,7 @@ public class ChatController extends Observable {
         Command command = new Command(Command.Action.FILE_ACCEPTED, new Message(model.getUser(), fileInfo));
         command.getMessage().setTo(user.getUsername());
 
-        try {
-            out.writeObject(command);
-            out.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        client.sendTcpCommand(command);
 
         // File accepted, create FileReceiver thread and wait for user to connect and
         // send the file
@@ -355,7 +260,7 @@ public class ChatController extends Observable {
             @Override
             public void run() {
                 SharedFiles sharedFiles = new SharedFiles(file, model.getUser().getUsername());
-                model.getUser().setFiles(sharedFiles);
+
                 if (logged)
                     sendSharedFiles(sharedFiles);
             }
@@ -371,12 +276,7 @@ public class ChatController extends Observable {
         Message message = new Message(model.getUser(), sharedFiles);
         Command command = new Command(Command.Action.SEND_SHARED_FILES, message);
 
-        try {
-            out.writeObject(command);
-            out.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        client.sendTcpCommand(command);
     }
 
     public void fileRequested(Command command) {
@@ -399,26 +299,14 @@ public class ChatController extends Observable {
         Message message = new Message(model.getUser(), fileInfo, fileInfo.getOwner());
         Command command = new Command(Command.Action.REQUEST_FILE, message);
 
-        try {
-            out.writeObject(command);
-            out.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return;
-        }
+        client.sendTcpCommand(command);
     }
 
     public void acceptTransfer(String username, FileInfo fileInfo) {
         Message message = new Message(model.getUser(), fileInfo, username);
         Command command = new Command(Command.Action.TRANSFER_ACCEPTED, message);
 
-        try {
-            out.writeObject(command);
-            out.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return;
-        }
+        client.sendTcpCommand(command);
     }
 
     public void transferAccepted(Message message) {
@@ -433,13 +321,7 @@ public class ChatController extends Observable {
         Message m = new Message(model.getUser(), fileInfo, user.getUsername());
         Command command = new Command(Command.Action.START_TRANSFER, m);
 
-        try {
-            out.writeObject(command);
-            out.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return;
-        }
+        client.sendTcpCommand(command);
     }
 
     public void startTransfer(Message message) {
@@ -448,5 +330,14 @@ public class ChatController extends Observable {
 
         Thread thread = new Thread(new FileSender(this, user, 9002, fileInfo));
         thread.start();
+    }
+
+    public void createConnection(User user, Action action) {
+        model.setUser(user);
+        client.createTcpConnection(user, action);
+    }
+
+    public void close() {
+        client.disconnect();
     }
 }

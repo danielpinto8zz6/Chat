@@ -1,4 +1,4 @@
-package server.controller;
+package server.network.tcp;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -8,6 +8,7 @@ import java.net.Socket;
 import chatroomlibrary.Command;
 import chatroomlibrary.User;
 import server.Constants;
+import server.controller.ServerController;
 import server.model.Client;
 
 class Authentication implements Runnable {
@@ -53,8 +54,8 @@ class Authentication implements Runnable {
 
             Client client = new Client(user, socket, in, out);
 
-            client.getObjectOutputStream().writeObject(new Command(Command.Action.LOGGED));
-            client.getObjectOutputStream().flush();
+            client.getTcpOut().writeObject(new Command(Command.Action.LOGGED));
+            client.getTcpOut().flush();
 
             controller.addClient(client);
         } catch (IOException e) {

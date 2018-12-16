@@ -9,10 +9,10 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import chatroomlibrary.User;
 
 public class Client {
-    private final ObjectOutputStream objectOutputStream;
-    private final ObjectInputStream objectInputStream;
+    private final ObjectOutputStream tcpOut;
+    private final ObjectInputStream tcpIn;
     private User user;
-    private Socket socket;
+    private Socket tcpSocket;
     private DefaultMutableTreeNode files;
 
     /**
@@ -25,11 +25,32 @@ public class Client {
      * @param in     a {@link java.io.ObjectInputStream} object.
      * @param out    a {@link java.io.ObjectOutputStream} object.
      */
-    public Client(User user, Socket socket, ObjectInputStream in, ObjectOutputStream out) {
+    public Client(User user, Socket tcpSocket, ObjectInputStream tcpIn, ObjectOutputStream tcpOut) {
         this.user = user;
-        this.socket = socket;
-        this.objectOutputStream = out;
-        this.objectInputStream = in;
+        this.tcpSocket = tcpSocket;
+        this.tcpOut = tcpOut;
+        this.tcpIn = tcpIn;
+    }
+
+    /**
+     * @return the tcpOut
+     */
+    public ObjectOutputStream getTcpOut() {
+        return tcpOut;
+    }
+
+    /**
+     * @return the tcpIn
+     */
+    public ObjectInputStream getTcpIn() {
+        return tcpIn;
+    }
+
+    /**
+     * @return the tcpSocket
+     */
+    public Socket getTcpSocket() {
+        return tcpSocket;
     }
 
     /**
@@ -55,39 +76,6 @@ public class Client {
      */
     public User getUser() {
         return user;
-    }
-
-    /**
-     * <p>
-     * Getter for the field <code>socket</code>.
-     * </p>
-     *
-     * @return the socket
-     */
-    public Socket getSocket() {
-        return socket;
-    }
-
-    /**
-     * <p>
-     * Getter for the field <code>objectOutputStream</code>.
-     * </p>
-     *
-     * @return a {@link java.io.ObjectOutputStream} object.
-     */
-    public ObjectOutputStream getObjectOutputStream() {
-        return this.objectOutputStream;
-    }
-
-    /**
-     * <p>
-     * Getter for the field <code>objectInputStream</code>.
-     * </p>
-     *
-     * @return a {@link java.io.ObjectInputStream} object.
-     */
-    public ObjectInputStream getObjectInputStream() {
-        return this.objectInputStream;
     }
 
     /**

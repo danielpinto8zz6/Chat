@@ -333,9 +333,14 @@ public class ChatController extends Observable {
     public void createConnection(User user, Action action) {
         model.setUser(user);
         client.createTcpConnection(user, action);
+        client.startRmi();
     }
 
     public void close() {
         client.disconnect();
     }
+
+	public String getAdress() {
+		return model.getUser().getAddress();
+	}
 }

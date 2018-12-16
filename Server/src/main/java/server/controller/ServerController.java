@@ -3,6 +3,7 @@ package server.controller;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Observable;
 
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -15,16 +16,23 @@ import chatroomlibrary.UserDao;
 import server.database.DbHelper;
 import server.model.Client;
 import server.model.Server;
+import server.network.CommunicationHandler;
+import server.network.tcp.ClientHandler;
+import server.network.tcp.TcpClientListener;
 
 public class ServerController extends Observable {
     private final Server model;
+    private CommunicationHandler communication;
 
     public ServerController(Server model) {
         this.model = model;
+        communication = new CommunicationHandler(this);
     }
 
     public void startServer() {
-        Thread thread = new Thread(new ClientReceiver(this));
+        communication.registerRmiService();
+
+        Thread thread = new Thread(new TcpClientListener(this));
         thread.start();
     }
 
@@ -43,8 +51,8 @@ public class ServerController extends Observable {
     public void broadcastCommand(Command command) {
         for (Client client : model.getClients()) {
             try {
-                client.getObjectOutputStream().writeObject(command);
-                client.getObjectOutputStream().flush();
+                client.getTcpOut().writeObject(command);
+                client.getTcpOut().flush();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -63,8 +71,8 @@ public class ServerController extends Observable {
 
         for (Client client : model.getClients()) {
             try {
-                client.getObjectOutputStream().writeObject(command);
-                client.getObjectOutputStream().flush();
+                client.getTcpOut().writeObject(command);
+                client.getTcpOut().flush();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -77,15 +85,15 @@ public class ServerController extends Observable {
 
         for (Client client : model.getClients()) {
             try {
-                client.getObjectOutputStream().writeObject(command);
-                client.getObjectOutputStream().flush();
+                client.getTcpOut().writeObject(command);
+                client.getTcpOut().flush();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
     }
 
-    private DefaultMutableTreeNode getFiles() {
+    public DefaultMutableTreeNode getFiles() {
         DefaultMutableTreeNode files = new DefaultMutableTreeNode(new String("Files"));
 
         for (Client client : model.getClients()) {
@@ -114,18 +122,18 @@ public class ServerController extends Observable {
         for (Client client : model.getClients()) {
             if (client.getUser().getUsername().equals(user)) {
                 find = true;
-                client.getObjectOutputStream().writeObject(command);
-                client.getObjectOutputStream().flush();
+                client.getTcpOut().writeObject(command);
+                client.getTcpOut().flush();
                 if (command.getAction() == Command.Action.MESSAGE) {
-                    sender.getObjectOutputStream().writeObject(command);
-                    sender.getObjectOutputStream().flush();
+                    sender.getTcpOut().writeObject(command);
+                    sender.getTcpOut().flush();
                 }
             }
         }
         if (!find) {
-            sender.getObjectOutputStream().writeObject(
+            sender.getTcpOut().writeObject(
                     new Command(Command.Action.MESSAGE, new Message(model.getServerDetails(), "User not found")));
-            sender.getObjectOutputStream().flush();
+            sender.getTcpOut().flush();
         }
     }
 
@@ -216,4 +224,7 @@ public class ServerController extends Observable {
         return model.getHostAddress();
     }
 
+    public List<User> getUsers() {
+        return model.getUsers();
+    }
 }

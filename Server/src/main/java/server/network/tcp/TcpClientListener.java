@@ -1,13 +1,15 @@
-package server.controller;
+package server.network.tcp;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class ClientReceiver implements Runnable {
+import server.controller.ServerController;
+
+public class TcpClientListener implements Runnable {
     private ServerController controller;
 
-    public ClientReceiver(ServerController controller) {
+    public TcpClientListener(ServerController controller) {
         this.controller = controller;
     }
 

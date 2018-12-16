@@ -1,4 +1,4 @@
-package server.controller;
+package server.network.tcp;
 
 import java.io.EOFException;
 import java.io.IOException;
@@ -6,9 +6,10 @@ import java.io.IOException;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import chatroomlibrary.Command;
+import server.controller.ServerController;
 import server.model.Client;
 
-class ClientHandler implements Runnable {
+public class ClientHandler implements Runnable {
 
     private final ServerController controller;
     private final Client client;
@@ -39,7 +40,7 @@ class ClientHandler implements Runnable {
         Command command;
 
         try {
-            while ((command = (Command) this.client.getObjectInputStream().readObject()) != null) {
+            while ((command = (Command) this.client.getTcpIn().readObject()) != null) {
                 if (command.getAction() == Command.Action.SEND_SHARED_FILES) {
                     DefaultMutableTreeNode files = (DefaultMutableTreeNode) command.getMessage().getData();
                     client.setFiles(files);
@@ -58,9 +59,9 @@ class ClientHandler implements Runnable {
             e.printStackTrace();
         } finally {
             try {
-                client.getObjectInputStream().close();
-                client.getObjectInputStream().close();
-                client.getSocket().close();
+                client.getTcpIn().close();
+                client.getTcpIn().close();
+                client.getTcpSocket().close();
             } catch (IOException e) {
                 e.printStackTrace();
             }

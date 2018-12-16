@@ -5,11 +5,18 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.rmi.NotBoundException;
+import java.rmi.Remote;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 
 import chatroomlibrary.Command;
 import chatroomlibrary.Message;
 import chatroomlibrary.User;
+import chatroomlibrary.rmi.UserSensor;
 import client.controller.ChatController;
+import client.network.rmi.Rmi;
 import client.network.tcp.TcpListener;
 
 public class Client {
@@ -19,6 +26,8 @@ public class Client {
 
     private Thread tcpListener = null;
     private ChatController controller;
+
+    private Rmi rmi;
 
     public Client(ChatController controller) {
         this.controller = controller;
@@ -85,6 +94,22 @@ public class Client {
         } catch (IOException e) {
             e.printStackTrace();
             return;
+        }
+    }
+
+    public void startRmi() {
+        try {
+            Registry r = LocateRegistry.getRegistry();
+            Remote remoteService = r.lookup("ObservacaoSistema");
+
+            UserSensor sensor = (UserSensor) remoteService;
+
+            rmi = new Rmi(controller);
+            sensor.addListener(rmi);
+        } catch (NotBoundException e) {
+            e.printStackTrace();
+        } catch (RemoteException e) {
+            e.printStackTrace();
         }
     }
 }

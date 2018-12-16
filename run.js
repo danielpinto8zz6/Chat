@@ -3,6 +3,7 @@ const exec = require('child_process').exec;
 
 const SERVER = "java -jar Server/target/Server-1.0-SNAPSHOT-jar-with-dependencies.jar";
 const CLIENT = "java -jar Client/target/Client-1.0-SNAPSHOT-jar-with-dependencies.jar";
+const MONITOR = "java -jar Monitor/target/Monitor-1.0-SNAPSHOT-jar-with-dependencies.jar";
 
 var COMMAND;
 
@@ -13,6 +14,12 @@ switch (args[2]) {
         break;
     case "client":
     case "1":
+        COMMAND = CLIENT;
+        break;
+    case "2":
+    case "monitor":
+        COMMAND = MONITOR;
+        break;
     default:
         COMMAND = CLIENT;
         break;

@@ -14,6 +14,7 @@
         <module>ChatRoomLibrary</module>
         <module>Server</module>
         <module>Client</module>
+        <module>Monitor</module>
     </modules>
 
     <build>

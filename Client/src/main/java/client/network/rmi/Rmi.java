@@ -2,6 +2,7 @@ package client.network.rmi;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -21,12 +22,12 @@ public class Rmi extends UnicastRemoteObject implements UserListener {
 
     @Override
     public void usersChanged(List<User> users) throws RemoteException {
-        System.exit(0);
+        controller.updateUsers((ArrayList<User>) users);
     }
 
     @Override
     public void sharedFilesChanged(DefaultMutableTreeNode files) throws RemoteException {
-        System.exit(0);
+        System.out.println("Users changed");
     };
 
 }

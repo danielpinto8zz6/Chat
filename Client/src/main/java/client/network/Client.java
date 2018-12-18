@@ -10,6 +10,7 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.ArrayList;
 
 import chatroomlibrary.Command;
 import chatroomlibrary.Message;
@@ -28,6 +29,7 @@ public class Client {
     private ChatController controller;
 
     private Rmi rmi;
+    private UserSensor sensor;
 
     public Client(ChatController controller) {
         this.controller = controller;
@@ -44,6 +46,13 @@ public class Client {
     public void stopTcp() {
         if (tcpListener != null)
             tcpListener.interrupt();
+        try {
+            tcpOut.close();
+            tcpIn.close();
+            tcpSocket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void startUdp() {
@@ -53,17 +62,9 @@ public class Client {
     }
 
     public void disconnect() {
-        if (tcpListener != null) {
-            stopTcp();
-            stopUdp();
-            try {
-                tcpOut.close();
-                tcpIn.close();
-                tcpSocket.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+        stopTcp();
+        stopUdp();
+        stopRmi();
     }
 
     public void createTcpConnection(User user, Command.Action action) {
@@ -102,12 +103,26 @@ public class Client {
             Registry r = LocateRegistry.getRegistry();
             Remote remoteService = r.lookup("ObservacaoSistema");
 
-            UserSensor sensor = (UserSensor) remoteService;
+            sensor = (UserSensor) remoteService;
 
             rmi = new Rmi(controller);
             sensor.addListener(rmi);
         } catch (NotBoundException e) {
             e.printStackTrace();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            controller.updateUsers((ArrayList<User>) sensor.getUsers());
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void stopRmi() {
+        try {
+            sensor.removeListener(rmi);
         } catch (RemoteException e) {
             e.printStackTrace();
         }

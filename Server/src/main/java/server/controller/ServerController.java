@@ -66,17 +66,18 @@ public class ServerController extends Observable {
      * </p>
      */
     public void broadcastAllUsers() {
-        Command command = new Command(Command.Action.BROADCAST_USERS,
-                new Message(model.getServerDetails(), model.getUsers()));
+        // Command command = new Command(Command.Action.BROADCAST_USERS,
+        //         new Message(model.getServerDetails(), model.getUsers()));
 
-        for (Client client : model.getClients()) {
-            try {
-                client.getTcpOut().writeObject(command);
-                client.getTcpOut().flush();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+        // for (Client client : model.getClients()) {
+        //     try {
+        //         client.getTcpOut().writeObject(command);
+        //         client.getTcpOut().flush();
+        //     } catch (IOException e) {
+        //         e.printStackTrace();
+        //     }
+        // }
+        communication.rmiService.notifyUsersList();
     }
 
     public void broadcastFiles() {

@@ -9,11 +9,39 @@ import java.util.List;
 
 import chatroomlibrary.User;
 import chatroomlibrary.rmi.UserSensor;
+import monitor.rmi.Rmi;
 
 /**
  * @author daniel
  */
 class App {
+    private UserSensor sensor;
+    private Rmi rmi;
+
+    public void startRmi() {
+        try {
+            Registry r = LocateRegistry.getRegistry();
+            Remote remoteService = r.lookup("ObservacaoSistema");
+
+            sensor = (UserSensor) remoteService;
+
+            rmi = new Rmi();
+            sensor.addListener(rmi);
+        } catch (NotBoundException e) {
+            e.printStackTrace();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void stopRmi() {
+        try {
+            sensor.removeListener(rmi);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
     /**
      * <p>
      * main.

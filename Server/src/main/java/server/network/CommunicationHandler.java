@@ -1,12 +1,19 @@
 package server.network;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
+import chatroomlibrary.Message;
 import server.controller.ServerController;
 import server.network.rmi.RmiService;
+import server.network.tcp.TCPListener;
 
 public class CommunicationHandler {
     private ServerController controller;
@@ -40,5 +47,34 @@ public class CommunicationHandler {
         }
 
         return true;
+    }
+
+    public void startTCP() {
+        Thread thread = new Thread(new TCPListener(controller));
+        thread.start();
+    }
+
+    public void sendUDPMessage(Message message, String address, int port) {
+        DatagramSocket socket;
+
+        try {
+            socket = new DatagramSocket();
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(baos);
+
+            oos.writeObject(message);
+
+            byte[] data = baos.toByteArray();
+            InetAddress servAddr = InetAddress.getByName(address);
+
+            DatagramPacket pkt;
+
+            pkt = new DatagramPacket(data, data.length, servAddr, port);
+            socket.send(pkt);
+            socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

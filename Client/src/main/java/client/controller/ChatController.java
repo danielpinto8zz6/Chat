@@ -2,12 +2,13 @@ package client.controller;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Observable;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import chatroomlibrary.Command;
-import chatroomlibrary.Command.Action;
+import chatroomlibrary.Message.Type;
+import chatroomlibrary.interfaces.IClientListener;
 import chatroomlibrary.FileInfo;
 import chatroomlibrary.Message;
 import chatroomlibrary.SharedFiles;
@@ -26,7 +27,7 @@ import client.network.tcp.FileSender;
  * @author daniel
  * @version $Id: $Id
  */
-public class ChatController extends Observable {
+public class ChatController extends Observable implements IClientListener {
     private final Chat model;
     private Client client;
 
@@ -44,29 +45,6 @@ public class ChatController extends Observable {
         this.client = new Client(this);
     }
 
-    /**
-     * <p>
-     * addMessage.
-     * </p>
-     *
-     * @param message a {@link chatroomlibrary.Message} object.
-     */
-    public void addMessage(Message message) {
-        if (message.getTo() == null) {
-            model.addMessage(message);
-        } else {
-            Conversation conversation = getConversation(message.getTo());
-            if (conversation == null) {
-                conversation = new Conversation(message.getUser());
-                model.addConversation(conversation);
-            }
-            conversation.addMessage(message);
-        }
-
-        setChanged();
-        notifyObservers(message);
-    }
-
     private Conversation getConversation(String to) {
         for (Conversation conversation : model.getConversations()) {
             if (conversation.getUser().getUsername() == to) {
@@ -75,20 +53,6 @@ public class ChatController extends Observable {
         }
 
         return null;
-    }
-
-    /**
-     * <p>
-     * updateUsers.
-     * </p>
-     *
-     * @param users a {@link java.util.ArrayList} object.
-     */
-    public void updateUsers(ArrayList<User> users) {
-        model.setUsers(users);
-
-        setChanged();
-        notifyObservers("update-users");
     }
 
     /**
@@ -102,7 +66,7 @@ public class ChatController extends Observable {
         if (text == "")
             return;
 
-        Message message = new Message(model.getUser(), text);
+        Message message = new Message(Message.Type.MESSAGE, model.getUser(), text);
 
         if (text.charAt(0) == '@') {
             if (text.contains(" ")) {
@@ -113,9 +77,7 @@ public class ChatController extends Observable {
             }
         }
 
-        Command command = new Command(Command.Action.MESSAGE, message);
-
-        client.sendTcpCommand(command);
+        client.sendTcpMessage(message);
     }
 
     /**
@@ -149,10 +111,9 @@ public class ChatController extends Observable {
      */
     public void sendFile(File file, String username) {
         FileInfo fileInfo = new FileInfo(file);
-        Message message = new Message(model.getUser(), fileInfo, username);
-        Command command = new Command(Command.Action.SEND_FILE, message);
+        Message message = new Message(Message.Type.SEND_FILE, model.getUser(), fileInfo, username);
 
-        client.sendTcpCommand(command);
+        client.sendTcpMessage(message);
     }
 
     /**
@@ -180,10 +141,10 @@ public class ChatController extends Observable {
      * @param absolutePath a {@link java.lang.String} object.
      */
     public void acceptFile(String path, User user, FileInfo fileInfo) {
-        Command command = new Command(Command.Action.FILE_ACCEPTED, new Message(model.getUser(), fileInfo));
-        command.getMessage().setTo(user.getUsername());
+        Message message = new Message(Message.Type.FILE_ACCEPTED, model.getUser(), fileInfo);
+        message.setTo(user.getUsername());
 
-        client.sendTcpCommand(command);
+        client.sendTcpMessage(message);
 
         // File accepted, create FileReceiver thread and wait for user to connect and
         // send the file
@@ -225,27 +186,10 @@ public class ChatController extends Observable {
     }
 
     public void fileReceived(String filename, String sender) {
-        setChanged();
-        notifyObservers(new String[] { "file-received", sender, model.getUser().getUsername(), filename });
-    }
-
-    public void logged() {
-        logged = true;
+        String username = model.getUser().getUsername();
 
         setChanged();
-        notifyObservers("connected");
-    }
-
-    public void login_failed() {
-        setChanged();
-        notifyObservers("login-failed");
-    }
-
-    public void updateFiles(DefaultMutableTreeNode files) {
-        model.setFiles(files);
-
-        setChanged();
-        notifyObservers("update-files");
+        notifyObservers(new String[] { "file-received", sender, username, filename });
     }
 
     public DefaultMutableTreeNode getFiles() {
@@ -271,15 +215,9 @@ public class ChatController extends Observable {
     }
 
     private void sendSharedFiles(DefaultMutableTreeNode sharedFiles) {
-        Message message = new Message(model.getUser(), sharedFiles);
-        Command command = new Command(Command.Action.SEND_SHARED_FILES, message);
+        Message message = new Message(Message.Type.SEND_SHARED_FILES, model.getUser(), sharedFiles);
 
-        client.sendTcpCommand(command);
-    }
-
-    public void fileRequested(Command command) {
-        setChanged();
-        notifyObservers(command);
+        client.sendTcpMessage(message);
     }
 
     public void fileSend(File file, User user) {
@@ -294,20 +232,87 @@ public class ChatController extends Observable {
             return;
         }
 
-        Message message = new Message(model.getUser(), fileInfo, fileInfo.getOwner());
-        Command command = new Command(Command.Action.REQUEST_FILE, message);
+        Message message = new Message(Message.Type.REQUEST_FILE, model.getUser(), fileInfo, fileInfo.getOwner());
 
-        client.sendTcpCommand(command);
+        client.sendTcpMessage(message);
     }
 
     public void acceptTransfer(String username, FileInfo fileInfo) {
-        Message message = new Message(model.getUser(), fileInfo, username);
-        Command command = new Command(Command.Action.TRANSFER_ACCEPTED, message);
+        Message message = new Message(Message.Type.TRANSFER_ACCEPTED, model.getUser(), fileInfo, username);
 
-        client.sendTcpCommand(command);
+        client.sendTcpMessage(message);
     }
 
-    public void transferAccepted(Message message) {
+    public void createConnection(User user, Type type) {
+        model.setUser(user);
+        client.createTcpConnection(user, type);
+    }
+
+    public void close() {
+        client.disconnect();
+    }
+
+    public String getAdress() {
+        return model.getUser().getAddress();
+    }
+
+    @Override
+    public synchronized void onMessageReceived(Message message) {
+        if (message.getTo() == null) {
+            model.addMessage(message);
+        } else {
+            Conversation conversation = getConversation(message.getTo());
+            if (conversation == null) {
+                conversation = new Conversation(message.getUser());
+                model.addConversation(conversation);
+            }
+            conversation.addMessage(message);
+        }
+
+        setChanged();
+        notifyObservers(message);
+    }
+
+    @Override
+    public synchronized void onUserListReceived(List<User> users) {
+        model.setUsers((ArrayList<User>) users);
+
+        setChanged();
+        notifyObservers("update-users");
+    }
+
+    @Override
+    public synchronized void onFilesListReceived(DefaultMutableTreeNode files) {
+        model.setFiles(files);
+
+        setChanged();
+        notifyObservers("update-files");
+    }
+
+    @Override
+    public synchronized void onLoginFailed() {
+        setChanged();
+        notifyObservers("login-failed");
+    }
+
+    @Override
+    public synchronized void onLogged() {
+        logged = true;
+
+        client.createUdpConnection();
+
+        setChanged();
+        notifyObservers("connected");
+    }
+
+    @Override
+    public synchronized void onFileRequested(Message message) {
+        setChanged();
+        notifyObservers(message);
+    }
+
+    @Override
+    public synchronized void onTransferAccepted(Message message) {
         FileInfo fileInfo = (FileInfo) message.getData();
         User user = message.getUser();
 
@@ -316,13 +321,13 @@ public class ChatController extends Observable {
         thread.start();
 
         // Transfer accepted, start receiving thread and ask the user to send
-        Message m = new Message(model.getUser(), fileInfo, user.getUsername());
-        Command command = new Command(Command.Action.START_TRANSFER, m);
+        Message m = new Message(Message.Type.START_TRANSFER, model.getUser(), fileInfo, user.getUsername());
 
-        client.sendTcpCommand(command);
+        client.sendTcpMessage(m);
     }
 
-    public void startTransfer(Message message) {
+    @Override
+    public synchronized void onStartTransfer(Message message) {
         FileInfo fileInfo = (FileInfo) message.getData();
         User user = message.getUser();
 
@@ -330,17 +335,7 @@ public class ChatController extends Observable {
         thread.start();
     }
 
-    public void createConnection(User user, Action action) {
-        model.setUser(user);
-        client.createTcpConnection(user, action);
-        client.startRmi();
+    public int getUdpPort() {
+        return model.getUser().getUdpPort();
     }
-
-    public void close() {
-        client.disconnect();
-    }
-
-	public String getAdress() {
-		return model.getUser().getAddress();
-	}
 }

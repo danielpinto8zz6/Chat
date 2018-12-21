@@ -3,16 +3,19 @@ package server.network.tcp;
 import java.io.EOFException;
 import java.io.IOException;
 
-import javax.swing.tree.DefaultMutableTreeNode;
-
-import chatroomlibrary.Command;
+import chatroomlibrary.Message;
 import server.controller.ServerController;
+import server.interfaces.IClientManager;
+import server.interfaces.IServerListener;
+import server.interfaces.IUsersCommunication;
 import server.model.Client;
 
 public class ClientHandler implements Runnable {
 
-    private final ServerController controller;
     private final Client client;
+    private IServerListener serverListener;
+    private IClientManager clientManager;
+    private IUsersCommunication usersCommunication;
 
     /**
      * <p>
@@ -23,12 +26,12 @@ public class ClientHandler implements Runnable {
      * @param client a {@link server.Client} object.
      */
     public ClientHandler(ServerController controller, Client client) {
-        this.controller = controller;
         this.client = client;
+        serverListener = controller;
+        clientManager = controller;
+        usersCommunication = controller;
 
-        this.controller.broadcastAllUsers();
-        if (this.client.getUser().getFiles() != null)
-            this.controller.broadcastFiles();
+        usersCommunication.notifyUsersList();
     }
 
     /**
@@ -37,19 +40,11 @@ public class ClientHandler implements Runnable {
      * </p>
      */
     public void run() {
-        Command command;
+        Message message;
 
         try {
-            while ((command = (Command) this.client.getTcpIn().readObject()) != null) {
-                if (command.getAction() == Command.Action.SEND_SHARED_FILES) {
-                    DefaultMutableTreeNode files = (DefaultMutableTreeNode) command.getMessage().getData();
-                    client.setFiles(files);
-                    controller.broadcastFiles();
-                } else if (command.getMessage().getTo() != null) {
-                    controller.sendCommandToUser(command, client, command.getMessage().getTo());
-                } else {
-                    controller.broadcastCommand(command);
-                }
+            while ((message = (Message) this.client.getTcpIn().readObject()) != null) {
+                serverListener.onMessageReceived(client, message);
             }
         } catch (EOFException e) {
             // Client disconnected
@@ -67,8 +62,8 @@ public class ClientHandler implements Runnable {
             }
         }
 
-        // end of Thread
-        controller.removeClient(client);
-        controller.broadcastAllUsers();
+        clientManager.removeClient(client);
+        usersCommunication.notifyUsersList();
+        usersCommunication.notifyFilesList();
     }
 }

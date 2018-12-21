@@ -6,10 +6,10 @@ import java.net.Socket;
 
 import server.controller.ServerController;
 
-public class TcpClientListener implements Runnable {
+public class TCPListener implements Runnable {
     private ServerController controller;
 
-    public TcpClientListener(ServerController controller) {
+    public TCPListener(ServerController controller) {
         this.controller = controller;
     }
 

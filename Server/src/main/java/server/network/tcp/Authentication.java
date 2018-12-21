@@ -5,7 +5,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-import chatroomlibrary.Command;
+import chatroomlibrary.Message;
 import chatroomlibrary.User;
 import server.Constants;
 import server.controller.ServerController;
@@ -27,25 +27,25 @@ class Authentication implements Runnable {
             out = new ObjectOutputStream(socket.getOutputStream());
             ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
 
-            Command command = (Command) in.readObject();
-            User user = command.getMessage().getUser();
+            Message message = (Message) in.readObject();
+            User user = message.getUser();
 
-            if (command == null || user == null) {
+            if (message == null || user == null) {
                 return;
             }
 
             if (!Constants.DEBUG) {
-                if (command.getAction() == Command.Action.LOGIN) {
+                if (message.getType() == Message.Type.LOGIN) {
                     if (!controller.authenticate(user)) {
                         controller.loginFailed(user);
-                        out.writeObject(new Command(Command.Action.LOGIN_FAILED));
+                        out.writeObject(new Message(Message.Type.LOGIN_FAILED));
                         out.flush();
                         return;
                     }
-                } else if (command.getAction() == Command.Action.REGISTER) {
+                } else if (message.getType() == Message.Type.REGISTER) {
                     if (!controller.register(user)) {
                         controller.loginFailed(user);
-                        out.writeObject(new Command(Command.Action.LOGIN_FAILED));
+                        out.writeObject(new Message(Message.Type.LOGIN_FAILED));
                         out.flush();
                         return;
                     }
@@ -54,7 +54,7 @@ class Authentication implements Runnable {
 
             Client client = new Client(user, socket, in, out);
 
-            client.getTcpOut().writeObject(new Command(Command.Action.LOGGED));
+            client.getTcpOut().writeObject(new Message(Message.Type.LOGGED));
             client.getTcpOut().flush();
 
             controller.addClient(client);

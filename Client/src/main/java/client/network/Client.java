@@ -3,33 +3,29 @@ package client.network;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.DatagramSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.rmi.NotBoundException;
-import java.rmi.Remote;
-import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
-import java.util.ArrayList;
 
-import chatroomlibrary.Command;
 import chatroomlibrary.Message;
 import chatroomlibrary.User;
-import chatroomlibrary.rmi.UserSensor;
 import client.controller.ChatController;
-import client.network.rmi.Rmi;
-import client.network.tcp.TcpListener;
+import client.network.tcp.TCPListener;
+import client.network.udp.UDPListener;
 
 public class Client {
     private Socket tcpSocket = null;
     private ObjectOutputStream tcpOut = null;
     private ObjectInputStream tcpIn = null;
 
-    private Thread tcpListener = null;
-    private ChatController controller;
+    private DatagramSocket udpSocket = null;
+    private ObjectOutputStream udpOut = null;
+    private ObjectInputStream udpIn = null;
 
-    private Rmi rmi;
-    private UserSensor sensor;
+    private Thread tcpListener = null;
+    private Thread udpListener = null;
+    private ChatController controller;
 
     public Client(ChatController controller) {
         this.controller = controller;
@@ -39,41 +35,51 @@ public class Client {
         if (tcpIn == null)
             return;
 
-        tcpListener = new Thread(new TcpListener(controller, tcpIn));
+        tcpListener = new Thread(new TCPListener(controller, tcpIn));
         tcpListener.start();
     }
 
     public void stopTcp() {
         if (tcpListener != null)
             tcpListener.interrupt();
-        try {
-            tcpOut.close();
-            tcpIn.close();
-            tcpSocket.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+
+        if (tcpSocket != null && tcpSocket.isConnected()) {
+            try {
+                tcpOut.close();
+                tcpIn.close();
+                tcpSocket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
     public void startUdp() {
+        udpListener = new Thread(new UDPListener(controller, udpSocket));
+        udpListener.start();
     }
 
     public void stopUdp() {
+        if (udpListener != null)
+            udpListener.interrupt();
+
+        if (udpSocket != null && udpSocket.isConnected()) {
+            udpSocket.close();
+        }
     }
 
     public void disconnect() {
         stopTcp();
         stopUdp();
-        stopRmi();
     }
 
-    public void createTcpConnection(User user, Command.Action action) {
+    public void createTcpConnection(User user, Message.Type type) {
         try {
             tcpSocket = new Socket(user.getAddress(), user.getTcpPort());
             tcpIn = new ObjectInputStream(tcpSocket.getInputStream());
             tcpOut = new ObjectOutputStream(tcpSocket.getOutputStream());
 
-            tcpOut.writeObject(new Command(action, new Message(user)));
+            tcpOut.writeObject(new Message(type, user));
             tcpOut.flush();
         } catch (UnknownHostException e) {
             e.printStackTrace();
@@ -85,12 +91,18 @@ public class Client {
     }
 
     public void createUdpConnection() {
+        try {
+            udpSocket = new DatagramSocket(controller.getUdpPort());
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
 
+        startUdp();
     }
 
-    public void sendTcpCommand(Command command) {
+    public void sendTcpMessage(Message message) {
         try {
-            tcpOut.writeObject(command);
+            tcpOut.writeObject(message);
             tcpOut.flush();
         } catch (IOException e) {
             e.printStackTrace();
@@ -98,33 +110,7 @@ public class Client {
         }
     }
 
-    public void startRmi() {
-        try {
-            Registry r = LocateRegistry.getRegistry();
-            Remote remoteService = r.lookup("ObservacaoSistema");
+    public void sendUdpMessage(Message message) {
 
-            sensor = (UserSensor) remoteService;
-
-            rmi = new Rmi(controller);
-            sensor.addListener(rmi);
-        } catch (NotBoundException e) {
-            e.printStackTrace();
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            controller.updateUsers((ArrayList<User>) sensor.getUsers());
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void stopRmi() {
-        try {
-            sensor.removeListener(rmi);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
     }
 }

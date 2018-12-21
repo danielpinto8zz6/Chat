@@ -109,6 +109,14 @@ public class UserDao {
         return searchResults;
     }
 
+    public static List<User> loadAll(Connection conn, String selectionArgs) throws SQLException {
+
+        String sql = "SELECT * FROM users " + selectionArgs;
+        List<User> searchResults = listQuery(conn, conn.prepareStatement(sql));
+
+        return searchResults;
+    }
+
     /**
      * create-method. This will create new row in database according to supplied
      * valueObject contents. Make sure that values for all NOT NULL columns are

@@ -18,7 +18,6 @@ import javax.swing.filechooser.FileSystemView;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 
-import chatroomlibrary.Command;
 import chatroomlibrary.FileInfo;
 import chatroomlibrary.Message;
 import chatroomlibrary.User;
@@ -80,7 +79,8 @@ public class ChatView extends javax.swing.JPanel implements Observer {
     // <editor-fold defaultstate="collapsed" desc="Generated
     // <editor-fold defaultstate="collapsed" desc="Generated
     // <editor-fold defaultstate="collapsed" desc="Generated
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    // <editor-fold defaultstate="collapsed" desc="Generated
+    // Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         jsbtn = new javax.swing.JButton();
@@ -129,37 +129,34 @@ public class ChatView extends javax.swing.JPanel implements Observer {
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
+        layout.setHorizontalGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGroup(layout
+                .createSequentialGroup().addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(jScrollPane2)
-                    .addComponent(jtextInputChatSP, javax.swing.GroupLayout.DEFAULT_SIZE, 500, Short.MAX_VALUE))
+                        .addComponent(jScrollPane2)
+                        .addComponent(jtextInputChatSP, javax.swing.GroupLayout.DEFAULT_SIZE, 500, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jubtn)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jsbtn, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
-                .addContainerGap())
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 420, Short.MAX_VALUE)
-                    .addComponent(jScrollPane1))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(jtextInputChatSP)
-                    .addComponent(jubtn, javax.swing.GroupLayout.DEFAULT_SIZE, 50, Short.MAX_VALUE)
-                    .addComponent(jsbtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
-        );
+                        .addGroup(layout.createSequentialGroup().addComponent(jubtn)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jsbtn, javax.swing.GroupLayout.PREFERRED_SIZE, 82,
+                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, Short.MAX_VALUE))
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                .addContainerGap()));
+        layout.setVerticalGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING,
+                        layout.createSequentialGroup().addContainerGap()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 420,
+                                                Short.MAX_VALUE)
+                                        .addComponent(jScrollPane1))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                        .addComponent(jtextInputChatSP)
+                                        .addComponent(jubtn, javax.swing.GroupLayout.DEFAULT_SIZE, 50, Short.MAX_VALUE)
+                                        .addComponent(jsbtn, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addContainerGap()));
     }// </editor-fold>//GEN-END:initComponents
 
     private void jListUsersMouseClicked(java.awt.event.MouseEvent evt) {// GEN-FIRST:event_jListUsersMouseClicked
@@ -272,6 +269,10 @@ public class ChatView extends javax.swing.JPanel implements Observer {
                 appendMessage(message);
             else if (message.getData() instanceof FileInfo) {
                 fileRequest((FileInfo) message.getData(), message.getUser());
+            } else if (message.getType() == Message.Type.REQUEST_FILE) {
+                FileInfo fileInfo = (FileInfo) message.getData();
+                String username = message.getUser().getUsername();
+                fileRequested(username, fileInfo);
             }
         } else if (arg instanceof String) {
             String str = (String) arg;
@@ -294,18 +295,6 @@ public class ChatView extends javax.swing.JPanel implements Observer {
             default:
                 break;
             }
-        } else if (arg instanceof Command) {
-            Command command = (Command) arg;
-            switch (command.getAction()) {
-            case REQUEST_FILE:
-                FileInfo fileInfo = (FileInfo) command.getMessage().getData();
-                String username = command.getMessage().getUser().getUsername();
-                fileRequested(username, fileInfo);
-                break;
-            default:
-                break;
-            }
-
         }
     }
 

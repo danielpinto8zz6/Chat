@@ -1,0 +1,20 @@
+{
+    "database.connections": [
+        {
+            "type": "mysql",
+            "name": "localhost (mysql)",
+            "host": "localhost:3306",
+            "user": "root",
+            "password": "",
+            "database": "chatroom"
+        }
+    ],
+    "files.exclude": {
+        "**/.git": true, // this is a default value
+        "**/.DS_Store": true, // this is a default value
+        "**/target": true,
+        "**/.project": true,
+        "**/.classpath": true,
+        "**/.settings": true,
+    }
+}

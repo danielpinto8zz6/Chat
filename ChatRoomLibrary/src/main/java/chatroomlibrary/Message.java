@@ -17,6 +17,7 @@ public class Message implements Serializable {
     private Object data;
     private LocalDateTime time;
     private String to = null;
+    private Type type;
 
     /**
      * <p>
@@ -26,8 +27,9 @@ public class Message implements Serializable {
      * @param user a {@link chatroomlibrary.User} object.
      * @param data a {@link java.lang.String} object.
      */
-    public Message(User user, Object data) {
+    public Message(Type type, User user, Object data) {
         this.time = LocalDateTime.now();
+        this.type = type;
         this.user = user;
         this.data = data;
     }
@@ -41,11 +43,40 @@ public class Message implements Serializable {
      * @param data a {@link java.lang.String} object.
      * @param to   a {@link java.lang.String} object.
      */
-    public Message(User user, Object data, String to) {
+    public Message(Type type, User user, Object data, String to) {
         this.time = LocalDateTime.now();
+        this.type = type;
         this.user = user;
         this.data = data;
         this.to = to;
+    }
+
+    public Message(User user) {
+        this.time = LocalDateTime.now();
+        this.user = user;
+    }
+
+    public Message(Type type) {
+        this.type = type;
+    }
+
+    public Message(Type type, User user) {
+        this.type = type;
+        this.user = user;
+    }
+
+    /**
+     * @return the type
+     */
+    public Type getType() {
+        return type;
+    }
+
+    /**
+     * @param type the type to set
+     */
+    public void setType(Type type) {
+        this.type = type;
     }
 
     /**
@@ -82,18 +113,6 @@ public class Message implements Serializable {
      */
     public void setTo(String to) {
         this.to = to;
-    }
-
-    /**
-     * <p>
-     * Constructor for Message.
-     * </p>
-     *
-     * @param user a {@link chatroomlibrary.User} object.
-     */
-    public Message(User user) {
-        this.time = LocalDateTime.now();
-        this.user = user;
     }
 
     /**
@@ -138,5 +157,10 @@ public class Message implements Serializable {
      */
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public enum Type {
+        REGISTER, REQUEST_LOGIN, LOGIN, LOGGED, LOGIN_FAILED, MESSAGE, BROADCAST_USERS, SEND_FILE, REQUEST_FILE,
+        FILE_ACCEPTED, BROADCAST_FILES, SEND_SHARED_FILES, TRANSFER_ACCEPTED, START_TRANSFER
     }
 }

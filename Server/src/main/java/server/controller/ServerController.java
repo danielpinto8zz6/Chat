@@ -3,24 +3,26 @@ package server.controller;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import chatroomlibrary.Command;
 import chatroomlibrary.Message;
 import chatroomlibrary.NotFoundException;
 import chatroomlibrary.User;
 import chatroomlibrary.UserDao;
 import server.database.DbHelper;
+import server.interfaces.IClientManager;
+import server.interfaces.IServerListener;
+import server.interfaces.IUsersCommunication;
 import server.model.Client;
 import server.model.Server;
 import server.network.CommunicationHandler;
 import server.network.tcp.ClientHandler;
-import server.network.tcp.TcpClientListener;
 
-public class ServerController extends Observable {
+public class ServerController extends Observable implements IServerListener, IClientManager, IUsersCommunication {
     private final Server model;
     private CommunicationHandler communication;
 
@@ -29,72 +31,28 @@ public class ServerController extends Observable {
         communication = new CommunicationHandler(this);
     }
 
-    public void startServer() {
-        communication.registerRmiService();
-
-        Thread thread = new Thread(new TcpClientListener(this));
-        thread.start();
-    }
-
-    public void stopServer() {
+    public void stop() {
         model.setRunning(false);
     }
 
-    // send incoming msg to all Users
-    /**
-     * <p>
-     * broadcastCommand.
-     * </p>
-     *
-     * @param command a {@link chatroomlibrary.Command} object.
-     */
-    public void broadcastCommand(Command command) {
+    public synchronized void broadcastMessage(Message message) {
         for (Client client : model.getClients()) {
             try {
-                client.getTcpOut().writeObject(command);
+                client.getTcpOut().writeObject(message);
                 client.getTcpOut().flush();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-    }
 
-    // send list of clients to all Users
-    /**
-     * <p>
-     * broadcastAllUsers.
-     * </p>
-     */
-    public void broadcastAllUsers() {
-        // Command command = new Command(Command.Action.BROADCAST_USERS,
-        //         new Message(model.getServerDetails(), model.getUsers()));
-
-        // for (Client client : model.getClients()) {
-        //     try {
-        //         client.getTcpOut().writeObject(command);
-        //         client.getTcpOut().flush();
-        //     } catch (IOException e) {
-        //         e.printStackTrace();
-        //     }
-        // }
-        communication.rmiService.notifyUsersList();
-    }
-
-    public void broadcastFiles() {
-        Command command = new Command(Command.Action.BROADCAST_FILES,
-                new Message(model.getServerDetails(), getFiles()));
-
-        for (Client client : model.getClients()) {
-            try {
-                client.getTcpOut().writeObject(command);
-                client.getTcpOut().flush();
-            } catch (IOException e) {
-                e.printStackTrace();
+        List<User> users = getOtherServersLoggedUsers();
+        if (!users.isEmpty())
+            for (User user : getOtherServersLoggedUsers()) {
+                communication.sendUDPMessage(message, user.getAddress(), 52684);
             }
-        }
     }
 
-    public DefaultMutableTreeNode getFiles() {
+    public synchronized DefaultMutableTreeNode getFiles() {
         DefaultMutableTreeNode files = new DefaultMutableTreeNode(new String("Files"));
 
         for (Client client : model.getClients()) {
@@ -108,37 +66,35 @@ public class ServerController extends Observable {
         return files;
     }
 
-    /**
-     * <p>
-     * sendCommandToUser.
-     * </p>
-     *
-     * @param command a {@link chatroomlibrary.Command} object.
-     * @param sender  a {@link server.Client} object.
-     * @param user    a {@link java.lang.String} object.
-     * @throws java.io.IOException if any.
-     */
-    public void sendCommandToUser(Command command, Client sender, String user) throws IOException {
+    public synchronized void sendPrivateMessage(Message message, Client sender, String user) {
         boolean find = false;
         for (Client client : model.getClients()) {
             if (client.getUser().getUsername().equals(user)) {
                 find = true;
-                client.getTcpOut().writeObject(command);
-                client.getTcpOut().flush();
-                if (command.getAction() == Command.Action.MESSAGE) {
-                    sender.getTcpOut().writeObject(command);
-                    sender.getTcpOut().flush();
+                try {
+                    client.getTcpOut().writeObject(message);
+                    client.getTcpOut().flush();
+                    if (message.getType() == Message.Type.MESSAGE) {
+                        sender.getTcpOut().writeObject(message);
+                        sender.getTcpOut().flush();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
         }
         if (!find) {
-            sender.getTcpOut().writeObject(
-                    new Command(Command.Action.MESSAGE, new Message(model.getServerDetails(), "User not found")));
-            sender.getTcpOut().flush();
+            try {
+                sender.getTcpOut()
+                        .writeObject(new Message(Message.Type.MESSAGE, model.getServerDetails(), "User not found"));
+                sender.getTcpOut().flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
-    public boolean authenticate(User user) {
+    public synchronized boolean authenticate(User user) {
         Connection connection = DbHelper.getConnection();
         try {
             User userFromDb = UserDao.getObject(connection, user.getUsername());
@@ -157,7 +113,7 @@ public class ServerController extends Observable {
         return false;
     }
 
-    public boolean register(User user) {
+    public synchronized boolean register(User user) {
         Connection connection = DbHelper.getConnection();
         try {
             UserDao.create(connection, user);
@@ -174,6 +130,48 @@ public class ServerController extends Observable {
         }
     }
 
+    public int getTcpPort() {
+        return model.getTcpPort();
+    }
+
+    public int getUdpPort() {
+        return model.getUdpPort();
+    }
+
+    public void loginFailed(User user) {
+        String username = user.getUsername();
+        String address = user.getAddress();
+
+        setChanged();
+        notifyObservers(new String[] { "login-failed", username, address });
+    }
+
+    public boolean isRunning() {
+        return model.isRunning();
+    }
+
+    public String getHostAddress() {
+        return model.getHostAddress();
+    }
+
+    public synchronized List<User> getUsers() {
+        return model.getUsers();
+    }
+
+    @Override
+    public synchronized void onMessageReceived(Client client, Message message) {
+        if (message.getType() == Message.Type.SEND_SHARED_FILES) {
+            DefaultMutableTreeNode files = (DefaultMutableTreeNode) message.getData();
+            client.setFiles(files);
+            notifyFilesList();
+        } else if (message.getTo() != null) {
+            sendPrivateMessage(message, client, message.getTo());
+        } else {
+            broadcastMessage(message);
+        }
+    }
+
+    @Override
     public synchronized void removeClient(Client client) {
         User user = client.getUser();
 
@@ -187,20 +185,16 @@ public class ServerController extends Observable {
             e.printStackTrace();
         }
 
+        String username = user.getUsername();
+        String address = user.getAddress();
+
         setChanged();
-        notifyObservers(new String[] { "user-exited", user.getUsername(), user.getAddress() });
+        notifyObservers(new String[] { "user-exited", username, address });
 
         model.removeClient(client);
     }
 
-    public int getTcpPort() {
-        return model.getTcpPort();
-    }
-
-    public int getUdpPort() {
-        return model.getUdpPort();
-    }
-
+    @Override
     public synchronized void addClient(Client client) {
         model.addClient(client);
         // create a new thread for newUser incoming messages handling
@@ -208,24 +202,57 @@ public class ServerController extends Observable {
 
         User user = client.getUser();
 
+        String username = user.getUsername();
+        String address = user.getAddress();
+
         setChanged();
-        notifyObservers(new String[] { "user-joined", user.getUsername(), user.getAddress() });
+        notifyObservers(new String[] { "user-joined", username, address });
     }
 
-    public void loginFailed(User user) {
-        setChanged();
-        notifyObservers(new String[] { "login-failed", user.getUsername(), user.getAddress() });
+    @Override
+    public synchronized void notifyUsersList() {
+        Message message = new Message(Message.Type.BROADCAST_USERS, model.getServerDetails(), model.getUsers());
+
+        for (Client client : model.getClients()) {
+            try {
+                client.getTcpOut().writeObject(message);
+                client.getTcpOut().flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
-    public boolean isRunning() {
-        return model.isRunning();
+    @Override
+    public synchronized void notifyFilesList() {
+        Message message = new Message(Message.Type.BROADCAST_FILES, model.getServerDetails(), getFiles());
+
+        for (Client client : model.getClients()) {
+            try {
+                client.getTcpOut().writeObject(message);
+                client.getTcpOut().flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
-    public String getHostAddress() {
-        return model.getHostAddress();
-    }
+    public synchronized List<User> getOtherServersLoggedUsers() {
+        List<User> dbLoggedUsers;
+        try {
+            dbLoggedUsers = UserDao.loadAll(DbHelper.getConnection(), "WHERE state=1");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
 
-    public List<User> getUsers() {
-        return model.getUsers();
+        for (User dbUser : dbLoggedUsers) {
+            for (User user : model.getUsers()) {
+                if (dbUser.getUsername().equals(user.getUsername())) {
+                    dbLoggedUsers.remove(dbUser);
+                }
+            }
+        }
+        return dbLoggedUsers;
     }
 }

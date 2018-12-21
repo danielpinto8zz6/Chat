@@ -1,33 +1,29 @@
-package client.network.rmi;
+package monitor.rmi;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import chatroomlibrary.User;
 import chatroomlibrary.rmi.UserListener;
-import client.controller.ChatController;
 
 public class Rmi extends UnicastRemoteObject implements UserListener {
 
     private static final long serialVersionUID = 1L;
-    private ChatController controller;
 
-    public Rmi(ChatController controller) throws RemoteException {
-        this.controller = controller;
+    public Rmi() throws RemoteException {
     }
 
     @Override
     public void usersChanged(List<User> users) throws RemoteException {
-        controller.updateUsers((ArrayList<User>) users);
+        System.out.println("Users changed");
     }
 
     @Override
     public void sharedFilesChanged(DefaultMutableTreeNode files) throws RemoteException {
-        System.out.println("Users changed");
+        System.out.println("Files changed");
     };
 
 }

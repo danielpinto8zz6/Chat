@@ -7,7 +7,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
 
-import chatroomlibrary.Command;
+import chatroomlibrary.Message;
 import server.controller.ServerController;
 
 public class UDPServerReceiver implements Runnable {
@@ -31,8 +31,8 @@ public class UDPServerReceiver implements Runnable {
                 ByteArrayInputStream in = new ByteArrayInputStream(data);
                 ObjectInputStream is = new ObjectInputStream(in);
                 try {
-                    Command Command = (Command) is.readObject();
-                    System.out.println("Object received = " + Command);
+                    Message message = (Message) is.readObject();
+                    System.out.println("Object received = " + message);
                 } catch (ClassNotFoundException e) {
                     e.printStackTrace();
                 }

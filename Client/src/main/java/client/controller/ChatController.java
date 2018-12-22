@@ -15,7 +15,7 @@ import chatroomlibrary.SharedFiles;
 import chatroomlibrary.User;
 import client.model.Chat;
 import client.model.Conversation;
-import client.network.Client;
+import client.network.CommunicationHandler;
 import client.network.tcp.FileReceiver;
 import client.network.tcp.FileSender;
 
@@ -29,7 +29,7 @@ import client.network.tcp.FileSender;
  */
 public class ChatController extends Observable implements IClientListener {
     private final Chat model;
-    private Client client;
+    private CommunicationHandler client;
 
     public boolean logged = false;
 
@@ -42,7 +42,7 @@ public class ChatController extends Observable implements IClientListener {
      */
     public ChatController(Chat model) {
         this.model = model;
-        this.client = new Client(this);
+        this.client = new CommunicationHandler(this);
     }
 
     private Conversation getConversation(String to) {
@@ -181,8 +181,10 @@ public class ChatController extends Observable implements IClientListener {
     }
 
     public void fileSent(String filename, String receiver) {
+        String username = model.getUser().getUsername();
+
         setChanged();
-        notifyObservers(new String[] { "file-sent", model.getUser().getUsername(), receiver, filename });
+        notifyObservers(new String[] { "file-sent", username, receiver, filename });
     }
 
     public void fileReceived(String filename, String sender) {
@@ -299,7 +301,7 @@ public class ChatController extends Observable implements IClientListener {
     public synchronized void onLogged() {
         logged = true;
 
-        client.createUdpConnection();
+        client.startUdp();
 
         setChanged();
         notifyObservers("connected");
@@ -338,4 +340,8 @@ public class ChatController extends Observable implements IClientListener {
     public int getUdpPort() {
         return model.getUser().getUdpPort();
     }
+
+	public boolean isRunning() {
+		return model.isRunning();
+	}
 }

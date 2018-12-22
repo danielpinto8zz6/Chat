@@ -29,6 +29,8 @@ public class Chat {
 
     private DefaultMutableTreeNode files;
 
+    private boolean running = true;
+
     /**
      * <p>
      * Constructor for Chat.
@@ -40,6 +42,20 @@ public class Chat {
         this.users = new ArrayList<>();
         this.messages = new ArrayList<>();
         this.conversations = new ArrayList<>();
+    }
+
+    /**
+     * @return the running
+     */
+    public boolean isRunning() {
+        return running;
+    }
+
+    /**
+     * @param running the running to set
+     */
+    public void setRunning(boolean running) {
+        this.running = running;
     }
 
     /**

@@ -37,19 +37,14 @@ public class ServerController extends Observable implements IServerListener, ICl
 
     public synchronized void broadcastMessage(Message message) {
         for (Client client : model.getClients()) {
-            try {
-                client.getTcpOut().writeObject(message);
-                client.getTcpOut().flush();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            communication.sendTCPMessage(client, message);
+            communication.sendUDPMessage(message, client.getUser());
         }
-
-        List<User> users = getOtherServersLoggedUsers();
-        if (!users.isEmpty())
-            for (User user : getOtherServersLoggedUsers()) {
-                communication.sendUDPMessage(message, user.getAddress(), 52684);
-            }
+        // List<User> users = getOtherServersLoggedUsers();
+        // if (!users.isEmpty())
+        // for (User user : getOtherServersLoggedUsers()) {
+        // communication.sendUDPMessage(message, user.getAddress(), 52684);
+        // }
     }
 
     public synchronized DefaultMutableTreeNode getFiles() {
@@ -156,6 +151,11 @@ public class ServerController extends Observable implements IServerListener, ICl
 
     public synchronized List<User> getUsers() {
         return model.getUsers();
+    }
+
+    @Override
+    public synchronized void onMessageReceived(Message message) {
+        broadcastMessage(message);
     }
 
     @Override

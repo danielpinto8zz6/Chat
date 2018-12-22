@@ -32,7 +32,7 @@ public class TCPListener implements Runnable {
     /** {@inheritDoc} */
     @Override
     public void run() {
-        while (!Thread.currentThread().isInterrupted()) {
+        while (controller.isRunning()) {
             try {
                 Object readObject = in.readObject();
                 if (readObject instanceof Message) {

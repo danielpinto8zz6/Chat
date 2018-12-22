@@ -5,4 +5,5 @@ import server.model.Client;
 
 public interface IServerListener {
     public void onMessageReceived(Client client, Message message);
+    public void onMessageReceived(Message message);
 }

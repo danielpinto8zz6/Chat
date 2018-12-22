@@ -1,26 +1,29 @@
 package server.network;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
 import chatroomlibrary.Message;
+import chatroomlibrary.User;
 import server.controller.ServerController;
+import server.model.Client;
 import server.network.rmi.RmiService;
 import server.network.tcp.TCPListener;
+import server.network.udp.UDPListener;
+import server.network.udp.UDPMessageSender;
 
 public class CommunicationHandler {
     private ServerController controller;
     public RmiService rmiService;
+    private UDPMessageSender udpMessageSender;
 
     public CommunicationHandler(ServerController controller) {
         this.controller = controller;
+        udpMessageSender = new UDPMessageSender();
     }
 
     public boolean registerRmiService() {
@@ -54,25 +57,27 @@ public class CommunicationHandler {
         thread.start();
     }
 
-    public void sendUDPMessage(Message message, String address, int port) {
-        DatagramSocket socket;
-
+    public void startUdp() {
         try {
-            socket = new DatagramSocket();
+            Thread thread = new Thread(new UDPListener(controller, controller.getUdpPort()));
+            thread.start();
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
+    }
 
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ObjectOutputStream oos = new ObjectOutputStream(baos);
+    public void sendUDPMessage(Message message, User user) {
+        try {
+            udpMessageSender.sendMessage(message, user.getAddress(), user.getUdpPort());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
-            oos.writeObject(message);
-
-            byte[] data = baos.toByteArray();
-            InetAddress servAddr = InetAddress.getByName(address);
-
-            DatagramPacket pkt;
-
-            pkt = new DatagramPacket(data, data.length, servAddr, port);
-            socket.send(pkt);
-            socket.close();
+    public void sendTCPMessage(Client client, Message message) {
+        try {
+            client.getTcpOut().writeObject(message);
+            client.getTcpOut().flush();
         } catch (IOException e) {
             e.printStackTrace();
         }

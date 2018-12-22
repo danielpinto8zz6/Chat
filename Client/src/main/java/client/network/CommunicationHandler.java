@@ -3,7 +3,6 @@ package client.network;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.DatagramSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
@@ -14,20 +13,16 @@ import client.controller.ChatController;
 import client.network.tcp.TCPListener;
 import client.network.udp.UDPListener;
 
-public class Client {
+public class CommunicationHandler {
     private Socket tcpSocket = null;
     private ObjectOutputStream tcpOut = null;
     private ObjectInputStream tcpIn = null;
-
-    private DatagramSocket udpSocket = null;
-    private ObjectOutputStream udpOut = null;
-    private ObjectInputStream udpIn = null;
 
     private Thread tcpListener = null;
     private Thread udpListener = null;
     private ChatController controller;
 
-    public Client(ChatController controller) {
+    public CommunicationHandler(ChatController controller) {
         this.controller = controller;
     }
 
@@ -40,9 +35,6 @@ public class Client {
     }
 
     public void stopTcp() {
-        if (tcpListener != null)
-            tcpListener.interrupt();
-
         if (tcpSocket != null && tcpSocket.isConnected()) {
             try {
                 tcpOut.close();
@@ -55,22 +47,16 @@ public class Client {
     }
 
     public void startUdp() {
-        udpListener = new Thread(new UDPListener(controller, udpSocket));
-        udpListener.start();
-    }
-
-    public void stopUdp() {
-        if (udpListener != null)
-            udpListener.interrupt();
-
-        if (udpSocket != null && udpSocket.isConnected()) {
-            udpSocket.close();
+        try {
+            udpListener = new Thread(new UDPListener(controller, controller.getUdpPort()));
+            udpListener.start();
+        } catch (SocketException e) {
+            e.printStackTrace();
         }
     }
 
     public void disconnect() {
         stopTcp();
-        stopUdp();
     }
 
     public void createTcpConnection(User user, Message.Type type) {
@@ -88,16 +74,6 @@ public class Client {
         }
 
         startTcp();
-    }
-
-    public void createUdpConnection() {
-        try {
-            udpSocket = new DatagramSocket(controller.getUdpPort());
-        } catch (SocketException e) {
-            e.printStackTrace();
-        }
-
-        startUdp();
     }
 
     public void sendTcpMessage(Message message) {

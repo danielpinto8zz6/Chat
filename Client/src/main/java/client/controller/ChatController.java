@@ -7,12 +7,12 @@ import java.util.Observable;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import chatroomlibrary.Message.Type;
-import chatroomlibrary.interfaces.IClientListener;
 import chatroomlibrary.FileInfo;
 import chatroomlibrary.Message;
+import chatroomlibrary.Message.Type;
 import chatroomlibrary.SharedFiles;
 import chatroomlibrary.User;
+import chatroomlibrary.interfaces.IClientListener;
 import client.model.Chat;
 import client.model.Conversation;
 import client.network.CommunicationHandler;
@@ -77,7 +77,7 @@ public class ChatController extends Observable implements IClientListener {
             }
         }
 
-        client.sendTcpMessage(message);
+        client.sendTCPMessage(message);
     }
 
     /**
@@ -113,7 +113,7 @@ public class ChatController extends Observable implements IClientListener {
         FileInfo fileInfo = new FileInfo(file);
         Message message = new Message(Message.Type.SEND_FILE, model.getUser(), fileInfo, username);
 
-        client.sendTcpMessage(message);
+        client.sendTCPMessage(message);
     }
 
     /**
@@ -144,7 +144,7 @@ public class ChatController extends Observable implements IClientListener {
         Message message = new Message(Message.Type.FILE_ACCEPTED, model.getUser(), fileInfo);
         message.setTo(user.getUsername());
 
-        client.sendTcpMessage(message);
+        client.sendTCPMessage(message);
 
         // File accepted, create FileReceiver thread and wait for user to connect and
         // send the file
@@ -216,10 +216,10 @@ public class ChatController extends Observable implements IClientListener {
         model.setSaveLocation(file);
     }
 
-    private void sendSharedFiles(DefaultMutableTreeNode sharedFiles) {
-        Message message = new Message(Message.Type.SEND_SHARED_FILES, model.getUser(), sharedFiles);
+    private void sendSharedFiles(DefaultMutableTreeNode files) {
+        Message message = new Message(Message.Type.SEND_SHARED_FILES, model.getUser(), files);
 
-        client.sendTcpMessage(message);
+        client.sendTCPMessage(message);
     }
 
     public void fileSend(File file, User user) {
@@ -236,13 +236,13 @@ public class ChatController extends Observable implements IClientListener {
 
         Message message = new Message(Message.Type.REQUEST_FILE, model.getUser(), fileInfo, fileInfo.getOwner());
 
-        client.sendTcpMessage(message);
+        client.sendTCPMessage(message);
     }
 
     public void acceptTransfer(String username, FileInfo fileInfo) {
         Message message = new Message(Message.Type.TRANSFER_ACCEPTED, model.getUser(), fileInfo, username);
 
-        client.sendTcpMessage(message);
+        client.sendTCPMessage(message);
     }
 
     public void createConnection(User user, Type type) {
@@ -325,7 +325,7 @@ public class ChatController extends Observable implements IClientListener {
         // Transfer accepted, start receiving thread and ask the user to send
         Message m = new Message(Message.Type.START_TRANSFER, model.getUser(), fileInfo, user.getUsername());
 
-        client.sendTcpMessage(m);
+        client.sendTCPMessage(m);
     }
 
     @Override
@@ -341,7 +341,11 @@ public class ChatController extends Observable implements IClientListener {
         return model.getUser().getUdpPort();
     }
 
-	public boolean isRunning() {
-		return model.isRunning();
+    public boolean isRunning() {
+        return model.isRunning();
+    }
+
+	public File getSaveLocation() {
+		return model.getSaveLocation();
 	}
 }

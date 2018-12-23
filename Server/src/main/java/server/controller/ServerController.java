@@ -3,7 +3,6 @@ package server.controller;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 
@@ -38,13 +37,7 @@ public class ServerController extends Observable implements IServerListener, ICl
     public synchronized void broadcastMessage(Message message) {
         for (Client client : model.getClients()) {
             communication.sendTCPMessage(client, message);
-            communication.sendUDPMessage(message, client.getUser());
         }
-        // List<User> users = getOtherServersLoggedUsers();
-        // if (!users.isEmpty())
-        // for (User user : getOtherServersLoggedUsers()) {
-        // communication.sendUDPMessage(message, user.getAddress(), 52684);
-        // }
     }
 
     public synchronized DefaultMutableTreeNode getFiles() {
@@ -79,12 +72,12 @@ public class ServerController extends Observable implements IServerListener, ICl
             }
         }
         if (!find) {
-            try {
-                sender.getTcpOut()
-                        .writeObject(new Message(Message.Type.MESSAGE, model.getServerDetails(), "User not found"));
-                sender.getTcpOut().flush();
-            } catch (IOException e) {
-                e.printStackTrace();
+            List<User> users = getLogggedUsers();
+            for (User u : users) {
+                if (u.getUsername().equals(user)) {
+                    communication.sendUDPMessage(message, u);
+                    break;
+                }
             }
         }
     }
@@ -163,6 +156,11 @@ public class ServerController extends Observable implements IServerListener, ICl
         if (message.getType() == Message.Type.SEND_SHARED_FILES) {
             DefaultMutableTreeNode files = (DefaultMutableTreeNode) message.getData();
             client.setFiles(files);
+            try {
+                UserDao.save(DbHelper.getConnection(), client.getUser());
+            } catch (NotFoundException | SQLException e) {
+                e.printStackTrace();
+            }
             notifyFilesList();
         } else if (message.getTo() != null) {
             sendPrivateMessage(message, client, message.getTo());
@@ -211,16 +209,23 @@ public class ServerController extends Observable implements IServerListener, ICl
 
     @Override
     public synchronized void notifyUsersList() {
-        Message message = new Message(Message.Type.BROADCAST_USERS, model.getServerDetails(), model.getUsers());
+        new Thread(new Runnable() {
 
-        for (Client client : model.getClients()) {
-            try {
-                client.getTcpOut().writeObject(message);
-                client.getTcpOut().flush();
-            } catch (IOException e) {
-                e.printStackTrace();
+            @Override
+            public void run() {
+                Message message = new Message(Message.Type.BROADCAST_USERS, model.getServerDetails(),
+                        getLogggedUsers());
+
+                for (Client client : model.getClients()) {
+                    try {
+                        client.getTcpOut().writeObject(message);
+                        client.getTcpOut().flush();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
-        }
+        }).start();
     }
 
     @Override
@@ -237,22 +242,12 @@ public class ServerController extends Observable implements IServerListener, ICl
         }
     }
 
-    public synchronized List<User> getOtherServersLoggedUsers() {
-        List<User> dbLoggedUsers;
+    public List<User> getLogggedUsers() {
         try {
-            dbLoggedUsers = UserDao.loadAll(DbHelper.getConnection(), "WHERE state=1");
+            return UserDao.loadAll(DbHelper.getConnection(), "WHERE state=1");
         } catch (SQLException e) {
             e.printStackTrace();
             return null;
         }
-
-        for (User dbUser : dbLoggedUsers) {
-            for (User user : model.getUsers()) {
-                if (dbUser.getUsername().equals(user.getUsername())) {
-                    dbLoggedUsers.remove(dbUser);
-                }
-            }
-        }
-        return dbLoggedUsers;
     }
 }

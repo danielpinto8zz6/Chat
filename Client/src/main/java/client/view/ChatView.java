@@ -267,12 +267,12 @@ public class ChatView extends javax.swing.JPanel implements Observer {
 
             if (message.getData() instanceof String)
                 appendMessage(message);
-            else if (message.getData() instanceof FileInfo) {
-                fileRequest((FileInfo) message.getData(), message.getUser());
-            } else if (message.getType() == Message.Type.REQUEST_FILE) {
+            else if (message.getType() == Message.Type.REQUEST_FILE) {
                 FileInfo fileInfo = (FileInfo) message.getData();
                 String username = message.getUser().getUsername();
                 fileRequested(username, fileInfo);
+            } else if (message.getData() instanceof FileInfo) {
+                fileRequest((FileInfo) message.getData(), message.getUser());
             }
         } else if (arg instanceof String) {
             String str = (String) arg;

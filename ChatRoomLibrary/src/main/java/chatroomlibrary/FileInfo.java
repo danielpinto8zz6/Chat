@@ -92,9 +92,15 @@ public class FileInfo implements Serializable {
     @Override
     public String toString() {
         if (name.equals("")) {
-            return path;
+            if (isDirectory)
+                return path;
+            else
+                return path + " (" + size + ")";
         } else {
-            return name;
+            if (isDirectory)
+                return name;
+            else
+                return name + " (" + size + ")";
         }
     }
 }

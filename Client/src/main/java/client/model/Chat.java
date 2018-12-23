@@ -22,7 +22,6 @@ public class Chat {
 
     private ArrayList<User> users;
     private ArrayList<Message> messages;
-
     private ArrayList<Conversation> conversations;
 
     private File saveLocation;

@@ -8,9 +8,6 @@ package server.view;
 import java.util.Observable;
 import java.util.Observer;
 
-import javax.swing.text.html.HTMLDocument;
-import javax.swing.text.html.HTMLEditorKit;
-
 import server.controller.ServerController;
 
 /**

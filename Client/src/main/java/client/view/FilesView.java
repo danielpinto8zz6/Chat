@@ -13,6 +13,8 @@ import javax.swing.tree.DefaultTreeModel;
 
 import chatroomlibrary.FileInfo;
 import client.controller.ChatController;
+
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 /**
@@ -82,9 +84,13 @@ public class FilesView extends javax.swing.JPanel implements Observer {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_jMenuItem1ActionPerformed
-        DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) jTree.getLastSelectedPathComponent();
-        FileInfo fileInfo = (FileInfo) selectedNode.getUserObject();
-        controller.requestFile(fileInfo);
+        if (controller.getSaveLocation() == null) {
+            JOptionPane.showMessageDialog(this, "Please select save location first!");
+        } else {
+            DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) jTree.getLastSelectedPathComponent();
+            FileInfo fileInfo = (FileInfo) selectedNode.getUserObject();
+            controller.requestFile(fileInfo);
+        }
     }// GEN-LAST:event_jMenuItem1ActionPerformed
 
     private void jTreeMouseClicked(java.awt.event.MouseEvent evt) {// GEN-FIRST:event_jTreeMouseClicked

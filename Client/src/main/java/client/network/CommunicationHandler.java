@@ -12,6 +12,7 @@ import chatroomlibrary.User;
 import client.controller.ChatController;
 import client.network.tcp.TCPListener;
 import client.network.udp.UDPListener;
+import client.network.udp.UDPMessageSender;
 
 public class CommunicationHandler {
     private Socket tcpSocket = null;
@@ -22,8 +23,11 @@ public class CommunicationHandler {
     private Thread udpListener = null;
     private ChatController controller;
 
+    private UDPMessageSender udpMessageSender;
+
     public CommunicationHandler(ChatController controller) {
         this.controller = controller;
+        udpMessageSender = new UDPMessageSender();
     }
 
     public void startTcp() {
@@ -76,7 +80,7 @@ public class CommunicationHandler {
         startTcp();
     }
 
-    public void sendTcpMessage(Message message) {
+    public void sendTCPMessage(Message message) {
         try {
             tcpOut.writeObject(message);
             tcpOut.flush();
@@ -86,7 +90,11 @@ public class CommunicationHandler {
         }
     }
 
-    public void sendUdpMessage(Message message) {
-
+    public void sendUDPMessage(Message message, User user) {
+        try {
+            udpMessageSender.sendMessage(message, user.getAddress(), user.getUdpPort());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

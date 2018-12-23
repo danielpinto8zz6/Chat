@@ -1,8 +1,6 @@
 package client.network.udp;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
@@ -55,6 +53,12 @@ public class UDPListener implements Runnable {
                         @SuppressWarnings("unchecked")
                         List<User> users = (List<User>) message.getData();
                         clientListener.onUserListReceived(users);
+                        break;
+                    case SEND_FILE:
+                        controller.fileRequest(message);
+                        break;
+                    case FILE_ACCEPTED:
+                        controller.fileAccepted(message);
                         break;
                     case LOGGED:
                         clientListener.onLogged();

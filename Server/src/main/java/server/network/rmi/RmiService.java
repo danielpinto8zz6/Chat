@@ -26,7 +26,7 @@ public class RmiService extends UnicastRemoteObject implements UserSensor {
 
     @Override
     public synchronized List<User> getUsers() throws RemoteException {
-        return controller.getUsers();
+        return controller.getLogggedUsers();
     }
 
     @Override
@@ -44,20 +44,20 @@ public class RmiService extends UnicastRemoteObject implements UserSensor {
         listeners.remove(listener);
     }
 
-    public synchronized void notifyUsersList() {
+    public synchronized void notifyUsersList(List<User> users) {
         for (UserListener listener : listeners) {
             try {
-                listener.usersChanged(getUsers());
+                listener.usersChanged(users);
             } catch (RemoteException e) {
                 listeners.remove(listener);
             }
         }
     }
 
-    public synchronized void notifySharedFiles() {
+    public synchronized void notifySharedFiles(DefaultMutableTreeNode files) {
         for (UserListener listener : listeners) {
             try {
-                listener.sharedFilesChanged(getSharedFiles());
+                listener.sharedFilesChanged(files);
             } catch (RemoteException e) {
                 listeners.remove(listener);
             }

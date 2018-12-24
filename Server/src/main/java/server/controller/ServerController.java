@@ -213,8 +213,8 @@ public class ServerController extends Observable implements IServerListener, ICl
 
             @Override
             public void run() {
-                Message message = new Message(Message.Type.BROADCAST_USERS, model.getServerDetails(),
-                        getLogggedUsers());
+                List<User> users = getLogggedUsers();
+                Message message = new Message(Message.Type.BROADCAST_USERS, model.getServerDetails(), users);
 
                 for (Client client : model.getClients()) {
                     try {
@@ -224,13 +224,16 @@ public class ServerController extends Observable implements IServerListener, ICl
                         e.printStackTrace();
                     }
                 }
+
+                communication.rmiService.notifyUsersList(users);
             }
         }).start();
     }
 
     @Override
     public synchronized void notifyFilesList() {
-        Message message = new Message(Message.Type.BROADCAST_FILES, model.getServerDetails(), getFiles());
+        DefaultMutableTreeNode files = getFiles();
+        Message message = new Message(Message.Type.BROADCAST_FILES, model.getServerDetails(), files);
 
         for (Client client : model.getClients()) {
             try {
@@ -240,6 +243,8 @@ public class ServerController extends Observable implements IServerListener, ICl
                 e.printStackTrace();
             }
         }
+
+        communication.rmiService.notifySharedFiles(files);
     }
 
     public List<User> getLogggedUsers() {
@@ -249,5 +254,19 @@ public class ServerController extends Observable implements IServerListener, ICl
             e.printStackTrace();
             return null;
         }
+    }
+
+    public void exit() {
+        for (User user : model.getUsers()) {
+            user.setState(0);
+            try {
+                UserDao.save(DbHelper.getConnection(), user);
+            } catch (NotFoundException e) {
+                e.printStackTrace();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        communication.removeRmi();  
     }
 }

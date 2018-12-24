@@ -32,9 +32,16 @@ class App {
 
         CommunicationHandler handler = new CommunicationHandler(controller);
         handler.startTCP();
-        // handler.registerRmiService();
 
         new ServerView(controller);
-    }
 
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                controller.exit();
+            }
+        });
+
+        System.out.println("Server started at : " + controller.getHostAddress());
+    }
 }

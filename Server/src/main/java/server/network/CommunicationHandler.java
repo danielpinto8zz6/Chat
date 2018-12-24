@@ -2,7 +2,10 @@ package server.network;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.MalformedURLException;
 import java.net.SocketException;
+import java.rmi.Naming;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -24,6 +27,7 @@ public class CommunicationHandler {
     public CommunicationHandler(ServerController controller) {
         this.controller = controller;
         udpMessageSender = new UDPMessageSender();
+        registerRmiService();
     }
 
     public boolean registerRmiService() {
@@ -81,5 +85,17 @@ public class CommunicationHandler {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void removeRmi() {
+        try {
+            Naming.unbind("rmi://127.0.0.1/ObservacaoSistema");
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (NotBoundException e) {
+			e.printStackTrace();
+		}
     }
 }

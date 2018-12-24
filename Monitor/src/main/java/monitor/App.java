@@ -9,38 +9,12 @@ import java.util.List;
 
 import chatroomlibrary.User;
 import chatroomlibrary.rmi.UserSensor;
-import monitor.rmi.Rmi;
 
 /**
  * @author daniel
  */
 class App {
     private UserSensor sensor;
-    private Rmi rmi;
-
-    public void startRmi() {
-        try {
-            Registry r = LocateRegistry.getRegistry();
-            Remote remoteService = r.lookup("ObservacaoSistema");
-
-            sensor = (UserSensor) remoteService;
-
-            rmi = new Rmi();
-            sensor.addListener(rmi);
-        } catch (NotBoundException e) {
-            e.printStackTrace();
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void stopRmi() {
-        try {
-            sensor.removeListener(rmi);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
-    }
 
     /**
      * <p>
@@ -67,19 +41,21 @@ class App {
             registration = "rmi://" + registration + "/" + services[0];
             Remote remoteService = r.lookup(services[0]);
             System.out.println(registration);
+            System.out.println();
             UserSensor sensor = (UserSensor) remoteService;
 
             List<User> users = sensor.getUsers();
             System.out.println("Users:");
             for (User user : users) {
-                System.out.println("Address -> " + user.getAddress());
-                System.out.println("TCP Port -> " + user.getTcpPort());
-                System.out.println("UDP Port -> " + user.getUdpPort());
+                System.out.println("Username -> " + user.getUsername());
+                System.out.println("\tAddress -> " + user.getAddress());
+                System.out.println("\tTCP Port -> " + user.getTcpPort());
+                System.out.println("\tUDP Port -> " + user.getUdpPort());
+                System.out.println();
             }
 
             RmiMonitor monitor = new RmiMonitor();
             sensor.addListener(monitor);
-
         } catch (NotBoundException e) {
             e.printStackTrace();
         } catch (RemoteException e) {

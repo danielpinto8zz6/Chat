@@ -29,9 +29,11 @@ class App {
         DbHelper.open();
         Server server = new Server(tcpPort, udpPort);
         ServerController controller = new ServerController(server);
-
         CommunicationHandler handler = new CommunicationHandler(controller);
+        controller.setCommunication(handler);
+        
         handler.startTCP();
+        handler.registerRmiService();
 
         new ServerView(controller);
 

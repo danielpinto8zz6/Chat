@@ -27,7 +27,6 @@ public class ServerController extends Observable implements IServerListener, ICl
 
     public ServerController(Server model) {
         this.model = model;
-        communication = new CommunicationHandler(this);
     }
 
     public void stop() {
@@ -269,4 +268,8 @@ public class ServerController extends Observable implements IServerListener, ICl
         }
         communication.removeRmi();  
     }
+
+    public void setCommunication(CommunicationHandler handler) {
+        communication = handler;
+	}
 }

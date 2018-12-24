@@ -52,6 +52,7 @@ class App {
                 System.out.println("\tTCP Port -> " + user.getTcpPort());
                 System.out.println("\tUDP Port -> " + user.getUdpPort());
                 System.out.println();
+                System.out.println();
             }
 
             RmiMonitor monitor = new RmiMonitor();

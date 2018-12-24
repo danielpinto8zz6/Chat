@@ -27,7 +27,6 @@ public class CommunicationHandler {
     public CommunicationHandler(ServerController controller) {
         this.controller = controller;
         udpMessageSender = new UDPMessageSender();
-        registerRmiService();
     }
 
     public boolean registerRmiService() {

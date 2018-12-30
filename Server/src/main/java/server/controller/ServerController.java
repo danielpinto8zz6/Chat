@@ -34,8 +34,13 @@ public class ServerController extends Observable implements IServerListener, ICl
     }
 
     public synchronized void broadcastMessage(Message message) {
+        List<User> logged = getLogggedUsers();
         for (Client client : model.getClients()) {
             communication.sendTCPMessage(client, message);
+        }
+        for (User user : logged) {
+            if (user.getAddress() != getHostAddress() && user.getTcpPort() != getTcpPort())
+                communication.sendUDPMessage(message, user);
         }
     }
 
@@ -224,6 +229,11 @@ public class ServerController extends Observable implements IServerListener, ICl
                     }
                 }
 
+                for (User user : users) {
+                    if (user.getAddress() != getHostAddress() && user.getTcpPort() != getTcpPort())
+                        communication.sendUDPMessage(message, user);
+                }
+
                 communication.rmiService.notifyUsersList(users);
             }
         }).start();
@@ -231,6 +241,7 @@ public class ServerController extends Observable implements IServerListener, ICl
 
     @Override
     public synchronized void notifyFilesList() {
+        List<User> users = getLogggedUsers();
         DefaultMutableTreeNode files = getFiles();
         Message message = new Message(Message.Type.BROADCAST_FILES, model.getServerDetails(), files);
 
@@ -242,6 +253,12 @@ public class ServerController extends Observable implements IServerListener, ICl
                 e.printStackTrace();
             }
         }
+
+        // Send files list by udp
+        // for (User user : users) {
+        //     if (user.getAddress() != getHostAddress() && user.getTcpPort() != getTcpPort())
+        //         communication.sendUDPMessage(message, user);
+        // }
 
         communication.rmiService.notifySharedFiles(files);
     }
@@ -266,10 +283,10 @@ public class ServerController extends Observable implements IServerListener, ICl
                 e.printStackTrace();
             }
         }
-        communication.removeRmi();  
+        communication.removeRmi();
     }
 
     public void setCommunication(CommunicationHandler handler) {
         communication = handler;
-	}
+    }
 }

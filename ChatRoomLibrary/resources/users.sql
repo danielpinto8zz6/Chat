@@ -15,7 +15,6 @@ CREATE TABLE users (
       tcp_port bigint,
       udp_port bigint,
       address varchar(255),
-      files varchar(255),
       failures bigint,
 PRIMARY KEY(username),
 INDEX users_username_INDEX (username))

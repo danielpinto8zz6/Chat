@@ -137,7 +137,7 @@ public class UserDao {
 
         try {
             sql = "INSERT INTO users ( username, password, state, " + "tcp_port, udp_port, address, "
-                    + "files, failures) VALUES (?, ?, ?, ?, ?, ?, ?, ?) ";
+                    + "failures) VALUES (?, ?, ?, ?, ?, ?, ?) ";
             stmt = conn.prepareStatement(sql);
 
             stmt.setString(1, valueObject.getUsername());
@@ -146,8 +146,7 @@ public class UserDao {
             stmt.setInt(4, valueObject.getTcpPort());
             stmt.setInt(5, valueObject.getUdpPort());
             stmt.setString(6, valueObject.getAddress());
-            stmt.setString(7, valueObject.getFiles());
-            stmt.setInt(8, valueObject.getFailures());
+            stmt.setInt(7, valueObject.getFailures());
 
             int rowcount = databaseUpdate(conn, stmt);
             if (rowcount != 1) {
@@ -176,7 +175,7 @@ public class UserDao {
     public static void save(Connection conn, User valueObject) throws NotFoundException, SQLException {
 
         String sql = "UPDATE users SET password = ?, state = ?, tcp_port = ?, "
-                + "udp_port = ?, address = ?, files = ?, " + "failures = ? WHERE (username = ? ) ";
+                + "udp_port = ?, address = ?, " + "failures = ? WHERE (username = ? ) ";
         PreparedStatement stmt = null;
 
         try {
@@ -186,10 +185,8 @@ public class UserDao {
             stmt.setInt(3, valueObject.getTcpPort());
             stmt.setInt(4, valueObject.getUdpPort());
             stmt.setString(5, valueObject.getAddress());
-            stmt.setString(6, valueObject.getFiles());
-            stmt.setInt(7, valueObject.getFailures());
-
-            stmt.setString(8, valueObject.getUsername());
+            stmt.setInt(6, valueObject.getFailures());
+            stmt.setString(7, valueObject.getUsername());
 
             int rowcount = databaseUpdate(conn, stmt);
             if (rowcount == 0) {
@@ -369,13 +366,6 @@ public class UserDao {
             sql.append("AND address LIKE '").append(valueObject.getAddress()).append("%' ");
         }
 
-        if (valueObject.getFiles() != null) {
-            if (first) {
-                first = false;
-            }
-            sql.append("AND files LIKE '").append(valueObject.getFiles()).append("%' ");
-        }
-
         if (valueObject.getFailures() != 0) {
             if (first) {
                 first = false;
@@ -393,14 +383,6 @@ public class UserDao {
             searchResults = listQuery(conn, conn.prepareStatement(sql.toString()));
 
         return searchResults;
-    }
-
-    /**
-     * getDaogenVersion will return information about generator which created these
-     * sources.
-     */
-    public static String getDaogenVersion() {
-        return "DaoGen version 2.4.1";
     }
 
     /**
@@ -446,7 +428,6 @@ public class UserDao {
                 valueObject.setTcpPort(result.getInt("tcp_port"));
                 valueObject.setUdpPort(result.getInt("udp_port"));
                 valueObject.setAddress(result.getString("address"));
-                valueObject.setFiles(result.getString("files"));
                 valueObject.setFailures(result.getInt("failures"));
 
             } else {
@@ -487,7 +468,6 @@ public class UserDao {
                 temp.setTcpPort(result.getInt("tcp_port"));
                 temp.setUdpPort(result.getInt("udp_port"));
                 temp.setAddress(result.getString("address"));
-                temp.setFiles(result.getString("files"));
                 temp.setFailures(result.getInt("failures"));
 
                 searchResults.add(temp);

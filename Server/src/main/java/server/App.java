@@ -31,7 +31,7 @@ class App {
         ServerController controller = new ServerController(server);
         CommunicationHandler handler = new CommunicationHandler(controller);
         controller.setCommunication(handler);
-        
+
         handler.startTCP();
         handler.registerRmiService();
 
@@ -44,6 +44,7 @@ class App {
             }
         });
 
-        System.out.println("Server started at : " + controller.getHostAddress());
+        System.out.println("Server started at : " + controller.getHostAddress() + " tcp port : "
+                + controller.getTcpPort() + " udp port : " + controller.getUdpPort());
     }
 }

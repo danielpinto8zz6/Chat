@@ -13,7 +13,7 @@ import server.interfaces.IServerListener;
 
 public class UDPListener implements Runnable {
     private IServerListener serverListener;
-    private final static int BUFFER = 1024;
+    private final static int BUFFER = 4096;
 
     DatagramSocket socket = null;
     private ServerController controller;
@@ -38,7 +38,7 @@ public class UDPListener implements Runnable {
                 if (readObject instanceof Message) {
                     serverListener.onMessageReceived((Message) readObject);
                 } else {
-                    System.err.println("Received unrecognized data on UDP socket! Ignoring...");
+                        System.err.println("Received unrecognized data on UDP socket! Ignoring...");
                 }
             } catch (IOException e) {
                 e.printStackTrace();

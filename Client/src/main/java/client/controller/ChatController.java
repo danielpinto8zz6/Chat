@@ -345,7 +345,15 @@ public class ChatController extends Observable implements IClientListener {
         return model.isRunning();
     }
 
-	public File getSaveLocation() {
-		return model.getSaveLocation();
-	}
+    public File getSaveLocation() {
+        return model.getSaveLocation();
+    }
+
+    public User getUser() {
+        return model.getUser();
+    }
+
+    public CommunicationHandler getCommunication() {
+        return client;
+    }
 }

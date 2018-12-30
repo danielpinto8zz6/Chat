@@ -17,7 +17,7 @@ import client.controller.ChatController;
 
 public class UDPListener implements Runnable {
     private IClientListener clientListener;
-    private final static int BUFFER = 1024;
+    private final static int BUFFER = 4096;
 
     DatagramSocket socket = null;
     private ChatController controller;
@@ -41,8 +41,6 @@ public class UDPListener implements Runnable {
                 Object readObject = Utils.convertFromBytes(buffer);
                 if (readObject instanceof Message) {
                     Message message = (Message) readObject;
-                    System.out.println("Received udp message " + message.getData());
-
                     switch (message.getType()) {
                     case MESSAGE:
                         if (message.getData() != null) {
@@ -78,6 +76,12 @@ public class UDPListener implements Runnable {
                         break;
                     case START_TRANSFER:
                         clientListener.onStartTransfer(message);
+                        break;
+                    case KEEP_ALIVE:
+                        Message m = new Message(Message.Type.IM_ALIVE, controller.getUser());
+                        controller.getCommunication().sendUDPMessage(m, socket.getInetAddress().getHostAddress(),
+                                socket.getPort());
+                        System.out.println("Keep alive");
                         break;
                     default:
                         break;

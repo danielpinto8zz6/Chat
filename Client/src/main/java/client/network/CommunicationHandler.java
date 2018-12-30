@@ -97,4 +97,12 @@ public class CommunicationHandler {
             e.printStackTrace();
         }
     }
+
+    public void sendUDPMessage(Message message, String address, int port) {
+        try {
+            udpMessageSender.sendMessage(message, address, port);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

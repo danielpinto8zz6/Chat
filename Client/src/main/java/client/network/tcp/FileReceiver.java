@@ -63,6 +63,9 @@ public class FileReceiver implements Runnable {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+            File file = new File(newFile);
+            if (file.exists())
+                file.delete();
         }
     }
 

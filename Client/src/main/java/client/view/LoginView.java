@@ -51,6 +51,12 @@ public class LoginView extends javax.swing.JPanel implements Observer {
     // <editor-fold defaultstate="collapsed" desc="Generated
     // <editor-fold defaultstate="collapsed" desc="Generated
     // Code">//GEN-BEGIN:initComponents
+    // <editor-fold defaultstate="collapsed" desc="Generated
+    // <editor-fold defaultstate="collapsed" desc="Generated
+    // <editor-fold defaultstate="collapsed" desc="Generated
+    // <editor-fold defaultstate="collapsed" desc="Generated
+    // <editor-fold defaultstate="collapsed" desc="Generated
+    // Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         jLabel1 = new javax.swing.JLabel();
@@ -268,14 +274,25 @@ public class LoginView extends javax.swing.JPanel implements Observer {
         return jTextFieldHost.getText().trim();
     }
 
+    /**
+     * <p>getTcpPort.</p>
+     *
+     * @return a int.
+     */
     public int getTcpPort() {
         return Integer.parseInt(jTextFieldTCPPort.getText().trim());
     }
 
+    /**
+     * <p>getUdpPort.</p>
+     *
+     * @return a int.
+     */
     public int getUdpPort() {
         return Integer.parseInt(jTextFieldUDPPort.getText().trim());
     }
 
+    /** {@inheritDoc} */
     @Override
     public void update(Observable o, Object arg) {
         if (arg instanceof String) {

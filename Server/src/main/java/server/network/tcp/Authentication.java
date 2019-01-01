@@ -16,11 +16,20 @@ class Authentication implements Runnable {
     private final ServerController controller;
     private Socket socket;
 
+    /**
+     * <p>Constructor for Authentication.</p>
+     *
+     * @param controller a {@link server.controller.ServerController} object.
+     * @param socket a {@link java.net.Socket} object.
+     */
     public Authentication(ServerController controller, Socket socket) {
         this.controller = controller;
         this.socket = socket;
     }
 
+    /**
+     * <p>run.</p>
+     */
     public void run() {
         try {
             ObjectOutputStream out;

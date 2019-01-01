@@ -21,18 +21,37 @@ import server.model.Server;
 import server.network.CommunicationHandler;
 import server.network.tcp.ClientHandler;
 
+/**
+ * <p>ServerController class.</p>
+ *
+ * @author daniel
+ * @version $Id: $Id
+ */
 public class ServerController extends Observable implements IServerListener, IClientManager, IUsersCommunication {
     private final Server model;
     private CommunicationHandler communication;
 
+    /**
+     * <p>Constructor for ServerController.</p>
+     *
+     * @param model a {@link server.model.Server} object.
+     */
     public ServerController(Server model) {
         this.model = model;
     }
 
+    /**
+     * <p>stop.</p>
+     */
     public void stop() {
         model.setRunning(false);
     }
 
+    /**
+     * <p>broadcastMessage.</p>
+     *
+     * @param message a {@link chatroomlibrary.Message} object.
+     */
     public synchronized void broadcastMessage(Message message) {
         List<User> logged = getLogggedUsers();
         for (Client client : model.getClients()) {
@@ -44,6 +63,11 @@ public class ServerController extends Observable implements IServerListener, ICl
         }
     }
 
+    /**
+     * <p>getFiles.</p>
+     *
+     * @return a {@link javax.swing.tree.DefaultMutableTreeNode} object.
+     */
     public synchronized DefaultMutableTreeNode getFiles() {
         DefaultMutableTreeNode files = new DefaultMutableTreeNode(new String("Files"));
 
@@ -58,6 +82,13 @@ public class ServerController extends Observable implements IServerListener, ICl
         return files;
     }
 
+    /**
+     * <p>sendPrivateMessage.</p>
+     *
+     * @param message a {@link chatroomlibrary.Message} object.
+     * @param sender a {@link server.model.Client} object.
+     * @param user a {@link java.lang.String} object.
+     */
     public synchronized void sendPrivateMessage(Message message, Client sender, String user) {
         boolean find = false;
         for (Client client : model.getClients()) {
@@ -86,6 +117,12 @@ public class ServerController extends Observable implements IServerListener, ICl
         }
     }
 
+    /**
+     * <p>authenticate.</p>
+     *
+     * @param user a {@link chatroomlibrary.User} object.
+     * @return a boolean.
+     */
     public synchronized boolean authenticate(User user) {
         Connection connection = DbHelper.getConnection();
         try {
@@ -105,6 +142,12 @@ public class ServerController extends Observable implements IServerListener, ICl
         return false;
     }
 
+    /**
+     * <p>register.</p>
+     *
+     * @param user a {@link chatroomlibrary.User} object.
+     * @return a boolean.
+     */
     public synchronized boolean register(User user) {
         Connection connection = DbHelper.getConnection();
         try {
@@ -122,14 +165,29 @@ public class ServerController extends Observable implements IServerListener, ICl
         }
     }
 
+    /**
+     * <p>getTcpPort.</p>
+     *
+     * @return a int.
+     */
     public int getTcpPort() {
         return model.getTcpPort();
     }
 
+    /**
+     * <p>getUdpPort.</p>
+     *
+     * @return a int.
+     */
     public int getUdpPort() {
         return model.getUdpPort();
     }
 
+    /**
+     * <p>loginFailed.</p>
+     *
+     * @param user a {@link chatroomlibrary.User} object.
+     */
     public void loginFailed(User user) {
         String username = user.getUsername();
         String address = user.getAddress();
@@ -138,23 +196,40 @@ public class ServerController extends Observable implements IServerListener, ICl
         notifyObservers(new String[] { "login-failed", username, address });
     }
 
+    /**
+     * <p>isRunning.</p>
+     *
+     * @return a boolean.
+     */
     public boolean isRunning() {
         return model.isRunning();
     }
 
+    /**
+     * <p>getHostAddress.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
     public String getHostAddress() {
         return model.getHostAddress();
     }
 
+    /**
+     * <p>getUsers.</p>
+     *
+     * @return a {@link java.util.List} object.
+     */
     public synchronized List<User> getUsers() {
         return model.getUsers();
     }
 
+    /** {@inheritDoc} */
     @Override
     public synchronized void onMessageReceived(Message message) {
         broadcastMessage(message);
     }
 
+    /** {@inheritDoc} */
     @Override
     public synchronized void onMessageReceived(Client client, Message message) {
         if (message.getType() == Message.Type.SEND_SHARED_FILES) {
@@ -173,6 +248,7 @@ public class ServerController extends Observable implements IServerListener, ICl
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public synchronized void removeClient(Client client) {
         User user = client.getUser();
@@ -196,6 +272,7 @@ public class ServerController extends Observable implements IServerListener, ICl
         model.removeClient(client);
     }
 
+    /** {@inheritDoc} */
     @Override
     public synchronized void addClient(Client client) {
         model.addClient(client);
@@ -211,6 +288,7 @@ public class ServerController extends Observable implements IServerListener, ICl
         notifyObservers(new String[] { "user-joined", username, address });
     }
 
+    /** {@inheritDoc} */
     @Override
     public synchronized void notifyUsersList() {
         new Thread(new Runnable() {
@@ -239,6 +317,7 @@ public class ServerController extends Observable implements IServerListener, ICl
         }).start();
     }
 
+    /** {@inheritDoc} */
     @Override
     public synchronized void notifyFilesList() {
         // List<User> users = getLogggedUsers();
@@ -263,6 +342,11 @@ public class ServerController extends Observable implements IServerListener, ICl
         communication.rmiService.notifySharedFiles(files);
     }
 
+    /**
+     * <p>getLogggedUsers.</p>
+     *
+     * @return a {@link java.util.List} object.
+     */
     public List<User> getLogggedUsers() {
         try {
             return UserDao.loadAll(DbHelper.getConnection(), "WHERE state=1");
@@ -272,6 +356,9 @@ public class ServerController extends Observable implements IServerListener, ICl
         }
     }
 
+    /**
+     * <p>exit.</p>
+     */
     public void exit() {
         for (User user : model.getUsers()) {
             user.setState(0);
@@ -286,6 +373,11 @@ public class ServerController extends Observable implements IServerListener, ICl
         communication.removeRmi();
     }
 
+    /**
+     * <p>Setter for the field <code>communication</code>.</p>
+     *
+     * @param handler a {@link server.network.CommunicationHandler} object.
+     */
     public void setCommunication(CommunicationHandler handler) {
         communication = handler;
     }

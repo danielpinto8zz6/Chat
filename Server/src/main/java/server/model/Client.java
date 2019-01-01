@@ -8,6 +8,12 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import chatroomlibrary.User;
 
+/**
+ * <p>Client class.</p>
+ *
+ * @author daniel
+ * @version $Id: $Id
+ */
 public class Client {
     private final ObjectOutputStream tcpOut;
     private final ObjectInputStream tcpIn;
@@ -21,9 +27,9 @@ public class Client {
      * </p>
      *
      * @param user   a {@link chatroomlibrary.User} object.
-     * @param socket a {@link java.net.Socket} object.
-     * @param in     a {@link java.io.ObjectInputStream} object.
-     * @param out    a {@link java.io.ObjectOutputStream} object.
+     * @param tcpSocket a {@link java.net.Socket} object.
+     * @param tcpIn a {@link java.io.ObjectInputStream} object.
+     * @param tcpOut a {@link java.io.ObjectOutputStream} object.
      */
     public Client(User user, Socket tcpSocket, ObjectInputStream tcpIn, ObjectOutputStream tcpOut) {
         this.user = user;
@@ -33,6 +39,8 @@ public class Client {
     }
 
     /**
+     * <p>Getter for the field <code>tcpOut</code>.</p>
+     *
      * @return the tcpOut
      */
     public ObjectOutputStream getTcpOut() {
@@ -40,6 +48,8 @@ public class Client {
     }
 
     /**
+     * <p>Getter for the field <code>tcpIn</code>.</p>
+     *
      * @return the tcpIn
      */
     public ObjectInputStream getTcpIn() {
@@ -47,6 +57,8 @@ public class Client {
     }
 
     /**
+     * <p>Getter for the field <code>tcpSocket</code>.</p>
+     *
      * @return the tcpSocket
      */
     public Socket getTcpSocket() {
@@ -54,6 +66,8 @@ public class Client {
     }
 
     /**
+     * <p>Getter for the field <code>files</code>.</p>
+     *
      * @return the files
      */
     public DefaultMutableTreeNode getFiles() {
@@ -61,6 +75,8 @@ public class Client {
     }
 
     /**
+     * <p>Setter for the field <code>files</code>.</p>
+     *
      * @param files the files to set
      */
     public void setFiles(DefaultMutableTreeNode files) {

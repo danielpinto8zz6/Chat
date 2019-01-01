@@ -6,6 +6,12 @@ import java.util.ArrayList;
 
 import chatroomlibrary.User;
 
+/**
+ * <p>Server class.</p>
+ *
+ * @author daniel
+ * @version $Id: $Id
+ */
 public class Server {
 
     private ArrayList<Client> clients;
@@ -17,7 +23,8 @@ public class Server {
      * Constructor for Server.
      * </p>
      *
-     * @param port a int.
+     * @param tcpPort a int.
+     * @param udpPort a int.
      */
     public Server(int tcpPort, int udpPort) {
         this.clients = new ArrayList<>();
@@ -26,6 +33,8 @@ public class Server {
     }
 
     /**
+     * <p>isRunning.</p>
+     *
      * @return the running
      */
     public boolean isRunning() {
@@ -33,6 +42,8 @@ public class Server {
     }
 
     /**
+     * <p>Setter for the field <code>running</code>.</p>
+     *
      * @param running the running to set
      */
     public void setRunning(boolean running) {
@@ -40,6 +51,8 @@ public class Server {
     }
 
     /**
+     * <p>Getter for the field <code>serverDetails</code>.</p>
+     *
      * @return the serverDetails
      */
     public User getServerDetails() {
@@ -47,12 +60,19 @@ public class Server {
     }
 
     /**
+     * <p>Setter for the field <code>serverDetails</code>.</p>
+     *
      * @param serverDetails the serverDetails to set
      */
     public void setServerDetails(User serverDetails) {
         this.serverDetails = serverDetails;
     }
 
+    /**
+     * <p>getHostAddress.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
     public String getHostAddress() {
         InetAddress hostAddress = null;
         try {
@@ -63,22 +83,49 @@ public class Server {
         return hostAddress.getHostAddress();
     }
 
+    /**
+     * <p>getTcpPort.</p>
+     *
+     * @return a int.
+     */
     public int getTcpPort() {
         return serverDetails.getTcpPort();
     }
 
+    /**
+     * <p>getUdpPort.</p>
+     *
+     * @return a int.
+     */
     public int getUdpPort() {
         return serverDetails.getUdpPort();
     }
 
+    /**
+     * <p>removeClient.</p>
+     *
+     * @param client a {@link server.model.Client} object.
+     * @return a boolean.
+     */
     public boolean removeClient(Client client) {
         return clients.remove(client);
     }
 
+    /**
+     * <p>addClient.</p>
+     *
+     * @param client a {@link server.model.Client} object.
+     * @return a boolean.
+     */
     public boolean addClient(Client client) {
         return clients.add(client);
     }
 
+    /**
+     * <p>getUsers.</p>
+     *
+     * @return a {@link java.util.ArrayList} object.
+     */
     public ArrayList<User> getUsers() {
         ArrayList<User> users = new ArrayList<>();
         for (Client client : clients) {
@@ -87,6 +134,11 @@ public class Server {
         return users;
     }
 
+    /**
+     * <p>Getter for the field <code>clients</code>.</p>
+     *
+     * @return a {@link java.util.ArrayList} object.
+     */
     public ArrayList<Client> getClients() {
         return clients;
     }

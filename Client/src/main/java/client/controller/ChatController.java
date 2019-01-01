@@ -108,6 +108,7 @@ public class ChatController extends Observable implements IClientListener {
      * </p>
      *
      * @param file a {@link java.io.File} object.
+     * @param username a {@link java.lang.String} object.
      */
     public void sendFile(File file, String username) {
         FileInfo fileInfo = new FileInfo(file);
@@ -135,10 +136,12 @@ public class ChatController extends Observable implements IClientListener {
     /**
      * <p>
      * acceptFile.
-     * 
+     *
      * </p>
      *
-     * @param absolutePath a {@link java.lang.String} object.
+     * @param path a {@link java.lang.String} object.
+     * @param user a {@link chatroomlibrary.User} object.
+     * @param fileInfo a {@link chatroomlibrary.FileInfo} object.
      */
     public void acceptFile(String path, User user, FileInfo fileInfo) {
         Message message = new Message(Message.Type.FILE_ACCEPTED, model.getUser(), fileInfo);
@@ -169,6 +172,11 @@ public class ChatController extends Observable implements IClientListener {
         thread.start();
     }
 
+    /**
+     * <p>getUsernames.</p>
+     *
+     * @return an array of {@link java.lang.String} objects.
+     */
     public String[] getUsernames() {
         ArrayList<String> usernames = new ArrayList<>();
         for (User user : model.getUsers()) {
@@ -180,6 +188,12 @@ public class ChatController extends Observable implements IClientListener {
         return usernamesArr;
     }
 
+    /**
+     * <p>fileSent.</p>
+     *
+     * @param filename a {@link java.lang.String} object.
+     * @param receiver a {@link java.lang.String} object.
+     */
     public void fileSent(String filename, String receiver) {
         String username = model.getUser().getUsername();
 
@@ -187,6 +201,12 @@ public class ChatController extends Observable implements IClientListener {
         notifyObservers(new String[] { "file-sent", username, receiver, filename });
     }
 
+    /**
+     * <p>fileReceived.</p>
+     *
+     * @param filename a {@link java.lang.String} object.
+     * @param sender a {@link java.lang.String} object.
+     */
     public void fileReceived(String filename, String sender) {
         String username = model.getUser().getUsername();
 
@@ -194,10 +214,20 @@ public class ChatController extends Observable implements IClientListener {
         notifyObservers(new String[] { "file-received", sender, username, filename });
     }
 
+    /**
+     * <p>getFiles.</p>
+     *
+     * @return a {@link javax.swing.tree.DefaultMutableTreeNode} object.
+     */
     public DefaultMutableTreeNode getFiles() {
         return model.getFiles();
     }
 
+    /**
+     * <p>setSharedFolder.</p>
+     *
+     * @param file a {@link java.io.File} object.
+     */
     public void setSharedFolder(File file) {
         Thread thread = new Thread(new Runnable() {
 
@@ -212,6 +242,11 @@ public class ChatController extends Observable implements IClientListener {
         thread.start();
     }
 
+    /**
+     * <p>setSaveLocation.</p>
+     *
+     * @param file a {@link java.io.File} object.
+     */
     public void setSaveLocation(File file) {
         model.setSaveLocation(file);
     }
@@ -222,6 +257,12 @@ public class ChatController extends Observable implements IClientListener {
         client.sendTCPMessage(message);
     }
 
+    /**
+     * <p>fileSend.</p>
+     *
+     * @param file a {@link java.io.File} object.
+     * @param user a {@link chatroomlibrary.User} object.
+     */
     public void fileSend(File file, User user) {
         FileInfo fileInfo = new FileInfo(file);
 
@@ -229,6 +270,11 @@ public class ChatController extends Observable implements IClientListener {
         thread.start();
     }
 
+    /**
+     * <p>requestFile.</p>
+     *
+     * @param fileInfo a {@link chatroomlibrary.FileInfo} object.
+     */
     public void requestFile(FileInfo fileInfo) {
         if (fileInfo.getOwner() == null) {
             return;
@@ -239,25 +285,46 @@ public class ChatController extends Observable implements IClientListener {
         client.sendTCPMessage(message);
     }
 
+    /**
+     * <p>acceptTransfer.</p>
+     *
+     * @param username a {@link java.lang.String} object.
+     * @param fileInfo a {@link chatroomlibrary.FileInfo} object.
+     */
     public void acceptTransfer(String username, FileInfo fileInfo) {
         Message message = new Message(Message.Type.TRANSFER_ACCEPTED, model.getUser(), fileInfo, username);
 
         client.sendTCPMessage(message);
     }
 
+    /**
+     * <p>createConnection.</p>
+     *
+     * @param user a {@link chatroomlibrary.User} object.
+     * @param type a {@link chatroomlibrary.Message.Type} object.
+     */
     public void createConnection(User user, Type type) {
         model.setUser(user);
         client.createTcpConnection(user, type);
     }
 
+    /**
+     * <p>close.</p>
+     */
     public void close() {
         client.disconnect();
     }
 
+    /**
+     * <p>getAdress.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
     public String getAdress() {
         return model.getUser().getAddress();
     }
 
+    /** {@inheritDoc} */
     @Override
     public synchronized void onMessageReceived(Message message) {
         if (message.getTo() == null) {
@@ -275,6 +342,7 @@ public class ChatController extends Observable implements IClientListener {
         notifyObservers(message);
     }
 
+    /** {@inheritDoc} */
     @Override
     public synchronized void onUserListReceived(List<User> users) {
         model.setUsers((ArrayList<User>) users);
@@ -283,6 +351,7 @@ public class ChatController extends Observable implements IClientListener {
         notifyObservers("update-users");
     }
 
+    /** {@inheritDoc} */
     @Override
     public synchronized void onFilesListReceived(DefaultMutableTreeNode files) {
         model.setFiles(files);
@@ -291,12 +360,14 @@ public class ChatController extends Observable implements IClientListener {
         notifyObservers("update-files");
     }
 
+    /** {@inheritDoc} */
     @Override
     public synchronized void onLoginFailed() {
         setChanged();
         notifyObservers("login-failed");
     }
 
+    /** {@inheritDoc} */
     @Override
     public synchronized void onLogged() {
         logged = true;
@@ -307,12 +378,14 @@ public class ChatController extends Observable implements IClientListener {
         notifyObservers("connected");
     }
 
+    /** {@inheritDoc} */
     @Override
     public synchronized void onFileRequested(Message message) {
         setChanged();
         notifyObservers(message);
     }
 
+    /** {@inheritDoc} */
     @Override
     public synchronized void onTransferAccepted(Message message) {
         FileInfo fileInfo = (FileInfo) message.getData();
@@ -328,6 +401,7 @@ public class ChatController extends Observable implements IClientListener {
         client.sendTCPMessage(m);
     }
 
+    /** {@inheritDoc} */
     @Override
     public synchronized void onStartTransfer(Message message) {
         FileInfo fileInfo = (FileInfo) message.getData();
@@ -337,22 +411,47 @@ public class ChatController extends Observable implements IClientListener {
         thread.start();
     }
 
+    /**
+     * <p>getUdpPort.</p>
+     *
+     * @return a int.
+     */
     public int getUdpPort() {
         return model.getUser().getUdpPort();
     }
 
+    /**
+     * <p>isRunning.</p>
+     *
+     * @return a boolean.
+     */
     public boolean isRunning() {
         return model.isRunning();
     }
 
+    /**
+     * <p>getSaveLocation.</p>
+     *
+     * @return a {@link java.io.File} object.
+     */
     public File getSaveLocation() {
         return model.getSaveLocation();
     }
 
+    /**
+     * <p>getUser.</p>
+     *
+     * @return a {@link chatroomlibrary.User} object.
+     */
     public User getUser() {
         return model.getUser();
     }
 
+    /**
+     * <p>getCommunication.</p>
+     *
+     * @return a {@link client.network.CommunicationHandler} object.
+     */
     public CommunicationHandler getCommunication() {
         return client;
     }

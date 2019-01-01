@@ -6,13 +6,25 @@ import java.net.Socket;
 
 import server.controller.ServerController;
 
+/**
+ * <p>TCPListener class.</p>
+ *
+ * @author daniel
+ * @version $Id: $Id
+ */
 public class TCPListener implements Runnable {
     private ServerController controller;
 
+    /**
+     * <p>Constructor for TCPListener.</p>
+     *
+     * @param controller a {@link server.controller.ServerController} object.
+     */
     public TCPListener(ServerController controller) {
         this.controller = controller;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void run() {
         ServerSocket server = null;

@@ -81,6 +81,18 @@ public class ChatView extends javax.swing.JPanel implements Observer {
     // <editor-fold defaultstate="collapsed" desc="Generated
     // <editor-fold defaultstate="collapsed" desc="Generated
     // Code">//GEN-BEGIN:initComponents
+    // <editor-fold defaultstate="collapsed" desc="Generated
+    // <editor-fold defaultstate="collapsed" desc="Generated
+    // <editor-fold defaultstate="collapsed" desc="Generated
+    // <editor-fold defaultstate="collapsed" desc="Generated
+    // Code">
+    // <editor-fold defaultstate="collapsed" desc="Generated
+    // <editor-fold defaultstate="collapsed" desc="Generated
+    // <editor-fold defaultstate="collapsed" desc="Generated
+    // <editor-fold defaultstate="collapsed" desc="Generated
+    // <editor-fold defaultstate="collapsed" desc="Generated
+    // <editor-fold defaultstate="collapsed" desc="Generated
+    // Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         jsbtn = new javax.swing.JButton();
@@ -231,10 +243,13 @@ public class ChatView extends javax.swing.JPanel implements Observer {
      */
     public void appendMessage(Message message) {
         if (message.getTo() != null)
-            appendToPane(jtextFilDiscu, "(<b>Private</b>)" + "@" + message.getUser().getUsername() + "<span> : "
-                    + message.getData() + "</span>");
+            appendToPane(jtextFilDiscu,
+                    "(<b>Private</b>)" + "@" + message.getUser().getUsername() + "<span> : " + message.getData()
+                            + "</span>" + " <small><font color='gray'>(" + message.getTime().getHour() + ":"
+                            + message.getTime().getMinute() + ")</font></small>");
         else
-            appendToPane(jtextFilDiscu, "@" + message.getUser().getUsername() + " : " + message.getData());
+            appendToPane(jtextFilDiscu, "@" + message.getUser().getUsername() + " : " + message.getData() + " <small><font color='gray'>(" + message.getTime().getHour() + ":"
+            + message.getTime().getMinute() + ")</font></small>");
     }
 
     /**
@@ -302,6 +317,9 @@ public class ChatView extends javax.swing.JPanel implements Observer {
      * <p>
      * fileRequest.
      * </p>
+     *
+     * @param fileInfo a {@link chatroomlibrary.FileInfo} object.
+     * @param user a {@link chatroomlibrary.User} object.
      */
     public void fileRequest(FileInfo fileInfo, User user) {
         int dialogResult = JOptionPane.showConfirmDialog(this,
@@ -328,6 +346,12 @@ public class ChatView extends javax.swing.JPanel implements Observer {
         }
     }
 
+    /**
+     * <p>fileRequested.</p>
+     *
+     * @param username a {@link java.lang.String} object.
+     * @param fileInfo a {@link chatroomlibrary.FileInfo} object.
+     */
     public void fileRequested(String username, FileInfo fileInfo) {
         int dialogResult = JOptionPane.showConfirmDialog(this,
                 username + "Requested (" + fileInfo.getName() + ")! Send?", "Warning", JOptionPane.YES_NO_OPTION);
@@ -341,7 +365,7 @@ public class ChatView extends javax.swing.JPanel implements Observer {
      * setUsersList.
      * </p>
      *
-     * @param users a {@link java.util.ArrayList} object.
+     * @param usernames an array of {@link java.lang.String} objects.
      */
     public void setUsersList(String[] usernames) {
         jListUsers.setListData(usernames);

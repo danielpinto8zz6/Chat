@@ -12,10 +12,18 @@ import java.net.ServerSocket;
 import chatroomlibrary.Message;
 import server.controller.ServerController;
 
+/**
+ * <p>KeepAlive class.</p>
+ *
+ * @author daniel
+ * @version $Id: $Id
+ */
 public class KeepAlive implements Runnable {
 
+    /** Constant <code>RECEBIDO="RECEBIDO"</code> */
     public static final String RECEBIDO = "RECEBIDO";
 
+    /** Constant <code>MAX_SIZE=1000</code> */
     public static final int MAX_SIZE = 1000;
 
     private static final int TIMER = 15;
@@ -28,6 +36,17 @@ public class KeepAlive implements Runnable {
     private ServerSocket serverSocket;
     private ServerController controller;
 
+    /**
+     * <p>Constructor for KeepAlive.</p>
+     *
+     * @param controller a {@link server.controller.ServerController} object.
+     * @param packet a {@link java.net.DatagramPacket} object.
+     * @param socket a {@link java.net.DatagramSocket} object.
+     * @param TCPPort a int.
+     * @param nome a {@link java.lang.String} object.
+     * @param serverSocket a {@link java.net.ServerSocket} object.
+     * @throws java.io.IOException if any.
+     */
     public KeepAlive(ServerController controller, DatagramPacket packet, DatagramSocket socket, int TCPPort,
             String nome, ServerSocket serverSocket) throws IOException {
         this.controller = controller;
@@ -40,6 +59,7 @@ public class KeepAlive implements Runnable {
         message = new Message(Message.Type.KEEP_ALIVE);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void run() {
         while (controller.isRunning()) {

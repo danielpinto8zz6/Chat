@@ -5,6 +5,12 @@ import java.sql.DriverManager;
 
 import com.mysql.cj.jdbc.Driver;
 
+/**
+ * <p>DbHelper class.</p>
+ *
+ * @author daniel
+ * @version $Id: $Id
+ */
 public class DbHelper {
     private static String jdbcDriver = "jdbc:mysql";
     private static String jdbcUrl = "127.0.0.1/chatroom";
@@ -12,6 +18,11 @@ public class DbHelper {
     private static String jdbcPasswd = "";
     private static Connection conn = null;
 
+    /**
+     * <p>getConnection.</p>
+     *
+     * @return a {@link java.sql.Connection} object.
+     */
     public static Connection getConnection() {
         if (conn != null) {
             return conn;
@@ -21,6 +32,9 @@ public class DbHelper {
         }
     }
 
+    /**
+     * <p>open.</p>
+     */
     public static void open() {
         try {
             DriverManager.registerDriver(new Driver());
@@ -31,6 +45,9 @@ public class DbHelper {
         }
     }
 
+    /**
+     * <p>close.</p>
+     */
     public static void close() {
         if (conn != null) {
             try {

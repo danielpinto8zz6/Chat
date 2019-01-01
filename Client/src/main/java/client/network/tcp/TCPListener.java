@@ -11,6 +11,12 @@ import chatroomlibrary.User;
 import chatroomlibrary.interfaces.IClientListener;
 import client.controller.ChatController;
 
+/**
+ * <p>TCPListener class.</p>
+ *
+ * @author daniel
+ * @version $Id: $Id
+ */
 public class TCPListener implements Runnable {
     private final ChatController controller;
     private ObjectInputStream in = null;
@@ -22,6 +28,7 @@ public class TCPListener implements Runnable {
      * </p>
      *
      * @param controller a {@link client.controller.ChatController} object.
+     * @param in a {@link java.io.ObjectInputStream} object.
      */
     public TCPListener(ChatController controller, ObjectInputStream in) {
         this.controller = controller;

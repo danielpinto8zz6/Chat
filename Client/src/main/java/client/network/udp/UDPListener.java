@@ -15,6 +15,12 @@ import chatroomlibrary.Utils;
 import chatroomlibrary.interfaces.IClientListener;
 import client.controller.ChatController;
 
+/**
+ * <p>UDPListener class.</p>
+ *
+ * @author daniel
+ * @version $Id: $Id
+ */
 public class UDPListener implements Runnable {
     private IClientListener clientListener;
     private final static int BUFFER = 4096;
@@ -22,12 +28,20 @@ public class UDPListener implements Runnable {
     DatagramSocket socket = null;
     private ChatController controller;
 
+    /**
+     * <p>Constructor for UDPListener.</p>
+     *
+     * @param controller a {@link client.controller.ChatController} object.
+     * @param port a int.
+     * @throws java.net.SocketException if any.
+     */
     public UDPListener(ChatController controller, int port) throws SocketException {
         this.socket = new DatagramSocket(port);
         clientListener = controller;
         this.controller = controller;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void run() {
         byte[] buffer = new byte[BUFFER];

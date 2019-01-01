@@ -8,7 +8,20 @@ import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 
+/**
+ * <p>MonitorDirectory class.</p>
+ *
+ * @author daniel
+ * @version $Id: $Id
+ */
 public class MonitorDirectory {
+	/**
+	 * <p>watch.</p>
+	 *
+	 * @param path a {@link java.nio.file.Path} object.
+	 * @throws java.io.IOException if any.
+	 * @throws java.lang.InterruptedException if any.
+	 */
 	public static void watch(Path path) throws IOException, InterruptedException {
 		WatchService watchService = FileSystems.getDefault().newWatchService();
 

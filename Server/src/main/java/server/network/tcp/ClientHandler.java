@@ -10,6 +10,12 @@ import server.interfaces.IServerListener;
 import server.interfaces.IUsersCommunication;
 import server.model.Client;
 
+/**
+ * <p>ClientHandler class.</p>
+ *
+ * @author daniel
+ * @version $Id: $Id
+ */
 public class ClientHandler implements Runnable {
 
     private final Client client;
@@ -22,8 +28,8 @@ public class ClientHandler implements Runnable {
      * Constructor for ClientHandler.
      * </p>
      *
-     * @param server a {@link server.Server} object.
      * @param client a {@link server.Client} object.
+     * @param controller a {@link server.controller.ServerController} object.
      */
     public ClientHandler(ServerController controller, Client client) {
         this.client = client;

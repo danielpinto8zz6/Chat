@@ -13,6 +13,12 @@ import chatroomlibrary.FileInfo;
 import chatroomlibrary.User;
 import client.controller.ChatController;
 
+/**
+ * <p>FileReceiver class.</p>
+ *
+ * @author daniel
+ * @version $Id: $Id
+ */
 public class FileReceiver implements Runnable {
 
     private ServerSocket serverSocket;
@@ -21,6 +27,15 @@ public class FileReceiver implements Runnable {
     private User user;
     private FileInfo fileInfo;
 
+    /**
+     * <p>Constructor for FileReceiver.</p>
+     *
+     * @param controller a {@link client.controller.ChatController} object.
+     * @param port a int.
+     * @param fileInfo a {@link chatroomlibrary.FileInfo} object.
+     * @param path a {@link java.lang.String} object.
+     * @param user a {@link chatroomlibrary.User} object.
+     */
     public FileReceiver(ChatController controller, int port, FileInfo fileInfo, String path, User user) {
         this.controller = controller;
         this.fileInfo = fileInfo;
@@ -69,6 +84,7 @@ public class FileReceiver implements Runnable {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public void run() {
         Socket socket = null;
@@ -83,6 +99,13 @@ public class FileReceiver implements Runnable {
         }
     }
 
+    /**
+     * <p>printTransferDetails.</p>
+     *
+     * @param startTime a long.
+     * @param endTime a long.
+     * @param totalRead a int.
+     */
     public void printTransferDetails(long startTime, long endTime, int totalRead) {
         System.out.println("Transfer begun......");
         System.out.println(totalRead + " bytes written in " + (endTime - startTime) + " ms.");

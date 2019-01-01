@@ -11,16 +11,24 @@ import java.util.Observer;
 import server.controller.ServerController;
 
 /**
+ * <p>ServerView class.</p>
  *
  * @author daniel
+ * @version $Id: $Id
  */
 public class ServerView extends javax.swing.JFrame implements Observer {
     private static final long serialVersionUID = 1L;
 
+    /**
+     * <p>Constructor for ServerView.</p>
+     *
+     * @param controller a {@link server.controller.ServerController} object.
+     */
     public ServerView(ServerController controller) {
         controller.addObserver(this);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void update(Observable o, Object arg) {
         if (arg instanceof String[]) {

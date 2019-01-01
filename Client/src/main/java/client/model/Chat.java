@@ -44,6 +44,8 @@ public class Chat {
     }
 
     /**
+     * <p>isRunning.</p>
+     *
      * @return the running
      */
     public boolean isRunning() {
@@ -51,6 +53,8 @@ public class Chat {
     }
 
     /**
+     * <p>Setter for the field <code>running</code>.</p>
+     *
      * @param running the running to set
      */
     public void setRunning(boolean running) {
@@ -204,10 +208,20 @@ public class Chat {
         conversations.add(conversation);
     }
 
+    /**
+     * <p>Setter for the field <code>files</code>.</p>
+     *
+     * @param files a {@link javax.swing.tree.DefaultMutableTreeNode} object.
+     */
     public void setFiles(DefaultMutableTreeNode files) {
         this.files = files;
     }
 
+    /**
+     * <p>Getter for the field <code>files</code>.</p>
+     *
+     * @return a {@link javax.swing.tree.DefaultMutableTreeNode} object.
+     */
     public DefaultMutableTreeNode getFiles() {
         return files;
     }

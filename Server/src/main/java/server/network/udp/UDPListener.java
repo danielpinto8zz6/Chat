@@ -11,6 +11,12 @@ import chatroomlibrary.Utils;
 import server.controller.ServerController;
 import server.interfaces.IServerListener;
 
+/**
+ * <p>UDPListener class.</p>
+ *
+ * @author daniel
+ * @version $Id: $Id
+ */
 public class UDPListener implements Runnable {
     private IServerListener serverListener;
     private final static int BUFFER = 4096;
@@ -18,12 +24,20 @@ public class UDPListener implements Runnable {
     DatagramSocket socket = null;
     private ServerController controller;
 
+    /**
+     * <p>Constructor for UDPListener.</p>
+     *
+     * @param controller a {@link server.controller.ServerController} object.
+     * @param port a int.
+     * @throws java.net.SocketException if any.
+     */
     public UDPListener(ServerController controller, int port) throws SocketException {
         this.socket = new DatagramSocket(port);
         serverListener = controller;
         this.controller = controller;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void run() {
         byte[] buffer = new byte[BUFFER];

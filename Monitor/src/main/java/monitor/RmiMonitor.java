@@ -30,6 +30,7 @@ public class RmiMonitor extends UnicastRemoteObject implements UserListener {
     @Override
     public void sharedFilesChanged(DefaultMutableTreeNode files) throws RemoteException {
         System.out.println("Files : " + files.toString());
+        @SuppressWarnings("unchecked")
         Enumeration<DefaultMutableTreeNode> en = files.preorderEnumeration();
         while (en.hasMoreElements()) {
             DefaultMutableTreeNode node = en.nextElement();

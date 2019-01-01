@@ -3,6 +3,12 @@ package chatroomlibrary;
 import java.io.File;
 import java.io.Serializable;
 
+/**
+ * <p>FileInfo class.</p>
+ *
+ * @author daniel
+ * @version $Id: $Id
+ */
 public class FileInfo implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -12,6 +18,11 @@ public class FileInfo implements Serializable {
     private boolean isDirectory;
     private String owner;
 
+    /**
+     * <p>Constructor for FileInfo.</p>
+     *
+     * @param file a {@link java.io.File} object.
+     */
     public FileInfo(File file) {
         path = file.getAbsolutePath();
         name = file.getName();
@@ -20,6 +31,8 @@ public class FileInfo implements Serializable {
     }
 
     /**
+     * <p>Getter for the field <code>owner</code>.</p>
+     *
      * @return the owner
      */
     public String getOwner() {
@@ -27,6 +40,8 @@ public class FileInfo implements Serializable {
     }
 
     /**
+     * <p>Setter for the field <code>owner</code>.</p>
+     *
      * @param owner the owner to set
      */
     public void setOwner(String owner) {
@@ -34,6 +49,8 @@ public class FileInfo implements Serializable {
     }
 
     /**
+     * <p>isDirectory.</p>
+     *
      * @return the isDirectory
      */
     public boolean isDirectory() {
@@ -41,6 +58,8 @@ public class FileInfo implements Serializable {
     }
 
     /**
+     * <p>setDirectory.</p>
+     *
      * @param isDirectory the isDirectory to set
      */
     public void setDirectory(boolean isDirectory) {
@@ -48,6 +67,8 @@ public class FileInfo implements Serializable {
     }
 
     /**
+     * <p>Getter for the field <code>size</code>.</p>
+     *
      * @return the size
      */
     public int getSize() {
@@ -55,6 +76,8 @@ public class FileInfo implements Serializable {
     }
 
     /**
+     * <p>Setter for the field <code>size</code>.</p>
+     *
      * @param size the size to set
      */
     public void setSize(int size) {
@@ -62,6 +85,8 @@ public class FileInfo implements Serializable {
     }
 
     /**
+     * <p>Getter for the field <code>name</code>.</p>
+     *
      * @return the name
      */
     public String getName() {
@@ -69,6 +94,8 @@ public class FileInfo implements Serializable {
     }
 
     /**
+     * <p>Setter for the field <code>name</code>.</p>
+     *
      * @param name the name to set
      */
     public void setName(String name) {
@@ -76,6 +103,8 @@ public class FileInfo implements Serializable {
     }
 
     /**
+     * <p>Getter for the field <code>path</code>.</p>
+     *
      * @return the path
      */
     public String getPath() {
@@ -83,12 +112,15 @@ public class FileInfo implements Serializable {
     }
 
     /**
+     * <p>Setter for the field <code>path</code>.</p>
+     *
      * @param path the path to set
      */
     public void setPath(String path) {
         this.path = path;
     }
 
+    /** {@inheritDoc} */
     @Override
     public String toString() {
         if (name.equals("")) {

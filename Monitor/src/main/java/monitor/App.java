@@ -14,8 +14,6 @@ import chatroomlibrary.rmi.UserSensor;
  * @author daniel
  */
 class App {
-    private UserSensor sensor;
-
     /**
      * <p>
      * main.

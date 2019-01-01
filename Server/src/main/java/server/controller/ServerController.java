@@ -241,7 +241,7 @@ public class ServerController extends Observable implements IServerListener, ICl
 
     @Override
     public synchronized void notifyFilesList() {
-        List<User> users = getLogggedUsers();
+        // List<User> users = getLogggedUsers();
         DefaultMutableTreeNode files = getFiles();
         Message message = new Message(Message.Type.BROADCAST_FILES, model.getServerDetails(), files);
 

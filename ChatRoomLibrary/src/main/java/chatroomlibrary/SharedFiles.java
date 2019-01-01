@@ -6,10 +6,22 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import chatroomlibrary.FileInfo;
 
+/**
+ * <p>SharedFiles class.</p>
+ *
+ * @author daniel
+ * @version $Id: $Id
+ */
 public class SharedFiles extends DefaultMutableTreeNode {
     private static final long serialVersionUID = 1L;
     private String owner;
 
+    /**
+     * <p>Constructor for SharedFiles.</p>
+     *
+     * @param rootFolder a {@link java.io.File} object.
+     * @param owner a {@link java.lang.String} object.
+     */
     public SharedFiles(File rootFolder, String owner) {
         super(rootFolder.getName());
         this.owner = owner;

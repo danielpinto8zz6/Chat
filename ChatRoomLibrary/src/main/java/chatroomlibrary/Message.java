@@ -26,6 +26,7 @@ public class Message implements Serializable {
      *
      * @param user a {@link chatroomlibrary.User} object.
      * @param data a {@link java.lang.String} object.
+     * @param type a {@link chatroomlibrary.Message.Type} object.
      */
     public Message(Type type, User user, Object data) {
         this.time = LocalDateTime.now();
@@ -42,6 +43,7 @@ public class Message implements Serializable {
      * @param user a {@link chatroomlibrary.User} object.
      * @param data a {@link java.lang.String} object.
      * @param to   a {@link java.lang.String} object.
+     * @param type a {@link chatroomlibrary.Message.Type} object.
      */
     public Message(Type type, User user, Object data, String to) {
         this.time = LocalDateTime.now();
@@ -51,21 +53,39 @@ public class Message implements Serializable {
         this.to = to;
     }
 
+    /**
+     * <p>Constructor for Message.</p>
+     *
+     * @param user a {@link chatroomlibrary.User} object.
+     */
     public Message(User user) {
         this.time = LocalDateTime.now();
         this.user = user;
     }
 
+    /**
+     * <p>Constructor for Message.</p>
+     *
+     * @param type a {@link chatroomlibrary.Message.Type} object.
+     */
     public Message(Type type) {
         this.type = type;
     }
 
+    /**
+     * <p>Constructor for Message.</p>
+     *
+     * @param type a {@link chatroomlibrary.Message.Type} object.
+     * @param user a {@link chatroomlibrary.User} object.
+     */
     public Message(Type type, User user) {
         this.type = type;
         this.user = user;
     }
 
     /**
+     * <p>Getter for the field <code>type</code>.</p>
+     *
      * @return the type
      */
     public Type getType() {
@@ -73,6 +93,8 @@ public class Message implements Serializable {
     }
 
     /**
+     * <p>Setter for the field <code>type</code>.</p>
+     *
      * @param type the type to set
      */
     public void setType(Type type) {
@@ -80,6 +102,8 @@ public class Message implements Serializable {
     }
 
     /**
+     * <p>Getter for the field <code>data</code>.</p>
+     *
      * @return the data
      */
     public Object getData() {
@@ -87,6 +111,8 @@ public class Message implements Serializable {
     }
 
     /**
+     * <p>Setter for the field <code>data</code>.</p>
+     *
      * @param data the data to set
      */
     public void setData(Object data) {

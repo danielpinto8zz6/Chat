@@ -16,10 +16,8 @@ import server.controller.ServerController;
  */
 public class ServerView extends javax.swing.JFrame implements Observer {
     private static final long serialVersionUID = 1L;
-    private ServerController controller;
 
     public ServerView(ServerController controller) {
-        this.controller = controller;
         controller.addObserver(this);
     }
 

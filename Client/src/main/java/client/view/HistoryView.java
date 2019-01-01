@@ -22,15 +22,12 @@ public class HistoryView extends javax.swing.JPanel implements Observer {
 
     private static final long serialVersionUID = 1L;
 
-    private ChatController controller;
-
     /**
      * Creates new form HistoryView
      * 
      * @param controller
      */
     public HistoryView(ChatController controller) {
-        this.controller = controller;
         controller.addObserver(this);
 
         initComponents();

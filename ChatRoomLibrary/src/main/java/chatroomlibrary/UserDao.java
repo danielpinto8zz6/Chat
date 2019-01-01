@@ -29,8 +29,10 @@ import java.util.List;
  * unlimited amount of iterations with all supported languages for each database
  * table you are paying for.) Send mail to "Tuomo.Lukka@iki.fi" for more
  * information. Thank you!
+ *
+ * @author daniel
+ * @version $Id: $Id
  */
-
 public class UserDao {
 
     /**
@@ -39,6 +41,8 @@ public class UserDao {
      * sometimes the programmer may want to extend also the valueObject and then
      * this method can be overrided to return extended valueObject. NOTE: If you
      * extend the valueObject class, make sure to override the clone() method in it!
+     *
+     * @return a {@link chatroomlibrary.User} object.
      */
     public static User createValueObject() {
         return new User();
@@ -50,6 +54,12 @@ public class UserDao {
      * convenience method for the real load-method which accepts the valueObject as
      * a parameter. Returned valueObject will be created using the
      * createValueObject() method.
+     *
+     * @param conn a {@link java.sql.Connection} object.
+     * @param username a {@link java.lang.String} object.
+     * @return a {@link chatroomlibrary.User} object.
+     * @throws chatroomlibrary.NotFoundException if any.
+     * @throws java.sql.SQLException if any.
      */
     public static User getObject(Connection conn, String username) throws NotFoundException, SQLException {
 
@@ -70,6 +80,8 @@ public class UserDao {
      * @param conn        This method requires working database connection.
      * @param valueObject This parameter contains the class instance to be loaded.
      *                    Primary-key field must be set for this to work properly.
+     * @throws chatroomlibrary.NotFoundException if any.
+     * @throws java.sql.SQLException if any.
      */
     public static void load(Connection conn, User valueObject) throws NotFoundException, SQLException {
 
@@ -100,6 +112,8 @@ public class UserDao {
      * when target tables have only small amounts of data.
      *
      * @param conn This method requires working database connection.
+     * @return a {@link java.util.List} object.
+     * @throws java.sql.SQLException if any.
      */
     public static List<User> loadAll(Connection conn) throws SQLException {
 
@@ -109,6 +123,14 @@ public class UserDao {
         return searchResults;
     }
 
+    /**
+     * <p>loadAll.</p>
+     *
+     * @param conn a {@link java.sql.Connection} object.
+     * @param selectionArgs a {@link java.lang.String} object.
+     * @return a {@link java.util.List} object.
+     * @throws java.sql.SQLException if any.
+     */
     public static List<User> loadAll(Connection conn, String selectionArgs) throws SQLException {
 
         String sql = "SELECT * FROM users " + selectionArgs;
@@ -129,6 +151,7 @@ public class UserDao {
      * @param valueObject This parameter contains the class instance to be created.
      *                    If automatic surrogate-keys are not used the Primary-key
      *                    field must be set for this to work properly.
+     * @throws java.sql.SQLException if any.
      */
     public static synchronized void create(Connection conn, User valueObject) throws SQLException {
 
@@ -171,6 +194,8 @@ public class UserDao {
      * @param conn        This method requires working database connection.
      * @param valueObject This parameter contains the class instance to be saved.
      *                    Primary-key field must be set for this to work properly.
+     * @throws chatroomlibrary.NotFoundException if any.
+     * @throws java.sql.SQLException if any.
      */
     public static void save(Connection conn, User valueObject) throws NotFoundException, SQLException {
 
@@ -216,6 +241,8 @@ public class UserDao {
      * @param conn        This method requires working database connection.
      * @param valueObject This parameter contains the class instance to be deleted.
      *                    Primary-key field must be set for this to work properly.
+     * @throws chatroomlibrary.NotFoundException if any.
+     * @throws java.sql.SQLException if any.
      */
     public static void delete(Connection conn, User valueObject) throws NotFoundException, SQLException {
 
@@ -258,6 +285,7 @@ public class UserDao {
      * with different DB backends.)
      *
      * @param conn This method requires working database connection.
+     * @throws java.sql.SQLException if any.
      */
     public static void deleteAll(Connection conn) throws SQLException {
 
@@ -281,6 +309,8 @@ public class UserDao {
      * many rows.
      *
      * @param conn This method requires working database connection.
+     * @return a int.
+     * @throws java.sql.SQLException if any.
      */
     public static int countAll(Connection conn) throws SQLException {
 
@@ -316,6 +346,8 @@ public class UserDao {
      * @param conn        This method requires working database connection.
      * @param valueObject This parameter contains the class instance where search
      *                    will be based. Primary-key field should not be set.
+     * @return a {@link java.util.List} object.
+     * @throws java.sql.SQLException if any.
      */
     public static List<User> searchMatching(Connection conn, User valueObject) throws SQLException {
 
@@ -394,6 +426,8 @@ public class UserDao {
      *
      * @param conn This method requires working database connection.
      * @param stmt This parameter contains the SQL statement to be excuted.
+     * @return a int.
+     * @throws java.sql.SQLException if any.
      */
     protected static int databaseUpdate(Connection conn, PreparedStatement stmt) throws SQLException {
 
@@ -411,6 +445,8 @@ public class UserDao {
      * @param conn        This method requires working database connection.
      * @param stmt        This parameter contains the SQL statement to be excuted.
      * @param valueObject Class-instance where resulting data will be stored.
+     * @throws chatroomlibrary.NotFoundException if any.
+     * @throws java.sql.SQLException if any.
      */
     protected static void singleQuery(Connection conn, PreparedStatement stmt, User valueObject)
             throws NotFoundException, SQLException {
@@ -450,6 +486,8 @@ public class UserDao {
      *
      * @param conn This method requires working database connection.
      * @param stmt This parameter contains the SQL statement to be excuted.
+     * @return a {@link java.util.List} object.
+     * @throws java.sql.SQLException if any.
      */
     protected static List<User> listQuery(Connection conn, PreparedStatement stmt) throws SQLException {
 

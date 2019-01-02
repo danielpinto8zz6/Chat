@@ -9,7 +9,9 @@ import chatroomlibrary.Message;
 import chatroomlibrary.Utils;
 
 /**
- * <p>UDPMessageSender class.</p>
+ * <p>
+ * UDPMessageSender class.
+ * </p>
  *
  * @author daniel
  * @version $Id: $Id
@@ -18,7 +20,9 @@ public class UDPMessageSender {
     private DatagramSocket socket;
 
     /**
-     * <p>Constructor for UDPMessageSender.</p>
+     * <p>
+     * Constructor for UDPMessageSender.
+     * </p>
      */
     public UDPMessageSender() {
         try {
@@ -29,11 +33,13 @@ public class UDPMessageSender {
     }
 
     /**
-     * <p>sendMessage.</p>
+     * <p>
+     * sendMessage.
+     * </p>
      *
-     * @param message a {@link chatroomlibrary.Message} object.
+     * @param message  a {@link chatroomlibrary.Message} object.
      * @param hostname a {@link java.lang.String} object.
-     * @param port a int.
+     * @param port     a int.
      * @throws java.lang.Exception if any.
      */
     public void sendMessage(Message message, String hostname, int port) throws Exception {
@@ -41,6 +47,22 @@ public class UDPMessageSender {
         buffer = Utils.convertToBytes(message);
 
         InetAddress address = InetAddress.getByName(hostname);
+        DatagramPacket packet = new DatagramPacket(buffer, buffer.length, address, port);
+        socket.send(packet);
+    }
+
+    /**
+     * <p>sendMessage.</p>
+     *
+     * @param message a {@link chatroomlibrary.Message} object.
+     * @param address a {@link java.net.InetAddress} object.
+     * @param port a int.
+     * @throws java.lang.Exception if any.
+     */
+    public void sendMessage(Message message, InetAddress address, int port) throws Exception {
+        byte buffer[];
+        buffer = Utils.convertToBytes(message);
+
         DatagramPacket packet = new DatagramPacket(buffer, buffer.length, address, port);
         socket.send(packet);
     }

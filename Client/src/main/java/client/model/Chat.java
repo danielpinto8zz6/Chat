@@ -30,6 +30,8 @@ public class Chat {
 
     private boolean running = true;
 
+    private File sharedFolder;
+
     /**
      * <p>
      * Constructor for Chat.
@@ -44,7 +46,27 @@ public class Chat {
     }
 
     /**
-     * <p>isRunning.</p>
+     * <p>Getter for the field <code>sharedFolder</code>.</p>
+     *
+     * @return the sharedFolder
+     */
+    public File getSharedFolder() {
+        return sharedFolder;
+    }
+
+    /**
+     * <p>Setter for the field <code>sharedFolder</code>.</p>
+     *
+     * @param sharedFolder the sharedFolder to set
+     */
+    public void setSharedFolder(File sharedFolder) {
+        this.sharedFolder = sharedFolder;
+    }
+
+    /**
+     * <p>
+     * isRunning.
+     * </p>
      *
      * @return the running
      */

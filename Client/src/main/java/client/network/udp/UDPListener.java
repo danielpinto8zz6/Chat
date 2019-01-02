@@ -16,7 +16,9 @@ import chatroomlibrary.interfaces.IClientListener;
 import client.controller.ChatController;
 
 /**
- * <p>UDPListener class.</p>
+ * <p>
+ * UDPListener class.
+ * </p>
  *
  * @author daniel
  * @version $Id: $Id
@@ -29,10 +31,12 @@ public class UDPListener implements Runnable {
     private ChatController controller;
 
     /**
-     * <p>Constructor for UDPListener.</p>
+     * <p>
+     * Constructor for UDPListener.
+     * </p>
      *
      * @param controller a {@link client.controller.ChatController} object.
-     * @param port a int.
+     * @param port       a int.
      * @throws java.net.SocketException if any.
      */
     public UDPListener(ChatController controller, int port) throws SocketException {
@@ -92,10 +96,8 @@ public class UDPListener implements Runnable {
                         clientListener.onStartTransfer(message);
                         break;
                     case KEEP_ALIVE:
-                        Message m = new Message(Message.Type.IM_ALIVE, controller.getUser());
-                        controller.getCommunication().sendUDPMessage(m, socket.getInetAddress().getHostAddress(),
-                                socket.getPort());
-                        System.out.println("Keep alive");
+                        Message m = new Message(Message.Type.ACK, controller.getUser());
+                        controller.getCommunication().sendUDPMessage(m, packet.getAddress(), packet.getPort());
                         break;
                     default:
                         break;

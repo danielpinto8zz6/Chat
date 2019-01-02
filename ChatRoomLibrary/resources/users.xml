@@ -30,9 +30,6 @@
       <dbColumn PK="false" colType="String" colName="address" varName="adress" 
       automatic="false" valueSource="" indexed="false" colLength="255" orderLevel="0" orderType="ASC" />
 
-      <dbColumn PK="false" colType="String" colName="files" varName="files" 
-      automatic="false" valueSource="" indexed="false" colLength="255" orderLevel="0" orderType="ASC" />
-
       <dbColumn PK="false" colType="Int" colName="failures" varName="failures" 
       automatic="false" valueSource="" indexed="false" colLength="10" orderLevel="0" orderType="ASC" />
 

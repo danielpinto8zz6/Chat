@@ -4,6 +4,7 @@ import server.controller.ServerController;
 import server.database.DbHelper;
 import server.model.Server;
 import server.network.CommunicationHandler;
+import server.network.KeepAlive;
 import server.view.ServerView;
 
 /**
@@ -35,12 +36,15 @@ class App {
         handler.startTCP();
         handler.registerRmiService();
 
+        new Thread(new KeepAlive(controller)).start();
+
         new ServerView(controller);
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
                 controller.exit();
+                DbHelper.close();
             }
         });
 

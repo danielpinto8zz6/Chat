@@ -33,6 +33,8 @@ public class ChatController extends Observable implements IClientListener {
 
     public boolean logged = false;
 
+    // private Thread monitor;
+
     /**
      * <p>
      * Constructor for ChatController.
@@ -107,7 +109,7 @@ public class ChatController extends Observable implements IClientListener {
      * sendFile.
      * </p>
      *
-     * @param file a {@link java.io.File} object.
+     * @param file     a {@link java.io.File} object.
      * @param username a {@link java.lang.String} object.
      */
     public void sendFile(File file, String username) {
@@ -139,8 +141,8 @@ public class ChatController extends Observable implements IClientListener {
      *
      * </p>
      *
-     * @param path a {@link java.lang.String} object.
-     * @param user a {@link chatroomlibrary.User} object.
+     * @param path     a {@link java.lang.String} object.
+     * @param user     a {@link chatroomlibrary.User} object.
      * @param fileInfo a {@link chatroomlibrary.FileInfo} object.
      */
     public void acceptFile(String path, User user, FileInfo fileInfo) {
@@ -173,7 +175,9 @@ public class ChatController extends Observable implements IClientListener {
     }
 
     /**
-     * <p>getUsernames.</p>
+     * <p>
+     * getUsernames.
+     * </p>
      *
      * @return an array of {@link java.lang.String} objects.
      */
@@ -189,7 +193,9 @@ public class ChatController extends Observable implements IClientListener {
     }
 
     /**
-     * <p>fileSent.</p>
+     * <p>
+     * fileSent.
+     * </p>
      *
      * @param filename a {@link java.lang.String} object.
      * @param receiver a {@link java.lang.String} object.
@@ -202,10 +208,12 @@ public class ChatController extends Observable implements IClientListener {
     }
 
     /**
-     * <p>fileReceived.</p>
+     * <p>
+     * fileReceived.
+     * </p>
      *
      * @param filename a {@link java.lang.String} object.
-     * @param sender a {@link java.lang.String} object.
+     * @param sender   a {@link java.lang.String} object.
      */
     public void fileReceived(String filename, String sender) {
         String username = model.getUser().getUsername();
@@ -215,7 +223,9 @@ public class ChatController extends Observable implements IClientListener {
     }
 
     /**
-     * <p>getFiles.</p>
+     * <p>
+     * getFiles.
+     * </p>
      *
      * @return a {@link javax.swing.tree.DefaultMutableTreeNode} object.
      */
@@ -224,7 +234,9 @@ public class ChatController extends Observable implements IClientListener {
     }
 
     /**
-     * <p>setSharedFolder.</p>
+     * <p>
+     * setSharedFolder.
+     * </p>
      *
      * @param file a {@link java.io.File} object.
      */
@@ -233,17 +245,40 @@ public class ChatController extends Observable implements IClientListener {
 
             @Override
             public void run() {
+                model.setSharedFolder(file);
+
                 SharedFiles sharedFiles = new SharedFiles(file, model.getUser().getUsername());
 
                 if (logged)
                     sendSharedFiles(sharedFiles);
+
+                // monitor = new Thread(new Runnable() {
+                //     @Override
+                //     public void run() {
+                //         try {
+                //             MonitorDirectory.watch(ChatController.this, file.toPath());
+                //         } catch (IOException | InterruptedException e) {
+                //             e.printStackTrace();
+                //         }
+                //     }
+                // });
+                // monitor.start();
             }
         });
         thread.start();
     }
 
     /**
-     * <p>setSaveLocation.</p>
+     * <p>updateSharedFolder.</p>
+     */
+    public void  updateSharedFolder() {
+        setSharedFolder(model.getSharedFolder());
+    }
+
+    /**
+     * <p>
+     * setSaveLocation.
+     * </p>
      *
      * @param file a {@link java.io.File} object.
      */
@@ -258,7 +293,9 @@ public class ChatController extends Observable implements IClientListener {
     }
 
     /**
-     * <p>fileSend.</p>
+     * <p>
+     * fileSend.
+     * </p>
      *
      * @param file a {@link java.io.File} object.
      * @param user a {@link chatroomlibrary.User} object.
@@ -271,7 +308,9 @@ public class ChatController extends Observable implements IClientListener {
     }
 
     /**
-     * <p>requestFile.</p>
+     * <p>
+     * requestFile.
+     * </p>
      *
      * @param fileInfo a {@link chatroomlibrary.FileInfo} object.
      */
@@ -286,7 +325,9 @@ public class ChatController extends Observable implements IClientListener {
     }
 
     /**
-     * <p>acceptTransfer.</p>
+     * <p>
+     * acceptTransfer.
+     * </p>
      *
      * @param username a {@link java.lang.String} object.
      * @param fileInfo a {@link chatroomlibrary.FileInfo} object.
@@ -298,7 +339,9 @@ public class ChatController extends Observable implements IClientListener {
     }
 
     /**
-     * <p>createConnection.</p>
+     * <p>
+     * createConnection.
+     * </p>
      *
      * @param user a {@link chatroomlibrary.User} object.
      * @param type a {@link chatroomlibrary.Message.Type} object.
@@ -309,14 +352,18 @@ public class ChatController extends Observable implements IClientListener {
     }
 
     /**
-     * <p>close.</p>
+     * <p>
+     * close.
+     * </p>
      */
     public void close() {
         client.disconnect();
     }
 
     /**
-     * <p>getAdress.</p>
+     * <p>
+     * getAdress.
+     * </p>
      *
      * @return a {@link java.lang.String} object.
      */
@@ -412,7 +459,9 @@ public class ChatController extends Observable implements IClientListener {
     }
 
     /**
-     * <p>getUdpPort.</p>
+     * <p>
+     * getUdpPort.
+     * </p>
      *
      * @return a int.
      */
@@ -421,7 +470,9 @@ public class ChatController extends Observable implements IClientListener {
     }
 
     /**
-     * <p>isRunning.</p>
+     * <p>
+     * isRunning.
+     * </p>
      *
      * @return a boolean.
      */
@@ -430,7 +481,9 @@ public class ChatController extends Observable implements IClientListener {
     }
 
     /**
-     * <p>getSaveLocation.</p>
+     * <p>
+     * getSaveLocation.
+     * </p>
      *
      * @return a {@link java.io.File} object.
      */
@@ -439,7 +492,9 @@ public class ChatController extends Observable implements IClientListener {
     }
 
     /**
-     * <p>getUser.</p>
+     * <p>
+     * getUser.
+     * </p>
      *
      * @return a {@link chatroomlibrary.User} object.
      */
@@ -448,7 +503,9 @@ public class ChatController extends Observable implements IClientListener {
     }
 
     /**
-     * <p>getCommunication.</p>
+     * <p>
+     * getCommunication.
+     * </p>
      *
      * @return a {@link client.network.CommunicationHandler} object.
      */
